@@ -23,6 +23,7 @@ const EmojiRole = require("./EmojiRole");
 const Courses = require("./Courses");
 const Bus = require("./Bus");
 const Big = require("./Big");
+const EmojiTop = require("./EmojiTop");
 const StringUtil = require("../utils/StringUtil");
 const PREFIX = "-";
 
@@ -38,6 +39,7 @@ class CommandRegistry {
             this._registry.push(new Courses());
             this._registry.push(new Bus());
             this._registry.push(new Big());
+            this._registry.push(new EmojiTop());
         }
     }
 

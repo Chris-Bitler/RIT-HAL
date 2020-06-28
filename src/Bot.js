@@ -21,6 +21,7 @@ const CommandRegistryImpl = require("./commands/CommandRegistry");
 const CommandRegistry = new CommandRegistryImpl();
 const ModProcessor = require("./processors/ModProcessor");
 const EmojiRoleProcessor = require("./processors/EmojiRoleProcessor");
+const EmojiProcessor = require("./processors/EmojiProcessor");
 const BusProcessor = require("./processors/BusProcessor");
 const FoodProcessor = require("./processors/FoodProcessor");
 const Env = require("./utils/Env");
@@ -56,6 +57,7 @@ client.on("message", message => {
         });
 
         CommandRegistry.runCommands(client, message);
+        EmojiProcessor.logEmojis(message);
     }
 });
 
