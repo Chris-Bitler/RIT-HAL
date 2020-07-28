@@ -1,0 +1,21 @@
+{
+  "name": "AntiServerBot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "hal": "node src/Bot.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.1",
+    "cheerio": "^1.0.0-rc.3",
+    "discord.js": "12.2.0",
+    "moment": "^2.24.0",
+    "moment-timezone": "^0.5.27",
+    "sqlite3": "^4.1.0"
+  }
+}
