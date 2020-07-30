@@ -20,7 +20,7 @@ export function mergeArgs(start: number, args: string[]): string {
 }
 
 export function removeEmptyArgs(args: string[]): string[] {
-    const toDelete = [];
+    const toDelete: number[] = [];
     let index = 0;
     args.forEach((arg: string) => {
         if (arg.trim() === "") {

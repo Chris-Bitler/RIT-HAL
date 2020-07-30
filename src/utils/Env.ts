@@ -15,9 +15,13 @@
  * along with RIT-HAL.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+interface env {
+    [key: string]: string
+}
+
 import fs  = require("fs");
 import os = require("os");
-const env: object = {};
+const env: env = {};
 const lineEnd: string = os.EOL;
 
 export function readInEnv(): void {
