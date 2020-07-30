@@ -4,3 +4,4 @@ bot
 hal.zip
 *.iml
 node_modules
+built/
