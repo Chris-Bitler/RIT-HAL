@@ -40,7 +40,11 @@ class Pin extends Command {
             embed.addField("Pinned by", pinningMember.displayName);
             if (message.attachments.size > 0) {
               message.attachments.forEach((attachment) => {
-                embed.addField("Attachment", "[" + attachment.name + "](" + attachment.url + ")");
+                if (!this.isImage(attachment)) {
+                  embed.addField("Attachment", "[" + attachment.name + "](" + attachment.url + ")");
+                } else {
+                  embed.setImage(attachment.url);
+                }
               })
             }
             starChannel.send(embed);
@@ -62,6 +66,10 @@ class Pin extends Command {
 
   getRequiredPermission() {
     return Discord.Permissions.FLAGS.KICK_MEMBERS
+  }
+
+  isImage(filename) {
+    return filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg")
   }
 }
 
