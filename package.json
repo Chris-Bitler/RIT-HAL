@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "hal": "node src/Bot.ts"
+    "hal": "node src/Bot.ts",
+    "lint-ts": "eslint . --ext ts",
+    "lint-js": "eslint . --ext js"
   },
   "keywords": [],
   "author": "",
@@ -26,6 +28,13 @@
     "reflect-metadata": "^0.1.13",
     "sequelize": "^5.22.3",
     "sequelize-typescript": "^1.1.0",
-    "sqlite3": "^4.1.0"
+    "sqlite3": "^4.1.0",
+    "typescript": "^3.9.7"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^3.7.1",
+    "@typescript-eslint/parser": "^3.7.1",
+    "eslint": "^7.5.0",
+    "prettier": "2.0.5"
   }
 }

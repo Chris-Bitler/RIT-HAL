@@ -17,11 +17,11 @@
 
 import axios, {AxiosInstance} from "axios";
 import {ArrivalResponseContainer, BusRoute, BusRoutes, ArrivalTimes, Stop} from "../types/Bus";
-const moment = require("moment");
+import * as moment from "moment";
 
 let routes: BusRoutes = {};
 const AGENCY_ID = 643; // TODO: Make config changeable
-let instance: AxiosInstance = axios.create({
+const instance: AxiosInstance = axios.create({
     baseURL: "https://transloc-api-1-2.p.rapidapi.com",
     headers: {
         "x-rapidapi-host": "transloc-api-1-2.p.rapidapi.com",
