@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export function getEmojiExtension(id: string): Promise<String> {
+export function getEmojiExtension(id: string): Promise<string> {
     const gifUrl: string = `https://cdn.discordapp.com/emojis/${id}.gif`;
     const pngUrl: string = `https://cdn.discordapp.com/emojis/${id}.png`;
     return new Promise((resolve, reject) => {

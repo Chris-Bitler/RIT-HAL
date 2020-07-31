@@ -5,18 +5,27 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "hal": "node src/Bot.js"
+    "hal": "node src/Bot.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/bluebird": "^3.5.32",
+    "@types/node": "^14.0.27",
+    "@types/validator": "^13.1.0",
     "@types/ws": "^7.2.6",
     "axios": "^0.19.1",
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "12.2.0",
+    "dotenv": "^8.2.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
+    "pg": "^8.3.0",
+    "pg-hstore": "^2.3.3",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^5.22.3",
+    "sequelize-typescript": "^1.1.0",
     "sqlite3": "^4.1.0"
   }
 }
