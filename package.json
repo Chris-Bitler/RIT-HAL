@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/bluebird": "^3.5.32",
+    "@types/memoizee": "^0.4.4",
     "@types/node": "^14.0.27",
     "@types/validator": "^13.1.0",
     "@types/ws": "^7.2.6",
@@ -21,6 +22,7 @@
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "12.2.0",
     "dotenv": "^8.2.0",
+    "memoizee": "^0.4.14",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.27",
     "pg": "^8.3.0",
