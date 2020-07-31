@@ -1,22 +1,8 @@
-/**
- * This file is part of RIT-HAL.
- *
- * RIT-HAL is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * RIT-HAL is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with RIT-HAL.  If not, see <https://www.gnu.org/licenses/>.
- */
 import {Client, DMChannel, Message} from "discord.js"
 import {Command} from "./Command";
 import {Big} from "./Big";
+import {Bus} from "./Bus"
+import {EmojiTop} from "./EmojiTop";
 
 const Melo = require("./Melo");
 const Food = require("./Food");
@@ -24,8 +10,6 @@ const FoodSpecials = require("./FoodSpecials");
 const Mod = require("./Mod");
 const EmojiRole = require("./EmojiRole");
 const Courses = require("./Courses");
-const Bus = require("./Bus");
-const EmojiTop = require("./EmojiTop");
 const Pin = require("./Pin");
 const StringUtil = require("../utils/StringUtil");
 const PREFIX = "-";
