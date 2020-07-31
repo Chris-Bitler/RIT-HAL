@@ -69,7 +69,7 @@ class Pin extends Command {
   }
 
   isImage(filename) {
-    return filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg")
+    return filename.endsWith(".png") || filename.endsWith(".jpg") || filename.endsWith(".jpeg") || filename.endsWith("gif")
   }
 }
 

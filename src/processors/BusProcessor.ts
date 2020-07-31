@@ -30,11 +30,11 @@ const instance: AxiosInstance = axios.create({
 });
 
 export async function refreshInformation() {
-    routes = await fetchRoutes(AGENCY_ID);
+    routes = await fetchRoutes();
     await updateStops(routes);
 }
 
-async function fetchRoutes(agencyId: number): Promise<BusRoutes> {
+async function fetchRoutes(): Promise<BusRoutes> {
     const response = (await instance.get("/routes.json", {
         params: {
             agencies: AGENCY_ID
@@ -59,39 +59,39 @@ async function updateStops(routes: BusRoutes) {
     });
 }
 
-export function getArrivalTimes(route: BusRoute): Promise<ArrivalTimes> {
-    return new Promise(async (resolve) => {
-        const stopInformation: ArrivalTimes = {};
-        const response = (await instance.get("/arrival-estimates.json", {
-            params: {
-                agencies: AGENCY_ID,
-                routes: route.route_id
-            }
-        })).data;
-        const arrivals: ArrivalResponseContainer[] = response.data.data;
-        arrivals.forEach(arrival => {
-            const stopName = routes[route.route_id].stops[arrival.stop_id].name;
-            if(!stopInformation[stopName]) {
-                stopInformation[stopName] = [];
-            }
-            arrival.arrivals.forEach(arrivalTime => {
-                stopInformation[stopName].push({
-                    time: moment(arrivalTime.arrival_at).toNow(true)
-                });
+export async function getArrivalTimes(route: BusRoute): Promise<ArrivalTimes> {
+    const stopInformation: ArrivalTimes = {};
+    const response = (await instance.get("/arrival-estimates.json", {
+        params: {
+            agencies: AGENCY_ID,
+            routes: route.route_id
+        }
+    })).data;
+    const arrivals: ArrivalResponseContainer[] = response.data.data;
+    arrivals.forEach(arrival => {
+        const stopName = routes[route.route_id].stops[arrival.stop_id].name;
+        if (!stopInformation[stopName]) {
+            stopInformation[stopName] = [];
+        }
+        arrival.arrivals.forEach(arrivalTime => {
+            stopInformation[stopName].push({
+                time: moment(arrivalTime.arrival_at).toNow(true)
             });
         });
-
-        resolve(stopInformation);
     });
+
+    return stopInformation;
 }
 
 export function getRouteByName(name: string): BusRoute|null {
-    const matchedRoutes = Object.values(routes).filter(route => route.long_name.toLowerCase() === name.toLowerCase());
+    const matchedRoutes = Object.values(routes)
+        .filter(route => route.long_name.toLowerCase() === name.toLowerCase());
     return matchedRoutes ? matchedRoutes[0] : null;
 }
 
 export function getRouteByNumber(number: number): BusRoute|null {
-    const filteredRoutes = Object.values(routes).filter(route => route.is_active);
+    const filteredRoutes = Object.values(routes)
+        .filter(route => route.is_active);
     return number-1 < filteredRoutes.length ? filteredRoutes[number-1] : null;
 }
 
@@ -108,11 +108,3 @@ function transformRoutes(routes: BusRoute[]): BusRoutes {
 
     return routeObj;
 }
-
-module.exports = {
-    refreshInformation,
-    getActiveRoutes,
-    getArrivalTimes,
-    getRouteByName,
-    getRouteByNumber
-};
