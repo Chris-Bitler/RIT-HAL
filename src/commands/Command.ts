@@ -1,4 +1,5 @@
 import { Client, Message, Permissions } from "discord.js"
+import {ConfigProperty} from "../models/ConfigProperty";
 
 export class Command {
     /**
@@ -27,10 +28,19 @@ export class Command {
         return Permissions.FLAGS.VIEW_CHANNEL;
     }
 
+    getConfigBase(): string {
+        return "base";
+    }
+
     /**
      * Get the list of channel IDs that this command can't be used in
      */
     async getProhibitedChannels(guildId: string): Promise<string[]> {
-        return [];
+        const prohibitedChannelsJSON = await ConfigProperty.getServerProperty(`${this.getConfigBase()}.prohibited`, guildId);
+        if (prohibitedChannelsJSON?.value) {
+            return (JSON.parse(prohibitedChannelsJSON.value) as string[])
+        } else {
+            return []
+        }
     }
 }

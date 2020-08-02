@@ -1,5 +1,5 @@
 import {Command} from "./Command";
-import {Client, Message, MessageAttachment, TextChannel} from "discord.js";
+import {Client, Message, MessageAttachment} from "discord.js";
 import {getEmojiExtension} from "../utils/EmojiUtil";
 
 export class Big extends Command {

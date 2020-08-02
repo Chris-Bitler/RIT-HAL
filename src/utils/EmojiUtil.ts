@@ -9,6 +9,6 @@ export function getEmojiExtension(id: string): Promise<string> {
             .then(() => resolve(gifUrl))
             .catch(() => axios.get(pngUrl))
             .then(() => resolve(pngUrl))
-            .catch(() => reject)
+            .catch(() => reject("no Valid emoji"))
     });
 }

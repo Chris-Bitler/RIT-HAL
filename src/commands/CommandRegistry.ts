@@ -16,7 +16,7 @@ const PREFIX = "-";
 
 class CommandRegistry {
     private registry: Command[] = [];
-    constructor(init: boolean = true) {
+    constructor(init = true) {
         if (init) {
             this.registry.push(new Melo());
             this.registry.push(new Food());
@@ -43,7 +43,7 @@ class CommandRegistry {
                     if (messageEvent.content.toLowerCase().startsWith(`${PREFIX}${command.getCommand()}`)) {
                         if (messageEvent.member && messageEvent.member.hasPermission(command.getRequiredPermission())) {
                             const args = messageEvent.content.trim().split(" ").slice(1);
-                            command.useCommand(client, messageEvent, StringUtil.removeEmptyArgs(args));
+                            await command.useCommand(client, messageEvent, StringUtil.removeEmptyArgs(args));
                         }
                     }
                 }

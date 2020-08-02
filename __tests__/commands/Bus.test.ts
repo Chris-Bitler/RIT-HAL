@@ -1,14 +1,7 @@
-import {
-    refreshInformation,
-    getActiveRoutes,
-    getRouteByNumber,
-    getArrivalTimes, getRouteByName
-} from "../../src/processors/BusProcessor";
 import {Client, Guild, GuildMember, GuildMemberManager, Message, MessageEmbed, TextChannel, User} from "discord.js";
 import {Bus} from "../../src/commands/Bus";
 import {BusRoute} from "../../src/types/Bus";
-import {ConfigProperty} from "../../src/models/ConfigProperty";
-
+import {BusProcessor} from "../../src/processors/BusProcessor";
 jest.mock("../../src/processors/BusProcessor");
 
 describe("Bus command tests", () => {
@@ -18,8 +11,9 @@ describe("Bus command tests", () => {
     let memberManager: GuildMemberManager;
     let user: User;
     let member: GuildMember;
-    let client: Client;
+    const client: Client = new Client();
     let mockSend: jest.MockedFunction<typeof channel.send>;
+    let busProcessor: BusProcessor;
     beforeEach(() => {
         const MockDiscord = jest.genMockFromModule<any>("discord.js");
         channel = new MockDiscord.TextChannel();
@@ -35,18 +29,23 @@ describe("Bus command tests", () => {
         member.hasPermission = jest.fn().mockReturnValue(true);
         (memberManager.resolve as jest.MockedFunction<typeof memberManager.resolve>).mockReturnValue(member);
         mockSend = channel.send as jest.MockedFunction<typeof channel.send>;
-        client = new Client();
+        delete BusProcessor.instance;
+        busProcessor = new BusProcessor();
+        BusProcessor.getInstance = jest.fn().mockReturnValue(busProcessor);
+    });
+    afterAll(() => {
+        client.destroy();
     });
 
     describe("forceRefresh tests", () => {
         beforeEach(() => {
-            (refreshInformation as jest.MockedFunction<typeof refreshInformation>).mockReset();
+            (busProcessor.refreshInformation as jest.MockedFunction<typeof busProcessor.refreshInformation>).mockReset();
         })
         test("forceRefresh should call refreshInformation and send message", async () => {
             const bus = new Bus();
             await bus.forceRefresh(channel, true);
 
-            expect(refreshInformation).toHaveBeenCalled();
+            expect(busProcessor.refreshInformation).toHaveBeenCalled();
             expect(channel.send).toHaveBeenCalled();
         });
 
@@ -54,7 +53,7 @@ describe("Bus command tests", () => {
             const bus = new Bus();
             await bus.useCommand(client, message, ["forcerefresh"]);
 
-            expect(refreshInformation).toHaveBeenCalled();
+            expect(busProcessor.refreshInformation).toHaveBeenCalled();
             expect(channel.send).toHaveBeenCalled();
         });
 
@@ -62,7 +61,7 @@ describe("Bus command tests", () => {
             const bus = new Bus();
             await bus.forceRefresh(channel, false);
 
-            expect(refreshInformation).not.toHaveBeenCalled();
+            expect(busProcessor.refreshInformation).not.toHaveBeenCalled();
             expect(channel.send).not.toHaveBeenCalled();
         });
     });
@@ -84,18 +83,18 @@ describe("Bus command tests", () => {
                     stops: {}
                 }
             ];
-            const mockGetActiveRoutes = getActiveRoutes as jest.MockedFunction<typeof getActiveRoutes>;
+            const mockGetActiveRoutes = busProcessor.getActiveRoutes as jest.MockedFunction<typeof busProcessor.getActiveRoutes>;
             mockGetActiveRoutes.mockReturnValue(busRoutes);
         });
-       test("should send routes embed", () => {
-           const bus = new Bus();
-           bus.showRoutes(client, message);
+        test("should send routes embed", () => {
+            const bus = new Bus();
+            bus.showRoutes(client, message);
 
-           const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
-           expect(resultingEmbed.title).toEqual("Active RIT Bus Routes");
-           expect(resultingEmbed.fields[0].value.includes("Test Route")).toBeTruthy();
-           expect(resultingEmbed.fields[0].value.includes("Test Route 2")).toBeTruthy();
-       });
+            const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
+            expect(resultingEmbed.title).toEqual("Active RIT Bus Routes");
+            expect(resultingEmbed.fields[0].value.includes("Test Route")).toBeTruthy();
+            expect(resultingEmbed.fields[0].value.includes("Test Route 2")).toBeTruthy();
+        });
         test("should send routes embed from useCommand", async () => {
             const bus = new Bus();
             await bus.useCommand(client, message, ["routes"]);
@@ -112,9 +111,9 @@ describe("Bus command tests", () => {
         let mockGetRouteByName;
         let mockGetArrivalTimes;
         beforeEach(() => {
-            mockGetRouteByNumber = getRouteByNumber as jest.MockedFunction<typeof getRouteByNumber>;
-            mockGetArrivalTimes = getArrivalTimes as jest.MockedFunction<typeof getArrivalTimes>;
-            mockGetRouteByName = getRouteByName as jest.MockedFunction<typeof getRouteByName>;
+            mockGetRouteByNumber = busProcessor.getRouteByNumber as jest.MockedFunction<typeof busProcessor.getRouteByNumber>;
+            mockGetArrivalTimes = busProcessor.getArrivalTimes as jest.MockedFunction<typeof busProcessor.getArrivalTimes>;
+            mockGetRouteByName = busProcessor.getRouteByName as jest.MockedFunction<typeof busProcessor.getRouteByName>;
             mockGetRouteByNumber.mockReturnValue({
                 is_active: true,
                 long_name: "Test Route 2",
@@ -146,19 +145,19 @@ describe("Bus command tests", () => {
             });
         })
         test("Not enough args should send related message", async () => {
-           const bus = new Bus();
-           await bus.showStops(client, message, []);
-           expect(mockSend).toHaveBeenCalledWith("`Incorrect Syntax. Try -bus arrivals [route]`");
+            const bus = new Bus();
+            await bus.showStops(client, message, []);
+            expect(mockSend).toHaveBeenCalledWith("`Incorrect Syntax. Try -bus arrivals [route]`");
         });
         test("No valid route should return error message", async () => {
-            mockGetRouteByNumber = getRouteByNumber as jest.MockedFunction<typeof getRouteByNumber>;
+            mockGetRouteByNumber = busProcessor.getRouteByNumber as jest.MockedFunction<typeof busProcessor.getRouteByNumber>;
             mockGetRouteByNumber.mockReturnValue(null);
             const bus = new Bus();
             await bus.showStops(client, message, ["arrivals", "-1"]);
             expect(mockSend).toHaveBeenCalledWith("Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route.");
         });
         test("No arrival times should return relevant embed", async () => {
-            mockGetArrivalTimes = getArrivalTimes as jest.MockedFunction<typeof getArrivalTimes>;
+            mockGetArrivalTimes = busProcessor.getArrivalTimes as jest.MockedFunction<typeof busProcessor.getArrivalTimes>;
             mockGetArrivalTimes.mockResolvedValue({});
             const bus = new Bus();
             await bus.showStops(client, message, ["arrivals", "0"]);
@@ -167,7 +166,7 @@ describe("Bus command tests", () => {
             expect(resultingEmbed.fields[0].name).toEqual("No results")
             expect(resultingEmbed.fields[0].value).toEqual("No arrival times retrieved. The bus may be stopped. Try again in a few minutes.");
         });
-        test("should get route by number from useCommand", async() => {
+        test("should get route by number from useCommand", async () => {
             const bus = new Bus();
             await bus.useCommand(client, message, ["arrivals", "0"]);
             const resultingEmbed: MessageEmbed = (channel.send as jest.MockedFunction<typeof channel.send>).mock.calls[0][0];
@@ -176,12 +175,12 @@ describe("Bus command tests", () => {
             expect(resultingEmbed.fields[0].value).toEqual("5 seconds");
         });
         test("should get route by number and send embed of travel times", async () => {
-           const bus = new Bus();
-           await bus.showStops(client, message, ["arrivals", "0"])
-           const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
-           expect(resultingEmbed.title).toEqual("Test Route 2 upcoming stops");
-           expect(resultingEmbed.fields[0].name).toEqual("Test Stop")
-           expect(resultingEmbed.fields[0].value).toEqual("5 seconds");
+            const bus = new Bus();
+            await bus.showStops(client, message, ["arrivals", "0"])
+            const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
+            expect(resultingEmbed.title).toEqual("Test Route 2 upcoming stops");
+            expect(resultingEmbed.fields[0].name).toEqual("Test Stop")
+            expect(resultingEmbed.fields[0].value).toEqual("5 seconds");
         });
 
         test("should get route by name and send embed of travel times", async () => {
@@ -191,23 +190,6 @@ describe("Bus command tests", () => {
             expect(resultingEmbed.title).toEqual("Test Route 2 upcoming stops");
             expect(resultingEmbed.fields[0].name).toEqual("Test Stop")
             expect(resultingEmbed.fields[0].value).toEqual("5 seconds");
-        });
-    });
-
-    describe("test getProhibitedChannels",  () => {
-        test("Should return prohibited channels", async () => {
-            ConfigProperty.findOne = jest.fn().mockReturnValue({
-                value: "[\"1\"]"
-            });
-            const bus = new Bus();
-            const channels: string[] = await bus.getProhibitedChannels("1");
-            expect(channels).toEqual(['1']);
-        });
-        test("Should return empty array if no result from findOne", async () => {
-            ConfigProperty.findOne = jest.fn().mockReturnValue(null);
-            const bus = new Bus();
-            const channels: string[] = await bus.getProhibitedChannels("1");
-            expect(channels).toEqual([]);
         });
     });
 
@@ -227,4 +209,8 @@ describe("Bus command tests", () => {
     test("getCommand", () => {
         expect(new Bus().getCommand()).toEqual("bus");
     });
+
+    test("getBaseConfig", () => {
+        expect(new Bus().getConfigBase()).toEqual("bus");
+    })
 });

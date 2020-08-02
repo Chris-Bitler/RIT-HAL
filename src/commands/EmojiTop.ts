@@ -1,6 +1,5 @@
 import {Command} from "./Command";
 import {getTopEmojis} from "../processors/EmojiProcessor";
-import { ConfigProperty } from "../models/ConfigProperty";
 import {Message, Client} from "discord.js";
 
 // TODO: Configurable
@@ -15,12 +14,7 @@ export class EmojiTop extends Command {
         return "emojitop";
     }
 
-    async getProhibitedChannels(guildId: string): Promise<string[]> {
-        const prohibitedChannelsJSON = await ConfigProperty.getServerProperty("bus.prohibited", guildId);
-        if (prohibitedChannelsJSON?.value) {
-            return (JSON.parse(prohibitedChannelsJSON?.value) as string[])
-        } else {
-            return []
-        }
+    getConfigBase(): string {
+        return "emojitop"
     }
 }

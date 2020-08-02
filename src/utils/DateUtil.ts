@@ -1,11 +1,3 @@
-interface DateMatches {
-    years: number | null,
-    months: number | null,
-    days: number | null,
-    hours: number | null,
-    minutes: number | null,
-    seconds: number | null
-}
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
@@ -13,7 +5,7 @@ const DAYS_IN_MONTH = 31;
 const MONTHS_IN_YEAR = 12;
 
 export const parseModDateString = (string: string): number => {
-    const MOD_DATE_REGEX = /(?<years>\d+\s?years?)?(?<months>\d+\s?months?)?(?<days>\d+\s?days?)?(?<hours>\d+\s?hours?)?(?<minutes>\d+\s?minutes?)?(?<seconds>\d+\s?seconds?)?/gi;
+    const MOD_DATE_REGEX = /(?<years>\d+\s?years?)?\s?(?<months>\d+\s?months?)?\s?(?<days>\d+\s?days?)?\s?(?<hours>\d+\s?hours?)?\s?(?<minutes>\d+\s?minutes?)?\s?(?<seconds>\d+\s?seconds?)?/gmi;
     const result: RegExpExecArray|null = MOD_DATE_REGEX.exec(string);
     let timeToAdd = 0;
 

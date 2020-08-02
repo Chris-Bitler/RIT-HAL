@@ -4,6 +4,7 @@ import {Table, Model, PrimaryKey, NotNull, Column} from "sequelize-typescript";
 export class Emoji extends Model<Emoji> {
     @PrimaryKey
     @NotNull
+    @Column
     serverId!: string;
 
     @PrimaryKey

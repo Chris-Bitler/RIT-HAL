@@ -2,18 +2,13 @@ import {Client, Message, TextChannel, Permissions, MessageEmbed} from "discord.j
 import {ArrivalTimes, BusRoute} from "../types/Bus";
 import {ConfigProperty} from "../models/ConfigProperty";
 import {Command} from "./Command";
-import {
-    getActiveRoutes,
-    getArrivalTimes,
-    getRouteByName,
-    getRouteByNumber,
-    refreshInformation
-} from "../processors/BusProcessor";
 import {mergeArgs} from "../utils/StringUtil";
+import {BusProcessor} from "../processors/BusProcessor";
 
 const incorrectSyntaxMessage = "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`";
 
 export class Bus extends Command {
+    busProcessor: BusProcessor = BusProcessor.getInstance();
     async useCommand(client: Client, evt: Message, args: string[]) {
         const sender = (evt.channel as TextChannel).guild.members.resolve(evt.author.id);
         if (sender) {
@@ -48,13 +43,13 @@ export class Bus extends Command {
 
     async forceRefresh(channel: TextChannel, hasPerm: boolean) {
         if (hasPerm) {
-            await refreshInformation();
+            await this.busProcessor.refreshInformation();
             await channel.send("Forced refresh of bus information");
         }
     }
 
     showRoutes(client: Client, evt: Message) {
-        const routes = getActiveRoutes();
+        const routes = this.busProcessor.getActiveRoutes();
         evt.channel.send(this.getRoutesEmbed(routes));
     }
 
@@ -67,14 +62,14 @@ export class Bus extends Command {
         const routeName = mergeArgs(1, args);
         let route: BusRoute|null;
         if (!isNaN(parseInt(routeName))) {
-            route = getRouteByNumber(parseInt(routeName));
+            route = this.busProcessor.getRouteByNumber(parseInt(routeName));
         } else {
-            route = getRouteByName(routeName);
+            route = this.busProcessor.getRouteByName(routeName);
         }
 
         if (route) {
             try {
-                const arrivals: ArrivalTimes = await getArrivalTimes(route);
+                const arrivals: ArrivalTimes = await this.busProcessor.getArrivalTimes(route);
                 evt.channel.send(this.getArrivalsEmbed(route.long_name, arrivals));
             } catch (error) {
                 console.log(error);
@@ -114,12 +109,7 @@ export class Bus extends Command {
         return embed;
     }
 
-    async getProhibitedChannels(guildId: string): Promise<string[]> {
-        const prohibitedChannelsJSON = await ConfigProperty.getServerProperty("bus.prohibited", guildId);
-        if (prohibitedChannelsJSON?.value) {
-            return (JSON.parse(prohibitedChannelsJSON?.value) as string[])
-        } else {
-            return []
-        }
+    getConfigBase(): string {
+        return "bus";
     }
 }

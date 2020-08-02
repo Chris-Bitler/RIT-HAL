@@ -5,24 +5,27 @@ jest.mock("../../src/utils/EmojiUtil");
 describe("Big command  tests", () => {
     let channel: TextChannel;
     let message: Message;
-    let client: Client;
+    const client: Client = new Client();
     beforeEach(() => {
         const MockDiscord = jest.genMockFromModule<any>("discord.js");
         channel = new MockDiscord.TextChannel();
         message = new MockDiscord.Message();
         message.channel = channel;
-        client = new Client();
-    })
-    test("No arguments should send message about needing emoji", () => {
+    });
+    afterAll(() => {
+        //normal cleanup things
+        client.destroy();
+    });
+    test("No arguments should send message about needing emoji", async () => {
         const big = new Big();
         const args: string[] = [];
-        big.useCommand(client, message, args);
+        await big.useCommand(client, message, args);
         expect(channel.send).toHaveBeenCalledWith("Please use an emoji to embiggen");
     });
-    test("should send no emoji detected if first arg is not an emoji", () => {
+    test("should send no emoji detected if first arg is not an emoji", async () => {
         const big = new Big();
         const args: string[] = ["blah blah blah"];
-        big.useCommand(client, message, args);
+        await big.useCommand(client, message, args);
         expect(channel.send).toHaveBeenCalledWith("No valid emoji detected");
     });
     test("should send attachment if is valid emoji", async () => {
