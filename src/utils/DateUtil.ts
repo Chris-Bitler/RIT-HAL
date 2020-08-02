@@ -6,14 +6,14 @@ interface DateMatches {
     minutes: number | null,
     seconds: number | null
 }
-const SECONDS_IN_MINUTE: number = 60;
-const MINUTES_IN_HOUR: number = 60;
-const HOURS_IN_DAY: number = 24;
-const DAYS_IN_MONTH: number = 31;
-const MONTHS_IN_YEAR: number = 12;
+const SECONDS_IN_MINUTE = 60;
+const MINUTES_IN_HOUR = 60;
+const HOURS_IN_DAY = 24;
+const DAYS_IN_MONTH = 31;
+const MONTHS_IN_YEAR = 12;
 
 export const parseModDateString = (string: string): number => {
-    const MOD_DATE_REGEX: RegExp = /(?<years>\d+\s?years?)?(?<months>\d+\s?months?)?(?<days>\d+\s?days?)?(?<hours>\d+\s?hours?)?(?<minutes>\d+\s?minutes?)?(?<seconds>\d+\s?seconds?)?/gi;
+    const MOD_DATE_REGEX = /(?<years>\d+\s?years?)?(?<months>\d+\s?months?)?(?<days>\d+\s?days?)?(?<hours>\d+\s?hours?)?(?<minutes>\d+\s?minutes?)?(?<seconds>\d+\s?seconds?)?/gi;
     const result: RegExpExecArray|null = MOD_DATE_REGEX.exec(string);
     let timeToAdd = 0;
 

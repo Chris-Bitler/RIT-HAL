@@ -27,10 +27,10 @@ export class Bus extends Command {
                     this.showRoutes(client, evt);
                     break;
                 case "arrivals":
-                    this.showStops(client, evt, args);
+                    await this.showStops(client, evt, args);
                     break;
                 case "forcerefresh":
-                    this.forceRefresh(
+                    await this.forceRefresh(
                         (evt.channel as TextChannel),
                         sender.hasPermission(Permissions.FLAGS.KICK_MEMBERS)
                     );
@@ -85,7 +85,7 @@ export class Bus extends Command {
     }
 
     getRoutesEmbed(routes: BusRoute[]) {
-        let embed = new MessageEmbed()
+        const embed = new MessageEmbed()
             .setTitle("Active RIT Bus Routes");
 
         let routesString = "";
@@ -101,7 +101,7 @@ export class Bus extends Command {
     }
 
     getArrivalsEmbed(routeName: string, arrivals: ArrivalTimes) {
-        let embed = new MessageEmbed()
+        const embed = new MessageEmbed()
             .setTitle(`${routeName} upcoming stops`);
         if (Object.keys(arrivals).length > 0) {
             Object.keys(arrivals).forEach(arrival => {
