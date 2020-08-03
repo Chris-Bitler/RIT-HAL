@@ -28,6 +28,9 @@ export class Command {
         return Permissions.FLAGS.VIEW_CHANNEL;
     }
 
+    /**
+     * The first section of any config property related to this command
+     */
     getConfigBase(): string {
         return "base";
     }

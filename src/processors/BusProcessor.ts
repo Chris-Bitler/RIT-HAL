@@ -11,10 +11,17 @@ const axiosInstance: AxiosInstance = axios.create({
     }
 });
 
+/**
+ * Singleton class to fetch and retrive bus routes
+ * from the transloc api
+ */
 export class BusProcessor {
     routes: BusRoutes = {};
     static instance: BusProcessor;
 
+    /**
+     * Get the instance of the BusProcessor singleton
+     */
     public static getInstance(): BusProcessor {
         if (!BusProcessor.instance) {
             BusProcessor.instance  = new BusProcessor();
@@ -23,11 +30,19 @@ export class BusProcessor {
         return BusProcessor.instance;
     }
 
+    /**
+     * Refresh the information about the routes and stops
+     */
     async refreshInformation() {
         this.routes = await this.fetchRoutes();
         await this.updateStops(this.routes);
     }
 
+    /**
+     * Fetch the routes from the api provided the agency id
+     * Saves the routes after transforming them to a more usable
+     * format
+     */
     async fetchRoutes(): Promise<BusRoutes> {
         const response = (await axiosInstance.get("/routes.json", {
             params: {
@@ -37,6 +52,11 @@ export class BusProcessor {
         return this.transformRoutes(response.data[AGENCY_ID]);
     }
 
+    /**
+     * Update the list of stops for the list of routes
+     * @param routes An object containing bus routes with their
+     * route ID as their property key
+     */
     async updateStops(routes: BusRoutes) {
         const stopsResponse = (await axiosInstance.get("/stops.json", {
             params: {
@@ -53,6 +73,10 @@ export class BusProcessor {
         });
     }
 
+    /**
+     * Retrieve arrival times for a specific route
+     * @param route A specific bus route retrieved from the API
+     */
     async getArrivalTimes(route: BusRoute): Promise<ArrivalTimes> {
         const stopInformation: ArrivalTimes = {};
         const response = (await axiosInstance.get("/arrival-estimates.json", {
@@ -77,22 +101,38 @@ export class BusProcessor {
         return stopInformation;
     }
 
+    /**
+     * Get a bus route by its name
+     * @param name The bus route's name
+     */
     getRouteByName(name: string): BusRoute|null {
         const matchedRoutes = Object.values(this.routes)
             .filter(route => route.long_name.toLowerCase() === name.toLowerCase());
         return matchedRoutes.length > 0 ? matchedRoutes[0] : null;
     }
 
+    /**
+     * Get a bus route by its id in the route object
+     * @param number The index of the route
+     */
     getRouteByNumber(number: number): BusRoute|null {
         const filteredRoutes = Object.values(this.routes)
             .filter(route => route.is_active);
         return number-1 < filteredRoutes.length ? filteredRoutes[number-1] : null;
     }
 
+    /**
+     * Get any route that is marked as 'is_active'
+     */
     getActiveRoutes(): BusRoute[] {
         return Object.values(this.routes).filter(route => route.is_active);
     }
 
+    /**
+     * Transform an array of bus routes to a BusRoutes object
+     * Used for easier management of the routes by id
+     * @param routes The bus routes returned from the API
+     */
     transformRoutes(routes: BusRoute[]): BusRoutes {
         const routeObj: BusRoutes = {};
         routes.forEach((route: BusRoute) => {

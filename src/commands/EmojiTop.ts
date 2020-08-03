@@ -1,13 +1,15 @@
 import {Command} from "./Command";
-import {getTopEmojis} from "../processors/EmojiProcessor";
+import {EmojiProcessor} from "../processors/EmojiProcessor";
 import {Message, Client} from "discord.js";
 
-// TODO: Configurable
-const PROHIBITED_CHANNELS = ["401908664018927628"];
-
+/**
+ * Command to list an embed of the top 10 most used emojis in the server
+ */
 export class EmojiTop extends Command {
+    emojiProcessor: EmojiProcessor = EmojiProcessor.getInstance();
+
     async useCommand(client: Client, evt: Message) {
-        await getTopEmojis(evt);
+        await this.emojiProcessor.getTopEmojis(evt);
     }
 
     getCommand() {

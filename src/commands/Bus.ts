@@ -1,14 +1,17 @@
 import {Client, Message, TextChannel, Permissions, MessageEmbed} from "discord.js";
 import {ArrivalTimes, BusRoute} from "../types/Bus";
-import {ConfigProperty} from "../models/ConfigProperty";
 import {Command} from "./Command";
 import {mergeArgs} from "../utils/StringUtil";
 import {BusProcessor} from "../processors/BusProcessor";
 
 const incorrectSyntaxMessage = "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`";
 
+/**
+ * Command used to display various RIT bus related information
+ */
 export class Bus extends Command {
     busProcessor: BusProcessor = BusProcessor.getInstance();
+
     async useCommand(client: Client, evt: Message, args: string[]) {
         const sender = (evt.channel as TextChannel).guild.members.resolve(evt.author.id);
         if (sender) {
@@ -19,10 +22,10 @@ export class Bus extends Command {
 
             switch (args[0].toLowerCase()) {
                 case "routes":
-                    this.showRoutes(client, evt);
+                    this.showRoutes(evt);
                     break;
                 case "arrivals":
-                    await this.showStops(client, evt, args);
+                    await this.showStops(evt, args);
                     break;
                 case "forcerefresh":
                     await this.forceRefresh(
@@ -37,23 +40,39 @@ export class Bus extends Command {
         }
     }
 
-    getCommand() {
+    getCommand(): string {
         return "bus";
     }
 
-    async forceRefresh(channel: TextChannel, hasPerm: boolean) {
+    /**
+     * Force a refresh of the bus information and send a message
+     * saying so
+     * @param channel The channel the message was used in
+     * @param hasPerm Whether or not the user had permission
+     */
+    async forceRefresh(channel: TextChannel, hasPerm: boolean): Promise<void> {
         if (hasPerm) {
             await this.busProcessor.refreshInformation();
             await channel.send("Forced refresh of bus information");
         }
     }
 
-    showRoutes(client: Client, evt: Message) {
+    /**
+     * Get the active routes and show an embed in the channel
+     * @param evt The message the command was sent in, used to get channel
+     */
+    showRoutes(evt: Message): void {
         const routes = this.busProcessor.getActiveRoutes();
         evt.channel.send(this.getRoutesEmbed(routes));
     }
 
-    async showStops(client: Client, evt: Message, args: string[]) {
+    /**
+     * Show the list of stops in the channel the command was used in
+     *
+     * @param evt The message from Discord.js
+     * @param args The arguments provided with the command
+     */
+    async showStops(evt: Message, args: string[]): Promise<void> {
         if (args.length < 2) {
             evt.channel.send("`Incorrect Syntax. Try -bus arrivals [route]`");
             return;
@@ -79,7 +98,11 @@ export class Bus extends Command {
         }
     }
 
-    getRoutesEmbed(routes: BusRoute[]) {
+    /**
+     * Get an embed showing the list of routes retrieved
+     * @param routes The list of bus routes retrieved from the API
+     */
+    getRoutesEmbed(routes: BusRoute[]): MessageEmbed {
         const embed = new MessageEmbed()
             .setTitle("Active RIT Bus Routes");
 
@@ -95,7 +118,12 @@ export class Bus extends Command {
         return embed;
     }
 
-    getArrivalsEmbed(routeName: string, arrivals: ArrivalTimes) {
+    /**
+     * Get an embed to display the bus arrival times in the channel
+     * @param routeName The name of the route to show the arrival times for
+     * @param arrivals The list of arrival objects, containing stop names and times
+     */
+    getArrivalsEmbed(routeName: string, arrivals: ArrivalTimes): MessageEmbed {
         const embed = new MessageEmbed()
             .setTitle(`${routeName} upcoming stops`);
         if (Object.keys(arrivals).length > 0) {

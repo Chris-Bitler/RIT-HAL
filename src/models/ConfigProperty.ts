@@ -1,5 +1,8 @@
 import { Column, Model, Table } from "sequelize-typescript";
 
+/**
+ * Class containing config property key/values and the server they belong to
+ */
 @Table
 export class ConfigProperty extends Model<ConfigProperty> {
     @Column

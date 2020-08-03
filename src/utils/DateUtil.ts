@@ -1,9 +1,16 @@
+// Constants for various units of time
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
 const HOURS_IN_DAY = 24;
 const DAYS_IN_MONTH = 31;
 const MONTHS_IN_YEAR = 12;
 
+/**
+ * Parse a string containing years/months/days/hours/minutes/seconds
+ * into a millisecond count that can be used for storing moderation punishment
+ * times.
+ * @param string The string to check for time units
+ */
 export const parseModDateString = (string: string): number => {
     const MOD_DATE_REGEX = /(?<years>\d+\s?years?)?\s?(?<months>\d+\s?months?)?\s?(?<days>\d+\s?days?)?\s?(?<hours>\d+\s?hours?)?\s?(?<minutes>\d+\s?minutes?)?\s?(?<seconds>\d+\s?seconds?)?/gmi;
     const result: RegExpExecArray|null = MOD_DATE_REGEX.exec(string);

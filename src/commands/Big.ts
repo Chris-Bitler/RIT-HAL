@@ -2,6 +2,9 @@ import {Command} from "./Command";
 import {Client, Message, MessageAttachment} from "discord.js";
 import {getEmojiExtension} from "../utils/EmojiUtil";
 
+/**
+ * Used to show a larger version of an emoji in the channel
+ */
 export class Big extends Command {
     async useCommand(client: Client, evt: Message, args: string[]) {
         if (args.length >= 1) {

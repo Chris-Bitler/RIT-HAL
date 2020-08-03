@@ -14,8 +14,17 @@ const Pin = require("./Pin");
 const StringUtil = require("../utils/StringUtil");
 const PREFIX = "-";
 
-class CommandRegistry {
+/**
+ * Class to contain the registry of commands for the discord bot
+ */
+export class CommandRegistry {
     private registry: Command[] = [];
+
+    /**
+     * If the command registry is being created, fill the registry
+     * with the various commands
+     * @param init whether or not it should initialize the registry
+     */
     constructor(init = true) {
         if (init) {
             this.registry.push(new Melo());
@@ -31,6 +40,16 @@ class CommandRegistry {
         }
     }
 
+    /**
+     * Run through the command registry and perform the following checks
+     * - message channel isn't a DM
+     * - the message channel isn't in the list of prohibited channels for the command
+     * - the content starts with the command being tested
+     * - the user has permission to use the command
+     * If all checks pass, call the useCommand method on the command
+     * @param client Discord Client
+     * @param messageEvent The discord.js message
+     */
     runCommands(client: Client, messageEvent: Message) {
         if (messageEvent.author.bot) {
             return;
@@ -51,5 +70,3 @@ class CommandRegistry {
         });
     }
 }
-
-module.exports = CommandRegistry;
