@@ -88,7 +88,7 @@ describe("Bus command tests", () => {
         });
         test("should send routes embed", () => {
             const bus = new Bus();
-            bus.showRoutes(client, message);
+            bus.showRoutes(message);
 
             const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
             expect(resultingEmbed.title).toEqual("Active RIT Bus Routes");
@@ -146,21 +146,21 @@ describe("Bus command tests", () => {
         })
         test("Not enough args should send related message", async () => {
             const bus = new Bus();
-            await bus.showStops(client, message, []);
+            await bus.showStops(message, []);
             expect(mockSend).toHaveBeenCalledWith("`Incorrect Syntax. Try -bus arrivals [route]`");
         });
         test("No valid route should return error message", async () => {
             mockGetRouteByNumber = busProcessor.getRouteByNumber as jest.MockedFunction<typeof busProcessor.getRouteByNumber>;
             mockGetRouteByNumber.mockReturnValue(null);
             const bus = new Bus();
-            await bus.showStops(client, message, ["arrivals", "-1"]);
+            await bus.showStops(message, ["arrivals", "-1"]);
             expect(mockSend).toHaveBeenCalledWith("Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route.");
         });
         test("No arrival times should return relevant embed", async () => {
             mockGetArrivalTimes = busProcessor.getArrivalTimes as jest.MockedFunction<typeof busProcessor.getArrivalTimes>;
             mockGetArrivalTimes.mockResolvedValue({});
             const bus = new Bus();
-            await bus.showStops(client, message, ["arrivals", "0"]);
+            await bus.showStops(message, ["arrivals", "0"]);
             const resultingEmbed: MessageEmbed = (channel.send as jest.MockedFunction<typeof channel.send>).mock.calls[0][0];
             expect(resultingEmbed.title).toEqual("Test Route 2 upcoming stops");
             expect(resultingEmbed.fields[0].name).toEqual("No results")
@@ -176,7 +176,7 @@ describe("Bus command tests", () => {
         });
         test("should get route by number and send embed of travel times", async () => {
             const bus = new Bus();
-            await bus.showStops(client, message, ["arrivals", "0"])
+            await bus.showStops(message, ["arrivals", "0"])
             const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
             expect(resultingEmbed.title).toEqual("Test Route 2 upcoming stops");
             expect(resultingEmbed.fields[0].name).toEqual("Test Stop")
@@ -185,7 +185,7 @@ describe("Bus command tests", () => {
 
         test("should get route by name and send embed of travel times", async () => {
             const bus = new Bus()
-            await bus.showStops(client, message, ["arrivals", "Test Stop 2"])
+            await bus.showStops(message, ["arrivals", "Test Stop 2"])
             const resultingEmbed: MessageEmbed = mockSend.mock.calls[0][0];
             expect(resultingEmbed.title).toEqual("Test Route 2 upcoming stops");
             expect(resultingEmbed.fields[0].name).toEqual("Test Stop")

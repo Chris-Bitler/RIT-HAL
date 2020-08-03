@@ -3,13 +3,13 @@ import {Command} from "./Command";
 import {Big} from "./Big";
 import {Bus} from "./Bus"
 import {EmojiTop} from "./EmojiTop";
+import {Courses} from "./Courses";
 
 const Melo = require("./Melo");
 const Food = require("./Food");
 const FoodSpecials = require("./FoodSpecials");
 const Mod = require("./Mod");
 const EmojiRole = require("./EmojiRole");
-const Courses = require("./Courses");
 const Pin = require("./Pin");
 const StringUtil = require("../utils/StringUtil");
 const PREFIX = "-";
