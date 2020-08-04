@@ -4,14 +4,14 @@ import {Big} from "./Big";
 import {Bus} from "./Bus"
 import {EmojiTop} from "./EmojiTop";
 import {Courses} from "./Courses";
+import {removeEmptyArgs} from "../utils/StringUtil";
+import {Mod} from "./Mod";
 
 const Melo = require("./Melo");
 const Food = require("./Food");
 const FoodSpecials = require("./FoodSpecials");
-const Mod = require("./Mod");
 const EmojiRole = require("./EmojiRole");
 const Pin = require("./Pin");
-const StringUtil = require("../utils/StringUtil");
 const PREFIX = "-";
 
 /**
@@ -50,7 +50,7 @@ export class CommandRegistry {
      * @param client Discord Client
      * @param messageEvent The discord.js message
      */
-    runCommands(client: Client, messageEvent: Message) {
+    runCommands(client: Client, messageEvent: Message): void {
         if (messageEvent.author.bot) {
             return;
         }
@@ -62,7 +62,7 @@ export class CommandRegistry {
                     if (messageEvent.content.toLowerCase().startsWith(`${PREFIX}${command.getCommand()}`)) {
                         if (messageEvent.member && messageEvent.member.hasPermission(command.getRequiredPermission())) {
                             const args = messageEvent.content.trim().split(" ").slice(1);
-                            await command.useCommand(client, messageEvent, StringUtil.removeEmptyArgs(args));
+                            await command.useCommand(client, messageEvent, removeEmptyArgs(args));
                         }
                     }
                 }

@@ -15,6 +15,7 @@
   "dependencies": {
     "@types/bluebird": "^3.5.32",
     "@types/memoizee": "^0.4.4",
+    "@types/moment-timezone": "^0.5.13",
     "@types/node": "^14.0.27",
     "@types/validator": "^13.1.0",
     "@types/ws": "^7.2.6",

@@ -1,15 +1,17 @@
 "use strict";
+import {ModProcessor} from "./processors/ModProcessor";
+
 require("dotenv").config();
 
-import {Client, DMChannel, Message} from "discord.js";
+import {Client, DMChannel, GuildMember, Message} from "discord.js";
 import {Sequelize} from "sequelize-typescript";
 const CommandRegistryImpl = require("./commands/CommandRegistry");
 const CommandRegistry = new CommandRegistryImpl();
-const ModProcessor = require("./processors/ModProcessor");
 const EmojiRoleProcessor = require("./processors/EmojiRoleProcessor");
 const EmojiProcessor = require("./processors/EmojiProcessor");
 const BusProcessor = require("./processors/BusProcessor");
 const FoodProcessor = require("./processors/FoodProcessor");
+const modProcessor = ModProcessor.getInstance();
 const client = new Client(
     {
         partials: ["MESSAGE", "CHANNEL", "REACTION"]
@@ -42,20 +44,29 @@ client.on("message", (message: Message) => {
     }
 });
 
-client.on("guildMemberUpdate", (oldMember, newMember) => {
-    if (oldMember.roles.cache.get(ModProcessor.MUTED_ID) && !newMember.roles.cache.get(ModProcessor.MUTED_ID)) {
-        ModProcessor.unmuteUser(newMember);
+client.on("guildMemberUpdate", async (oldMember, newMember) => {
+    const mutedRoleId = await modProcessor.fetchMutedRoleId(newMember.guild.id);
+    if (mutedRoleId) {
+        if (oldMember.roles.cache.get(mutedRoleId) && !newMember.roles.cache.get(mutedRoleId)) {
+            await modProcessor.unmuteUser(newMember.guild, newMember.id);
+        }
     }
 });
 
-client.on("guildMemberAdd", (member) => {
-    if (ModProcessor.isUserMuted(member)) {
-        ModProcessor.reassignUserMutedRole(member)
+client.on("guildMemberAdd", async (member) => {
+    let guildMember: GuildMember;
+    if (member.partial) {
+        guildMember = await member.fetch();
+    } else {
+        guildMember = member;
+    }
+    if (modProcessor.isUserMuted(guildMember)) {
+        await modProcessor.reassignUserMutedRole(guildMember)
     }
 });
 
-client.on("guildBanRemove", (guild, member) => {
-    ModProcessor.unbanUser(guild, member.id);
+client.on("guildBanRemove", async (guild, member) => {
+    await modProcessor.unbanUser(guild, member.id);
 });
 
 client.on("messageReactionAdd", async (reaction, user) => {
@@ -70,8 +81,8 @@ client.on("messageReactionAdd", async (reaction, user) => {
     }
 });
 
-ModProcessor.loadPunishmentsFromDB();
-setInterval(() => ModProcessor.tickPunishments(client), 1000);
+modProcessor.loadPunishmentsFromDB();
+setInterval(() => modProcessor.tickPunishments(client), 1000);
 
 client.login(process.env.discord_token).then(() => {});
 
