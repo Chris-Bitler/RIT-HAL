@@ -1,6 +1,7 @@
 import { Command } from "./Command";
 import { Client, Message } from "discord.js";
 import { getFoodEmbed, getOpenPlaces } from "../processors/FoodProcessor";
+import { getErrorEmbed } from "../utils/EmbedUtil";
 
 /**
  * Command to show what food places are open on campus right now
@@ -15,6 +16,8 @@ export class Food extends Command {
             evt.channel.send(getFoodEmbed(place));
           }
         });
+      } else {
+        evt.channel.send(getErrorEmbed("No food places are open currently."));
       }
     } catch (err) {
       // TODO: Sentry logging

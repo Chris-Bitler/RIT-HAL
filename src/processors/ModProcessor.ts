@@ -1,5 +1,5 @@
 import { Ban, Mute } from "../types/Punishment";
-import { Client, Guild, GuildMember, User } from "discord.js";
+import { Client, Guild, GuildMember, TextChannel, User } from "discord.js";
 import { Punishment } from "../models/Punishment";
 import { ConfigProperty } from "../models/ConfigProperty";
 import * as moment from "moment-timezone";
@@ -28,11 +28,13 @@ export class ModProcessor {
    *
    * @param memberToMute The member who is being muted
    * @param muter The member who is doing the muting
+   * @param channel The channel the mute command was sent in
    * @param reason The reason the member was muted
    * @param expiration The amount of milliseconds- to add to the current epoch for expiration
    */
   async muteUser(
     memberToMute: GuildMember,
+    channel: TextChannel,
     muter: GuildMember,
     reason: string,
     expiration: number
@@ -73,6 +75,25 @@ export class ModProcessor {
         expiration: expirationDateTime,
         serverId: memberToMute.guild.id,
       });
+
+      const expirationDate = moment(expirationDateTime);
+      const expirationDateString = moment
+        .tz(expirationDate, "America/New_York")
+        .format("MMMM Do YYYY, h:mm:ss a");
+      await channel.send(
+        getInformationalEmbed(
+          "User muted",
+          `${memberToMute} has been muted for ${reason} until ${expirationDateString}`
+        )
+      );
+      await memberToMute.send(
+        getInformationalEmbed(
+          "You have been muted",
+          `You have been muted for _${reason}_ until ${expirationDateString} EST by **${
+            muter.displayName || muter.user.username
+          }**`
+        )
+      );
     } else {
       await muter.send(
         getErrorEmbed(
@@ -128,7 +149,7 @@ export class ModProcessor {
       await memberToBan.ban({ reason: reason });
     } catch (err) {
       await banner.send(
-        getErrorEmbed("An error occurred when trying to kick that user.")
+        getErrorEmbed("An error occurred when trying to ban that user.")
       );
       await memberToBan.ban({ reason: reason });
     }

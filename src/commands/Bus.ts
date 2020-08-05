@@ -130,16 +130,24 @@ export class Bus extends Command {
   getRoutesEmbed(routes: BusRoute[]): MessageEmbed {
     const embed = new MessageEmbed().setTitle("Active RIT Bus Routes");
 
-    let routesString = "";
-    let i = 1;
-    routes.forEach((route) => {
-      routesString += `${i}. ${route.long_name}\n`;
-      i++;
-    });
+    if (routes.length > 0) {
+      let routesString = "";
+      let i = 1;
+      routes.forEach((route) => {
+        routesString += `${i}. ${route.long_name}\n`;
+        i++;
+      });
 
-    embed.addField("Routes", routesString);
+      embed.addField("Routes", routesString);
 
-    return embed;
+      return embed;
+    } else {
+      embed.addField(
+        "No buses running",
+        "There are currently no buses running."
+      );
+      return embed;
+    }
   }
 
   /**

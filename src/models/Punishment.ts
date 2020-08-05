@@ -1,4 +1,4 @@
-import { Column, Model, Table } from "sequelize-typescript";
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 /**
  * Model representing a user punishment (mute/ban/warning/kick)
@@ -29,6 +29,6 @@ export class Punishment extends Model<Punishment> {
   @Column
   serverId!: string;
 
-  @Column
+  @Column(DataType.BIGINT)
   expiration!: number;
 }

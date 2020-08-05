@@ -163,32 +163,10 @@ export class Mod extends Command {
     if (cmdArgs.target && cmdArgs.time && cmdArgs.reason) {
       await modProcessor.muteUser(
         cmdArgs.target,
+        channel,
         sender,
         cmdArgs.reason,
         cmdArgs.time
-      );
-
-      const expirationDate = moment(Date.now() + cmdArgs.time);
-      const expirationDateString = moment
-        .tz(expirationDate, "America/New_York")
-        .format("MMMM Do YYYY, h:mm:ss a");
-      await channel.send(
-        getInformationalEmbed(
-          "User muted",
-          `${cmdArgs.target} has been muted for ${cmdArgs.reason} until ${expirationDateString}`
-        )
-      );
-      await cmdArgs.target.send(
-        getInformationalEmbed(
-          "You have been muted",
-          "You have been muted for _" +
-            cmdArgs.reason +
-            "_ until " +
-            expirationDateString +
-            " EST by **" +
-            sender.displayName +
-            "**"
-        )
       );
     } else {
       await channel.send(
@@ -214,7 +192,7 @@ export class Mod extends Command {
       await modProcessor.unmuteUser(cmdArgs.target.guild, cmdArgs.target.user);
       await channel.send(
         getInformationalEmbed(
-          "User has been unbanned",
+          "User has been unmuted",
           `${cmdArgs.target} has been unmuted.`
         )
       );

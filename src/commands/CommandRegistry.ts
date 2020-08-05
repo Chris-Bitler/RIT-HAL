@@ -55,15 +55,15 @@ export class CommandRegistry {
     this.registry.forEach(async (command: Command) => {
       // TODO: Make string of IFs less hideous
       if (!(messageEvent.channel instanceof DMChannel)) {
-        const prohibitedChannels = await command.getProhibitedChannels(
-          messageEvent.channel.guild.id
-        );
-        if (!prohibitedChannels.includes(messageEvent.channel.id)) {
-          if (
-            messageEvent.content
-              .toLowerCase()
-              .startsWith(`-${command.getCommand()}`)
-          ) {
+        if (
+          messageEvent.content
+            .toLowerCase()
+            .startsWith(`-${command.getCommand()}`)
+        ) {
+          const prohibitedChannels = await command.getProhibitedChannels(
+            messageEvent.channel.guild.id
+          );
+          if (!prohibitedChannels.includes(messageEvent.channel.id)) {
             if (
               messageEvent.member &&
               messageEvent.member.hasPermission(command.getRequiredPermission())

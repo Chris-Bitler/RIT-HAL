@@ -123,7 +123,7 @@ export class EmojiProcessor {
         serverId: channel.guild.id,
       },
       limit: 10,
-      order: ["num", "DESC"],
+      order: [["num", "DESC"]],
     });
     const embed = new MessageEmbed();
     embed.setTitle("Top 10 emojis by usage in the server");
