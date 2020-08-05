@@ -1,6 +1,9 @@
 import { Client, Message, Permissions } from "discord.js"
 import {ConfigProperty} from "../models/ConfigProperty";
 
+/**
+ * Class representing a command
+ */
 export class Command {
     /**
      * The function called when a command is used
@@ -8,7 +11,7 @@ export class Command {
      * @param {Message} evt The message event from discord.js
      * @param {string[]} args Arguments given with the command
      */
-    async useCommand(client: Client, evt: Message, args: string[]) {
+    async useCommand(client: Client, evt: Message, args: string[]): Promise<void> {
         throw new Error("You need to implement useCommand");
     }
 

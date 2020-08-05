@@ -8,11 +8,11 @@ import {Message, Client} from "discord.js";
 export class EmojiTop extends Command {
     emojiProcessor: EmojiProcessor = EmojiProcessor.getInstance();
 
-    async useCommand(client: Client, evt: Message) {
+    async useCommand(client: Client, evt: Message): Promise<void> {
         await this.emojiProcessor.getTopEmojis(evt);
     }
 
-    getCommand() {
+    getCommand(): string {
         return "emojitop";
     }
 

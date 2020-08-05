@@ -6,13 +6,11 @@ import {EmojiTop} from "./EmojiTop";
 import {Courses} from "./Courses";
 import {removeEmptyArgs} from "../utils/StringUtil";
 import {Mod} from "./Mod";
-
-const Melo = require("./Melo");
-const Food = require("./Food");
-const FoodSpecials = require("./FoodSpecials");
-const EmojiRole = require("./EmojiRole");
-const Pin = require("./Pin");
-const PREFIX = "-";
+import {Food} from "./Food";
+import {FoodSpecials} from "./FoodSpecials";
+import {EmojiRole} from "./EmojiRole";
+import {Pin} from "./Pin";
+import {Config} from "./Config";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -27,7 +25,6 @@ export class CommandRegistry {
      */
     constructor(init = true) {
         if (init) {
-            this.registry.push(new Melo());
             this.registry.push(new Food());
             this.registry.push(new FoodSpecials());
             this.registry.push(new Mod());
@@ -37,6 +34,7 @@ export class CommandRegistry {
             this.registry.push(new Big());
             this.registry.push(new EmojiTop());
             this.registry.push(new Pin());
+            this.registry.push(new Config());
         }
     }
 
@@ -59,7 +57,7 @@ export class CommandRegistry {
             if (!(messageEvent.channel instanceof DMChannel)) {
                 const prohibitedChannels = await command.getProhibitedChannels(messageEvent.channel.guild.id);
                 if (!prohibitedChannels.includes(messageEvent.channel.id)) {
-                    if (messageEvent.content.toLowerCase().startsWith(`${PREFIX}${command.getCommand()}`)) {
+                    if (messageEvent.content.toLowerCase().startsWith(`-${command.getCommand()}`)) {
                         if (messageEvent.member && messageEvent.member.hasPermission(command.getRequiredPermission())) {
                             const args = messageEvent.content.trim().split(" ").slice(1);
                             await command.useCommand(client, messageEvent, removeEmptyArgs(args));

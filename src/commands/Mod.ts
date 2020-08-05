@@ -5,6 +5,7 @@ import * as moment from "moment-timezone";
 import {parseModDateString} from "../utils/DateUtil";
 import {ModProcessor} from "../processors/ModProcessor";
 import {Punishment} from "../models/Punishment";
+import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
 
 const modProcessor = ModProcessor.getInstance();
 
@@ -161,9 +162,13 @@ export class Mod extends Command {
     async unmuteUser(channel: TextChannel, sender: GuildMember, cmdArgs: CommandArgs): Promise<void> {
         if (cmdArgs.target) {
             await modProcessor.unmuteUser(cmdArgs.target.guild, cmdArgs.target.user);
-            await channel.send(`${cmdArgs.target} has been unmuted.`);
+            await channel.send(
+                getInformationalEmbed("User has been unbanned",`${cmdArgs.target} has been unmuted.`)
+            );
         } else {
-            await channel.send(`${sender} - You need to use the command in the correct format: -mod unmute [user ping]`);
+            await channel.send(
+                getErrorEmbed(`${sender} - You need to use the command in the correct format: -mod unmute [user ping]`)
+            );
         }
     }
 

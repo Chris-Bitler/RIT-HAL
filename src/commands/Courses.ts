@@ -2,6 +2,7 @@ import {Command} from "./Command";
 import {Client, Message, MessageEmbed} from "discord.js"
 import {getClasses} from "../processors/ClassProcessor";
 import {Course} from "../types/Courses";
+import {getErrorEmbed} from "../utils/EmbedUtil";
 
 /**
  * Command to get information on courses from tigercenter's api
@@ -9,7 +10,11 @@ import {Course} from "../types/Courses";
 export class Courses extends Command {
     async useCommand(client: Client, evt: Message, args: string[]): Promise<void> {
         if (args.length < 2) {
-            evt.channel.send("Incorrect Syntax. Try `-courses [major abbreviation] [course number] (section)`");
+            evt.channel.send(
+                getErrorEmbed(
+                    "Incorrect Syntax. Try `-courses [major abbreviation] [course number] (section)`"
+                )
+            );
             return;
         }
 

@@ -3,8 +3,9 @@ import {ArrivalTimes, BusRoute} from "../types/Bus";
 import {Command} from "./Command";
 import {mergeArgs} from "../utils/StringUtil";
 import {BusProcessor} from "../processors/BusProcessor";
+import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
 
-const incorrectSyntaxMessage = "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`";
+const incorrectSyntaxMessage = getErrorEmbed("`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`");
 
 /**
  * Command used to display various RIT bus related information
@@ -12,7 +13,7 @@ const incorrectSyntaxMessage = "`Incorrect Syntax. Try -bus routes or -bus arriv
 export class Bus extends Command {
     busProcessor: BusProcessor = BusProcessor.getInstance();
 
-    async useCommand(client: Client, evt: Message, args: string[]) {
+    async useCommand(client: Client, evt: Message, args: string[]): Promise<void> {
         const sender = (evt.channel as TextChannel).guild.members.resolve(evt.author.id);
         if (sender) {
             if (args.length < 1) {
@@ -53,7 +54,7 @@ export class Bus extends Command {
     async forceRefresh(channel: TextChannel, hasPerm: boolean): Promise<void> {
         if (hasPerm) {
             await this.busProcessor.refreshInformation();
-            await channel.send("Forced refresh of bus information");
+            await channel.send(getInformationalEmbed("Refreshed", "Forced refresh of bus information"));
         }
     }
 
@@ -74,7 +75,7 @@ export class Bus extends Command {
      */
     async showStops(evt: Message, args: string[]): Promise<void> {
         if (args.length < 2) {
-            evt.channel.send("`Incorrect Syntax. Try -bus arrivals [route]`");
+            evt.channel.send(getErrorEmbed("`Incorrect Syntax. Try -bus arrivals [route]`"));
             return;
         }
 
@@ -94,7 +95,9 @@ export class Bus extends Command {
                 console.log(error);
             }
         } else {
-            evt.channel.send("Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route.");
+            evt.channel.send(
+                getErrorEmbed("Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route.")
+            );
         }
     }
 
@@ -131,7 +134,10 @@ export class Bus extends Command {
                 embed.addField(arrival, arrivals[arrival][0].time);
             });
         } else {
-            embed.addField("No results", "No arrival times retrieved. The bus may be stopped. Try again in a few minutes.");
+            embed.addField(
+                "No results",
+                "No arrival times retrieved. The bus may be stopped. Try again in a few minutes."
+            );
         }
 
         return embed;

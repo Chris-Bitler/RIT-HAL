@@ -9,6 +9,9 @@ export class EmojiToRole extends Model<EmojiToRole> {
     emojiId!: string;
 
     @Column
+    channelId!: string;
+
+    @Column
     serverId!: string;
 
     @Column

@@ -1,16 +1,17 @@
 "use strict";
 import {ModProcessor} from "./processors/ModProcessor";
-
-require("dotenv").config();
-
-import {Client, DMChannel, GuildMember, Message} from "discord.js";
+import {Client, GuildEmoji, GuildMember, Message, TextChannel} from "discord.js";
 import {Sequelize} from "sequelize-typescript";
-const CommandRegistryImpl = require("./commands/CommandRegistry");
-const CommandRegistry = new CommandRegistryImpl();
-const EmojiRoleProcessor = require("./processors/EmojiRoleProcessor");
-const EmojiProcessor = require("./processors/EmojiProcessor");
-const BusProcessor = require("./processors/BusProcessor");
-const FoodProcessor = require("./processors/FoodProcessor");
+import * as dotenv from "dotenv";
+import {CommandRegistry} from "./commands/CommandRegistry";
+import {EmojiProcessor} from "./processors/EmojiProcessor";
+import {checkReactionToDB} from "./processors/EmojiRoleProcessor";
+import {BusProcessor} from "./processors/BusProcessor";
+import {checkFoodDaily} from "./processors/FoodProcessor";
+dotenv.config();
+
+
+const commandRegistry = new CommandRegistry();
 const modProcessor = ModProcessor.getInstance();
 const client = new Client(
     {
@@ -37,10 +38,10 @@ if (postgre_db && postgre_username && postgre_password && postgre_host) {
     process.exit(1);
 }
 
-client.on("message", (message: Message) => {
+client.on("message", async (message: Message) => {
     if (!message.partial) {
-        CommandRegistry.runCommands(client, message);
-        EmojiProcessor.logEmojis(message);
+        commandRegistry.runCommands(client, message);
+        await EmojiProcessor.getInstance().logEmojis(message);
     }
 });
 
@@ -71,12 +72,12 @@ client.on("guildBanRemove", async (guild, member) => {
 
 client.on("messageReactionAdd", async (reaction, user) => {
     if (reaction.message.partial) await reaction.message.fetch();
-    let channel = reaction.message.channel;
-    if (!user.bot && !(channel instanceof DMChannel)) {
+    const channel = reaction.message.channel;
+    if (!user.bot && channel instanceof TextChannel) {
         const emoji = reaction.emoji;
         const member = channel.guild.members.resolve(await user.fetch());
-        if (member) {
-            EmojiRoleProcessor.checkReactionToDB(emoji, member, channel, reaction);
+        if (member && emoji instanceof GuildEmoji) {
+            await checkReactionToDB(emoji, member, channel, reaction);
         }
     }
 });
@@ -84,13 +85,13 @@ client.on("messageReactionAdd", async (reaction, user) => {
 modProcessor.loadPunishmentsFromDB();
 setInterval(() => modProcessor.tickPunishments(client), 1000);
 
-client.login(process.env.discord_token).then(() => {});
+client.login(process.env.discord_token);
 
-client.on("ready", () => {
-    FoodProcessor.checkFoodDaily(client);
-    setInterval(() => FoodProcessor.checkFoodDaily(client), 60*1000);
+client.on("ready", async () => {
+    await checkFoodDaily(client);
+    setInterval(() => checkFoodDaily(client), 10*60*1000);
 });
 
-BusProcessor.refreshInformation();
+BusProcessor.getInstance().refreshInformation();
 
-setInterval(() => BusProcessor.refreshInformation(), 1000*60*30); // 30 minutes
+setInterval(() => BusProcessor.getInstance().refreshInformation(), 1000*60*30); // 30 minutes

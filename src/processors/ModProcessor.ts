@@ -3,6 +3,7 @@ import {Client, Guild, GuildMember, User} from "discord.js";
 import {Punishment} from "../models/Punishment";
 import {ConfigProperty} from "../models/ConfigProperty";
 import * as moment from "moment-timezone";
+import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
 
 /**
  * Class for processing and tracking moderation actions
@@ -15,7 +16,7 @@ export class ModProcessor {
     /**
      * Get the instance of the processor
      */
-    static getInstance() {
+    static getInstance(): ModProcessor {
         if (!this.instance) {
             this.instance = new ModProcessor();
         }
@@ -64,7 +65,9 @@ export class ModProcessor {
                 serverId: memberToMute.guild.id
             });
         } else {
-            await muter.send("Your server admin needs to set the ID of the muted role before you can use this command.");
+            await muter.send(
+                getErrorEmbed("Your server admin needs to set the ID of the muted role before you can use this command.")
+            );
         }
     }
 
@@ -94,10 +97,17 @@ export class ModProcessor {
         const expirationDateString = moment.tz(expirationDateTime, "America/New_York").format("MMMM Do YYYY, h:mm:ss a");
 
         try {
-            await memberToBan.send("You have been banned from the RIT discord for _" + reason.trim() + "_ by **" + banner.user.username + "** until " + expirationDateString);
+            await memberToBan.send(
+                getInformationalEmbed(
+                    "You have been banned",
+                    `You have been banned from the RIT discord for _${reason.trim()}_ by **${banner.user.username}** until ${expirationDateString}`
+                )
+            );
             await memberToBan.ban({reason: reason});
         } catch (err) {
-            await banner.send("An error occurred when trying to kick that user.");
+            await banner.send(
+                getErrorEmbed("An error occurred when trying to kick that user.")
+            );
             await memberToBan.ban({reason: reason});
         }
         await Punishment.create({
@@ -191,7 +201,12 @@ export class ModProcessor {
     async kickUser (memberToKick: GuildMember, kicker: GuildMember, reason: string): Promise<void> {
         // Note: This messaging has to be handled here because it can't be sent after the user is kicked
         try {
-            await memberToKick.send("You have been kicked from the RIT discord for _" + reason.trim() + "_ by **" + kicker.user.username + "**");
+            await memberToKick.send(
+                getInformationalEmbed(
+                    "You have been kicked",
+                    `You have been kicked from the RIT discord for _${reason.trim()}_ by **${kicker.user.username}**`
+                )
+            );
             await Punishment.create({
                 userId: memberToKick.id,
                 userName: memberToKick.user.username,
@@ -204,7 +219,9 @@ export class ModProcessor {
             });
             await memberToKick.kick(reason.trim());
         } catch (err) {
-            await kicker.send("An error occurred when trying to kick that user.");
+            await kicker.send(
+                getErrorEmbed("An error occurred when trying to kick that user.")
+            );
             await Punishment.create({
                 userId: memberToKick.id,
                 userName: memberToKick.user.username,
@@ -227,7 +244,12 @@ export class ModProcessor {
      */
     async warnUser (memberToWarn: GuildMember, warner: GuildMember, reason: string): Promise<void> {
         try {
-            await memberToWarn.send("You have been warned by **" + warner.user.username + "** in the RIT discord for _" + reason.trim() + "_.");
+            await memberToWarn.send(
+                getInformationalEmbed(
+                    "You have been warned",
+                    `You have been warned by **${warner.user.username}** in the RIT discord for _${reason.trim()}_.`
+                )
+            );
             await Punishment.create({
                 userId: memberToWarn.id,
                 userName: memberToWarn.user.username,
@@ -239,7 +261,9 @@ export class ModProcessor {
                 expiration: 0
             });
         } catch (err) {
-            await warner.send("An error occurred when trying to warn that user.");
+            await warner.send(
+                getErrorEmbed("An error occurred when trying to warn that user.")
+            );
             await Punishment.create({
                 userId: memberToWarn.id,
                 userName: memberToWarn.user.username,
