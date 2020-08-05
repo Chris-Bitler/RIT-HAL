@@ -146,10 +146,13 @@ export class Mod extends Command {
 
             const expirationDate = moment(Date.now() + cmdArgs.time);
             const expirationDateString = moment.tz(expirationDate, "America/New_York").format("MMMM Do YYYY, h:mm:ss a");
-            await channel.send(`${cmdArgs.target} has been muted for ${cmdArgs.reason} until ${expirationDateString}`);
-            await cmdArgs.target.send("You have been muted for _" + cmdArgs.reason + "_ until " + expirationDateString + " EST by **" + sender.displayName + "**");
+            await channel.send(getInformationalEmbed("User muted", `${cmdArgs.target} has been muted for ${cmdArgs.reason} until ${expirationDateString}`));
+            await cmdArgs.target.send(getInformationalEmbed(
+                "You have been muted",
+                "You have been muted for _" + cmdArgs.reason + "_ until " + expirationDateString + " EST by **" + sender.displayName + "**"
+            ));
         } else {
-            await channel.send(`${sender} - You need to use the command in the correct format: -mod mute [user ping] [time] | [reason]`);
+            await channel.send(getErrorEmbed(`${sender} - You need to use the command in the correct format: -mod mute [user ping] [time] | [reason]`));
         }
     }
 
@@ -181,9 +184,9 @@ export class Mod extends Command {
     async kickUser(channel: TextChannel, sender: GuildMember, cmdArgs: CommandArgs): Promise<void> {
         if (cmdArgs.target && cmdArgs.reason) {
             await modProcessor.kickUser(cmdArgs.target, sender, cmdArgs.reason);
-            await channel.send(`${cmdArgs.target} has been kicked.`);
+            await channel.send(getInformationalEmbed("User kicked", `${cmdArgs.target} has been kicked.`));
         } else {
-            await channel.send(`${sender} - You need to use the command in the correct format: -mod kick [user ping] [reason]`);
+            await channel.send(getErrorEmbed(`${sender} - You need to use the command in the correct format: -mod kick [user ping] [reason]`));
         }
     }
 
@@ -199,9 +202,9 @@ export class Mod extends Command {
             const expirationDateString = moment.tz(expirationDate, "America/New_York").format("MMMM Do YYYY, h:mm:ss a");
 
             await modProcessor.banUser(cmdArgs.target, sender, cmdArgs.reason, cmdArgs.time);
-            await channel.send(`${cmdArgs.target} has been banned for _${cmdArgs.reason}_ until ${expirationDateString}.`);
+            await channel.send(getInformationalEmbed("User banned", `${cmdArgs.target} has been banned for _${cmdArgs.reason}_ until ${expirationDateString}.`));
         } else {
-            await channel.send(`${sender} - You need to use the command in the correct format: -mod ban [user ping] [time] | [reason]`);
+            await channel.send(getErrorEmbed(`${sender} - You need to use the command in the correct format: -mod ban [user ping] [time] | [reason]`));
         }
     }
 
@@ -214,9 +217,9 @@ export class Mod extends Command {
     async warnUser(channel: TextChannel, sender: GuildMember, cmdArgs: CommandArgs): Promise<void> {
         if (cmdArgs.target && cmdArgs.reason) {
             await modProcessor.warnUser(cmdArgs.target, sender, cmdArgs.reason);
-            await channel.send(`${cmdArgs.target} has been warned for _${cmdArgs.reason}_.`);
+            await channel.send(getInformationalEmbed("User warned", `${cmdArgs.target} has been warned for _${cmdArgs.reason}_.`));
         } else {
-            await channel.send(`${sender} - You need to use the command in the correct format: -mod warn [user ping] [reason]`);
+            await channel.send(getErrorEmbed(`${sender} - You need to use the command in the correct format: -mod warn [user ping] [reason]`));
         }
     }
 

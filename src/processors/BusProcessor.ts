@@ -3,22 +3,26 @@ import {ArrivalResponseContainer, BusRoute, BusRoutes, ArrivalTimes, Stop} from 
 import * as moment from "moment";
 
 const AGENCY_ID = 643; // TODO: Make config changeable
-const axiosInstance: AxiosInstance = axios.create({
-    baseURL: "https://transloc-api-1-2.p.rapidapi.com",
-    headers: {
-        "x-rapidapi-host": "transloc-api-1-2.p.rapidapi.com",
-        "x-rapidapi-key": process.env.rapidapi_token,
-    }
-});
+let axiosInstance: AxiosInstance;
 
 /**
  * Singleton class to fetch and retrive bus routes
  * from the transloc api
  */
 export class BusProcessor {
+
     routes: BusRoutes = {};
     static instance: BusProcessor;
 
+    constructor() {
+        axiosInstance = axios.create({
+            baseURL: "https://transloc-api-1-2.p.rapidapi.com",
+            headers: {
+                "x-rapidapi-host": "transloc-api-1-2.p.rapidapi.com",
+                "x-rapidapi-key": process.env.rapidapi_token,
+            }
+        });
+    }
     /**
      * Get the instance of the BusProcessor singleton
      */

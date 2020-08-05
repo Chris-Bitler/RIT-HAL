@@ -3,7 +3,7 @@ import {MessageEmbed} from "discord.js";
 export function getErrorEmbed(text: string): MessageEmbed {
     const embed = new MessageEmbed();
     embed.setTitle("Error");
-    embed.setColor("red");
+    embed.setColor("RED");
     embed.setDescription(text);
     embed.setTimestamp(Date.now());
     return embed;
@@ -12,7 +12,7 @@ export function getErrorEmbed(text: string): MessageEmbed {
 export function getInformationalEmbed(title: string, text: string): MessageEmbed {
     const embed = new MessageEmbed();
     embed.setTitle(title);
-    embed.setColor("blue");
+    embed.setColor("BLUE");
     embed.setDescription(text);
     embed.setTimestamp(Date.now());
     return embed;

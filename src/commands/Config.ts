@@ -33,10 +33,18 @@ export class Config extends Command {
                         )
                     );
                 } else {
+                    ConfigProperty.update({
+                        value
+                    }, {
+                        where: {
+                            serverId,
+                            key
+                        }
+                    })
                     evt.channel.send(
                         getInformationalEmbed(
                             "Value updated",
-                            `${configProperty.key} was updated to ${configProperty.value}`
+                            `${configProperty.key} was updated to ${value}`
                         )
                     )
                 }

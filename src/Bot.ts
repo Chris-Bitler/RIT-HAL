@@ -8,6 +8,10 @@ import {EmojiProcessor} from "./processors/EmojiProcessor";
 import {checkReactionToDB} from "./processors/EmojiRoleProcessor";
 import {BusProcessor} from "./processors/BusProcessor";
 import {checkFoodDaily} from "./processors/FoodProcessor";
+import {ConfigProperty} from "./models/ConfigProperty";
+import {Emoji} from "./models/Emoji";
+import {EmojiToRole} from "./models/EmojiToRole";
+import {Punishment} from "./models/Punishment";
 dotenv.config();
 
 
@@ -28,7 +32,7 @@ if (postgre_db && postgre_username && postgre_password && postgre_host) {
         {
             host: postgre_host,
             dialect: "postgres",
-            models: [__dirname + "/models"]
+            models: [ConfigProperty, Emoji, EmojiToRole, Punishment]
         }
     );
     sequelize.sync();
@@ -82,8 +86,8 @@ client.on("messageReactionAdd", async (reaction, user) => {
     }
 });
 
-modProcessor.loadPunishmentsFromDB();
-setInterval(() => modProcessor.tickPunishments(client), 1000);
+setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
+setInterval(() => modProcessor.tickPunishments(client), 2000);
 
 client.login(process.env.discord_token);
 

@@ -23,5 +23,3 @@ export class FoodSpecials extends Command {
         return "specials"
     }
 }
-
-module.exports = FoodSpecials;
