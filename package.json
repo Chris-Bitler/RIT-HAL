@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "hal": "node dist/Bot.js",
     "lint-ts": "eslint src/ --ext ts",
     "lint-js": "eslint src/ --ext js"
