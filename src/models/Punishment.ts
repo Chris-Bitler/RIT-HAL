@@ -5,30 +5,30 @@ import { Column, DataType, Model, Table } from "sequelize-typescript";
  */
 @Table
 export class Punishment extends Model<Punishment> {
-  @Column
-  userId!: string;
+    @Column
+    userId!: string;
 
-  @Column
-  userName!: string;
+    @Column
+    userName!: string;
 
-  @Column
-  punisherId!: string;
+    @Column
+    punisherId!: string;
 
-  @Column
-  punisherName!: string;
+    @Column
+    punisherName!: string;
 
-  @Column
-  type!: string;
+    @Column
+    type!: string;
 
-  @Column
-  reason!: string;
+    @Column
+    reason!: string;
 
-  @Column
-  active: boolean = false;
+    @Column
+    active: boolean = false;
 
-  @Column
-  serverId!: string;
+    @Column
+    serverId!: string;
 
-  @Column(DataType.BIGINT)
-  expiration!: number;
+    @Column(DataType.BIGINT)
+    expiration!: number;
 }

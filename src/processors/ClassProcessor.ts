@@ -8,27 +8,27 @@ import { Course } from "../types/Courses";
  * @param section The section of the course
  */
 export async function getClasses(
-  majorAbbrev: string,
-  courseNumber: string,
-  section = ""
+    majorAbbrev: string,
+    courseNumber: string,
+    section = ""
 ): Promise<Course[]> {
-  const result = (
-    await axios.post(
-      "https://tigercenter.rit.edu/tigerCenterApp/tc/class-search",
-      {
-        searchParams: {
-          query: `${majorAbbrev} ${courseNumber} ${section}`.trim(),
-          term: "2201",
-          isAdvanced: false,
-          courseAttributeOptions: [],
-          courseAttributeOptionsPassed: [],
-        },
-      }
-    )
-  ).data;
-  if (result.found) {
-    return result.searchResults as Course[];
-  } else {
-    return [];
-  }
+    const result = (
+        await axios.post(
+            "https://tigercenter.rit.edu/tigerCenterApp/tc/class-search",
+            {
+                searchParams: {
+                    query: `${majorAbbrev} ${courseNumber} ${section}`.trim(),
+                    term: "2201",
+                    isAdvanced: false,
+                    courseAttributeOptions: [],
+                    courseAttributeOptionsPassed: []
+                }
+            }
+        )
+    ).data;
+    if (result.found) {
+        return result.searchResults as Course[];
+    } else {
+        return [];
+    }
 }

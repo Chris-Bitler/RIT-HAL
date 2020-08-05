@@ -1,3 +1,3 @@
 export interface UnicodeEmoji {
-  id: string;
+    id: string;
 }

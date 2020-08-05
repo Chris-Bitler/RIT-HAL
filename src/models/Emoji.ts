@@ -5,14 +5,14 @@ import { Table, Model, PrimaryKey, Column } from "sequelize-typescript";
  */
 @Table
 export class Emoji extends Model<Emoji> {
-  @PrimaryKey
-  @Column
-  serverId!: string;
+    @PrimaryKey
+    @Column
+    serverId!: string;
 
-  @PrimaryKey
-  @Column
-  emoji!: string;
+    @PrimaryKey
+    @Column
+    emoji!: string;
 
-  @Column
-  num!: number;
+    @Column
+    num!: number;
 }

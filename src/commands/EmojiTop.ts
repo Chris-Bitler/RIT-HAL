@@ -6,17 +6,17 @@ import { Message, Client } from "discord.js";
  * Command to list an embed of the top 10 most used emojis in the server
  */
 export class EmojiTop extends Command {
-  emojiProcessor: EmojiProcessor = EmojiProcessor.getInstance();
+    emojiProcessor: EmojiProcessor = EmojiProcessor.getInstance();
 
-  async useCommand(client: Client, evt: Message): Promise<void> {
-    await this.emojiProcessor.getTopEmojis(evt);
-  }
+    async useCommand(client: Client, evt: Message): Promise<void> {
+        await this.emojiProcessor.getTopEmojis(evt);
+    }
 
-  getCommand(): string {
-    return "emojitop";
-  }
+    getCommand(): string {
+        return "emojitop";
+    }
 
-  getConfigBase(): string {
-    return "emojitop";
-  }
+    getConfigBase(): string {
+        return "emojitop";
+    }
 }

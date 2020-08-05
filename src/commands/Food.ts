@@ -7,28 +7,30 @@ import { getErrorEmbed } from "../utils/EmbedUtil";
  * Command to show what food places are open on campus right now
  */
 export class Food extends Command {
-  async useCommand(client: Client, evt: Message): Promise<void> {
-    try {
-      const openPlaces = await getOpenPlaces();
-      if (openPlaces) {
-        openPlaces.forEach((place) => {
-          if (place.sections.length > 0) {
-            evt.channel.send(getFoodEmbed(place));
-          }
-        });
-      } else {
-        evt.channel.send(getErrorEmbed("No food places are open currently."));
-      }
-    } catch (err) {
-      // TODO: Sentry logging
+    async useCommand(client: Client, evt: Message): Promise<void> {
+        try {
+            const openPlaces = await getOpenPlaces();
+            if (openPlaces) {
+                openPlaces.forEach((place) => {
+                    if (place.sections.length > 0) {
+                        evt.channel.send(getFoodEmbed(place));
+                    }
+                });
+            } else {
+                evt.channel.send(
+                    getErrorEmbed("No food places are open currently.")
+                );
+            }
+        } catch (err) {
+            // TODO: Sentry logging
+        }
     }
-  }
 
-  getCommand(): string {
-    return "rit food";
-  }
+    getCommand(): string {
+        return "rit food";
+    }
 
-  getConfigBase(): string {
-    return "food";
-  }
+    getConfigBase(): string {
+        return "food";
+    }
 }
