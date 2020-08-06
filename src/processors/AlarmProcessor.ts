@@ -1,4 +1,5 @@
 import { Alarm } from "../types/Alarm";
+import * as moment from "moment-timezone";
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import { Alarm as AlarmModel } from "../models/Alarm";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
@@ -40,8 +41,18 @@ export class AlarmProcessor {
     ): Promise<void> {
         if (message.guild) {
             try {
+                let lastUsed = 0;
+
+                // Deal with times that have already passed today
+                const current = moment().tz("America/New_York");
+                current.hours(hours)
+                current.minutes(minutes);
+                if (Date.now() > current.valueOf()) {
+                    lastUsed = current.valueOf();
+                }
+
                 const alarm = await AlarmModel.create({
-                    lastUsed: 0,
+                    lastUsed: lastUsed,
                     channelId: channel.id,
                     serverId: message.guild.id,
                     hours,
@@ -53,7 +64,7 @@ export class AlarmProcessor {
                     hours,
                     minutes,
                     message: messageToSend,
-                    lastSent: 0,
+                    lastSent: lastUsed,
                     channelId: channel.id,
                     serverId: message.guild.id,
                     id: alarm.id
@@ -192,11 +203,11 @@ export class AlarmProcessor {
     async tickAlarms(client: Client): Promise<void> {
         for (const alarm of this.alarms) {
             const now = Date.now();
-            const date = new Date();
+            const date = moment().tz("America/New_York");
             if (
                 alarm.lastSent + MS_IN_23_HOURS < now &&
-                date.getHours() + 1 >= alarm.hours &&
-                date.getMinutes() + 1 >= alarm.minutes
+                date.hour() + 1 >= alarm.hours &&
+                date.minute() + 1 >= alarm.minutes
             ) {
                 const guild = client.guilds.resolve(alarm.serverId);
                 if (guild) {
