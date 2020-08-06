@@ -22,8 +22,8 @@ import { ConfigProperty } from "./models/ConfigProperty";
 import { Emoji } from "./models/Emoji";
 import { EmojiToRole } from "./models/EmojiToRole";
 import { Punishment } from "./models/Punishment";
-import {AlarmProcessor} from "./processors/AlarmProcessor";
-import {Alarm} from "./models/Alarm";
+import { AlarmProcessor } from "./processors/AlarmProcessor";
+import { Alarm } from "./models/Alarm";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();

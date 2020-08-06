@@ -1,8 +1,8 @@
-import {Command} from "./Command";
-import {Client, Message, Permissions, TextChannel} from "discord.js";
-import {getErrorEmbed} from "../utils/EmbedUtil";
-import {mergeArgs} from "../utils/StringUtil";
-import {AlarmProcessor} from "../processors/AlarmProcessor";
+import { Command } from "./Command";
+import { Client, Message, Permissions, TextChannel } from "discord.js";
+import { getErrorEmbed } from "../utils/EmbedUtil";
+import { mergeArgs } from "../utils/StringUtil";
+import { AlarmProcessor } from "../processors/AlarmProcessor";
 
 // Represents an invalid hour/minute for getTime()
 const INVALID_TIME = -1;
@@ -13,7 +13,11 @@ const INVALID_TIME = -1;
 export class Alarm extends Command {
     alarmProcessor = AlarmProcessor.getInstance();
 
-    async useCommand(client: Client, evt: Message, args: string[]): Promise<void> {
+    async useCommand(
+        client: Client,
+        evt: Message,
+        args: string[]
+    ): Promise<void> {
         if (args.length >= 1 && evt.channel instanceof TextChannel) {
             const type = args[0].toLowerCase();
             switch (type) {
@@ -28,15 +32,19 @@ export class Alarm extends Command {
                     break;
                 default:
                     await evt.channel.send(
-                        getErrorEmbed("Invalid command. Type `-alarm` to see the possible arguments")
-                    )
+                        getErrorEmbed(
+                            "Invalid command. Type `-alarm` to see the possible arguments"
+                        )
+                    );
             }
         } else {
             if (evt.channel instanceof TextChannel) {
                 await evt.channel.send(
-                    getErrorEmbed("Incorrect syntax. Try `-alarm [create|list|delete]`.\n" +
-                        "Use of them to see the syntax for it")
-                )
+                    getErrorEmbed(
+                        "Incorrect syntax. Try `-alarm [create|list|delete]`.\n" +
+                            "Use of them to see the syntax for it"
+                    )
+                );
             }
         }
     }
@@ -46,7 +54,7 @@ export class Alarm extends Command {
     }
 
     getCommand(): string {
-        return "alarm"
+        return "alarm";
     }
 
     getRequiredPermission(): number {
@@ -59,7 +67,7 @@ export class Alarm extends Command {
      * @param args The args for the command
      */
     async createAlarm(evt: Message, args: string[]): Promise<void> {
-        if(args.length >= 5) {
+        if (args.length >= 5) {
             // TODO: Replace this with regex
             const channel = args[1]
                 .replace("<", "")
@@ -68,8 +76,10 @@ export class Alarm extends Command {
             const [hours, minutes] = this.getTime(args[2], args[3]);
             if (hours === INVALID_TIME || minutes === INVALID_TIME) {
                 await evt.channel.send(
-                    getErrorEmbed("Invalid time. Make sure that it is in the form hours:minutes [am|pm]\n" +
-                        " and that the hours are 12 or less and the minutes are less than 60")
+                    getErrorEmbed(
+                        "Invalid time. Make sure that it is in the form hours:minutes [am|pm]\n" +
+                            " and that the hours are 12 or less and the minutes are less than 60"
+                    )
                 );
                 return;
             }
@@ -88,16 +98,16 @@ export class Alarm extends Command {
                             hours,
                             minutes,
                             messageToSend
-                        )
+                        );
                     } else {
                         evt.channel.send(
-                            getErrorEmbed("Target channel needs to be a text channel")
-                        )
+                            getErrorEmbed(
+                                "Target channel needs to be a text channel"
+                            )
+                        );
                     }
                 } else {
-                    evt.channel.send(
-                        getErrorEmbed("Cannot find channel")
-                    )
+                    evt.channel.send(getErrorEmbed("Cannot find channel"));
                 }
             }
         } else {
@@ -105,7 +115,7 @@ export class Alarm extends Command {
                 getErrorEmbed(
                     "Incorrect syntax. Try `-alarm create [channel] [time in Hours:Minutes] [am or pm] [message]"
                 )
-            )
+            );
         }
     }
 
@@ -122,7 +132,8 @@ export class Alarm extends Command {
                 const minutes = parseInt(minutesString);
                 if (hours && minutes) {
                     if (hours <= 12 && minutes < 60) {
-                        hours = amOrPm.toLowerCase() === "pm" ? hours + 12 : hours;
+                        hours =
+                            amOrPm.toLowerCase() === "pm" ? hours + 12 : hours;
                         return [hours, minutes];
                     }
                 }
@@ -151,8 +162,10 @@ export class Alarm extends Command {
             await this.alarmProcessor.deleteAlarm(evt, id);
         } else {
             await evt.channel.send(
-                getErrorEmbed("Incorrect syntax. Try `-alarm delete [id]` where the ID is the ID of the alarm from `-alarm list`")
-            )
+                getErrorEmbed(
+                    "Incorrect syntax. Try `-alarm delete [id]` where the ID is the ID of the alarm from `-alarm list`"
+                )
+            );
         }
     }
 }

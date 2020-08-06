@@ -1,7 +1,7 @@
-import {Alarm} from "../types/Alarm";
-import {Client, Message, MessageEmbed, TextChannel} from "discord.js";
-import {Alarm as AlarmModel} from "../models/Alarm";
-import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
+import { Alarm } from "../types/Alarm";
+import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
+import { Alarm as AlarmModel } from "../models/Alarm";
+import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 
 const MS_IN_23_HOURS = 82800000;
 
@@ -59,8 +59,6 @@ export class AlarmProcessor {
                     id: alarm.id
                 });
 
-
-
                 let amPm = "am";
                 if (hours > 12) {
                     amPm = "pm";
@@ -70,14 +68,13 @@ export class AlarmProcessor {
                     hoursToSend = hours % 12;
                 }
 
-
                 await message.channel.send(
                     getInformationalEmbed(
                         "Alarm created",
                         `An alarm for ${channel} was created to go off at ${hoursToSend}:${minutes} ${amPm}
                         saying ${message}`
                     )
-                )
+                );
             } catch (error) {
                 // TODO: Log error to sentry
             }
@@ -92,7 +89,7 @@ export class AlarmProcessor {
         const serverId = message.guild?.id;
         if (serverId) {
             return this.alarms.filter((alarm) => {
-                return alarm.serverId === serverId
+                return alarm.serverId === serverId;
             });
         } else {
             return [];
@@ -104,7 +101,7 @@ export class AlarmProcessor {
      */
     async loadAlarms(): Promise<void> {
         const alarms = await AlarmModel.findAll();
-        for(const alarm of alarms) {
+        for (const alarm of alarms) {
             this.alarms.push({
                 lastSent: alarm.lastUsed,
                 hours: alarm.hours,
@@ -132,9 +129,10 @@ export class AlarmProcessor {
                 const hours = alarm.hours !== 12 ? alarm.hours % 12 : 12;
                 const minutes = alarm.minutes;
                 const amPm = alarm.hours >= 12 ? "pm" : "am";
-                description += `**ID:** ${alarm.id}\n` +
+                description +=
+                    `**ID:** ${alarm.id}\n` +
                     `**Time:** ${hours}:${minutes} ${amPm}\n` +
-                    `**Message:** ${alarm.message}\n\n`
+                    `**Message:** ${alarm.message}\n\n`;
             }
 
             embed.addField("Alarms", description);
@@ -166,7 +164,7 @@ export class AlarmProcessor {
                         }
                     });
                     this.alarms = this.alarms.filter((alarm) => {
-                        return alarm.id !== id
+                        return alarm.id !== id;
                     });
                     await message.channel.send(
                         getInformationalEmbed(
@@ -175,7 +173,11 @@ export class AlarmProcessor {
                         )
                     );
                 } else {
-                    await message.channel.send(getErrorEmbed("That alarm doesn't belong to this server."));
+                    await message.channel.send(
+                        getErrorEmbed(
+                            "That alarm doesn't belong to this server."
+                        )
+                    );
                 }
             }
         } else {
@@ -193,22 +195,27 @@ export class AlarmProcessor {
             const date = new Date();
             if (
                 alarm.lastSent + MS_IN_23_HOURS < now &&
-                date.getHours()+1 >= alarm.hours &&
-                date.getMinutes()+1 >= alarm.minutes
+                date.getHours() + 1 >= alarm.hours &&
+                date.getMinutes() + 1 >= alarm.minutes
             ) {
                 const guild = client.guilds.resolve(alarm.serverId);
                 if (guild) {
-                    const channel = client.channels.resolve(alarm.channelId) as TextChannel;
+                    const channel = client.channels.resolve(
+                        alarm.channelId
+                    ) as TextChannel;
                     if (channel) {
                         await channel.send(alarm.message);
                         alarm.lastSent = now;
-                        await AlarmModel.update({
-                            lastUsed: now
-                        }, {
-                            where: {
-                                id: alarm.id
+                        await AlarmModel.update(
+                            {
+                                lastUsed: now
+                            },
+                            {
+                                where: {
+                                    id: alarm.id
+                                }
                             }
-                        })
+                        );
                     }
                 }
             }

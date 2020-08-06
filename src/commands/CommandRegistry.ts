@@ -11,7 +11,7 @@ import { FoodSpecials } from "./FoodSpecials";
 import { EmojiRole } from "./EmojiRole";
 import { Pin } from "./Pin";
 import { Config } from "./Config";
-import {Alarm} from "./Alarm";
+import { Alarm } from "./Alarm";
 
 /**
  * Class to contain the registry of commands for the discord bot
