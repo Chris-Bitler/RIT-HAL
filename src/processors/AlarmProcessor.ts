@@ -45,7 +45,7 @@ export class AlarmProcessor {
 
                 // Deal with times that have already passed today
                 const current = moment().tz("America/New_York");
-                current.hours(hours)
+                current.hours(hours);
                 current.minutes(minutes);
                 if (Date.now() > current.valueOf()) {
                     lastUsed = current.valueOf();
