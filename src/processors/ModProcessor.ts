@@ -324,7 +324,7 @@ export class ModProcessor {
                 userName: memberToWarn.user.username,
                 punisherId: warner.id,
                 punisherName: warner.user.username,
-                type: "kick",
+                type: "warn",
                 reason,
                 serverId: memberToWarn.guild.id,
                 expiration: 0

@@ -1,4 +1,8 @@
 "use strict";
+// Fixes bug in sequelize that returns bigint as string
+import * as pg from "pg";
+pg.defaults.parseInt8 = true;
+
 import { ModProcessor } from "./processors/ModProcessor";
 import {
     Client,
@@ -18,10 +22,14 @@ import { ConfigProperty } from "./models/ConfigProperty";
 import { Emoji } from "./models/Emoji";
 import { EmojiToRole } from "./models/EmojiToRole";
 import { Punishment } from "./models/Punishment";
+import {AlarmProcessor} from "./processors/AlarmProcessor";
+import {Alarm} from "./models/Alarm";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
 const modProcessor = ModProcessor.getInstance();
+const alarmProcessor = AlarmProcessor.getInstance();
+
 const client = new Client({
     partials: ["MESSAGE", "CHANNEL", "REACTION"]
 });
@@ -40,7 +48,7 @@ if (postgre_db && postgre_username && postgre_password && postgre_host) {
         {
             host: postgre_host,
             dialect: "postgres",
-            models: [ConfigProperty, Emoji, EmojiToRole, Punishment]
+            models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm]
         }
     );
     sequelize.sync();
@@ -98,6 +106,8 @@ client.on("messageReactionAdd", async (reaction, user) => {
 
 setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
 setInterval(() => modProcessor.tickPunishments(client), 2000);
+setTimeout(() => alarmProcessor.loadAlarms(), 1000);
+setInterval(() => alarmProcessor.tickAlarms(client), 1000);
 
 client.login(process.env.discord_token);
 

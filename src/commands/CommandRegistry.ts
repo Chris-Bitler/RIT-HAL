@@ -11,6 +11,7 @@ import { FoodSpecials } from "./FoodSpecials";
 import { EmojiRole } from "./EmojiRole";
 import { Pin } from "./Pin";
 import { Config } from "./Config";
+import {Alarm} from "./Alarm";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -35,6 +36,7 @@ export class CommandRegistry {
             this.registry.push(new EmojiTop());
             this.registry.push(new Pin());
             this.registry.push(new Config());
+            this.registry.push(new Alarm());
         }
     }
 

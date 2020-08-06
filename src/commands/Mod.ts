@@ -336,7 +336,7 @@ export class Mod extends Command {
                         `Type: ${punishment.type}\n` +
                         `Reason: ${punishment.reason}\n` +
                         `Expiration: ${
-                            punishment.expiration ? expirationDateString : "N/A"
+                            punishment.expiration !== 0 ? expirationDateString : "N/A"
                         }\n` +
                         `Active: ${punishment.active ? "True" : "False"}\n` +
                         `By: ${punishment.punisherName}\n\n`
