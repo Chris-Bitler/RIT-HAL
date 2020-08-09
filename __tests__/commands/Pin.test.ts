@@ -6,7 +6,7 @@ import {
     Client,
     VoiceChannel,
     MessageManager,
-    GuildMemberManager, GuildMember, User, MessageAttachment, Collection, Snowflake, MessageEmbed
+    GuildMemberManager, GuildMember, User, MessageAttachment, Collection, Snowflake, MessageEmbed, Permissions
 } from "discord.js";
 import {getErrorEmbed, getInformationalEmbed} from "../../src/utils/EmbedUtil";
 import {Pin} from "../../src/commands/Pin";
@@ -192,5 +192,12 @@ describe("Pin command tests", () => {
                 "Message from Test1 pinned in starboard."
             )
         )
+    });
+
+    test("command should be set up correctly", () => {
+        const pin = new Pin();
+        expect(pin.getCommand()).toEqual("starboard");
+        expect(pin.getConfigBase()).toEqual("starboard");
+        expect(pin.getRequiredPermission()).toEqual(Permissions.FLAGS.KICK_MEMBERS);
     });
 });

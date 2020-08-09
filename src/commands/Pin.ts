@@ -71,7 +71,6 @@ export class Pin extends Command {
                     }
                 } catch (exception) {
                     sentry.captureException(exception);
-                    console.log(exception);
                     await evt.channel.send(
                         getErrorEmbed(
                             "Error sending embed to starboard channel"
@@ -161,6 +160,10 @@ export class Pin extends Command {
 
     getCommand(): string {
         return "starboard";
+    }
+
+    getConfigBase(): string {
+        return "starboard"
     }
 
     getRequiredPermission(): number {

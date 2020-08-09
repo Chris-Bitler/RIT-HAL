@@ -38,7 +38,7 @@ export class Alarm extends Command {
                     );
             }
         } else {
-            if (evt.channel instanceof TextChannel) {
+            if (evt.channel.type === "text") {
                 await evt.channel.send(
                     getErrorEmbed(
                         "Incorrect syntax. Try `-alarm [create|list|delete]`.\n" +

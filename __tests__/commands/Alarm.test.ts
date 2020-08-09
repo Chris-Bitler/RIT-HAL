@@ -1,4 +1,4 @@
-import {Client, Message, Guild, TextChannel, GuildChannelManager, VoiceChannel} from "discord.js";
+import {Client, Message, Guild, TextChannel, GuildChannelManager, VoiceChannel, Permissions} from "discord.js";
 import {AlarmProcessor} from "../../src/processors/AlarmProcessor";
 import {Alarm} from "../../src/commands/Alarm";
 import {getErrorEmbed} from "../../src/utils/EmbedUtil";
@@ -129,6 +129,39 @@ describe("Alarm command tests", () => {
             await alarm.useCommand(client, message, ["delete", "1"]);
             expect(alarmProcessor.deleteAlarm).toHaveBeenCalledWith(message, "1");
         });
+    });
+
+    test("Given no valid first arg, should error embed", async () => {
+        alarmProcessor.deleteAlarm = jest.fn();
+        const alarm = new Alarm();
+        await alarm.useCommand(client, message, ["asdefgh", ""]);
+        expect(channel.send).toHaveBeenCalledWith(
+            getErrorEmbed(
+                "Invalid command. Type `-alarm` to see the possible arguments"
+            )
+        );
+    });
+
+    test("Given no args, should give explanatory error", async () => {
+        alarmProcessor.deleteAlarm = jest.fn();
+        const alarm = new Alarm();
+        await alarm.useCommand(client, message, []);
+        expect(channel.send).toHaveBeenCalledWith(
+            getErrorEmbed(
+                "Incorrect syntax. Try `-alarm [create|list|delete]`.\n" +
+                "Use of them to see the syntax for it"
+            )
+        );
+    });
+
+    test("configBase should be the same as command", () => {
+        const alarm = new Alarm();
+        expect(alarm.getConfigBase()).toEqual(alarm.getCommand());
+    });
+
+    test("Expect command to require administrator permission", () => {
+        const alarm = new Alarm();
+        expect(alarm.getRequiredPermission()).toEqual(Permissions.FLAGS.ADMINISTRATOR);
     });
 
     afterAll(() => {
