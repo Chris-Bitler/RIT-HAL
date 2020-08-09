@@ -19,7 +19,7 @@ export async function addEmojiRole(
         await EmojiToRole.create({
             emojiId: emote.id,
             roleId: role.id,
-            channelId: role.id,
+            channelId: channel.id,
             serverId: channel.guild.id
         });
         await initialChannel.send(
@@ -75,8 +75,3 @@ export async function checkReactionToDB(
         }
     }
 }
-
-module.exports = {
-    addEmojiRole,
-    checkReactionToDB
-};

@@ -1,11 +1,13 @@
 import axios from "axios";
 import * as cheerio from "cheerio";
 import { DailyPostInfo, FoodPlace, MenuItem, PlaceMenu } from "../types/Food";
-import { Client, Guild, MessageEmbed, TextChannel } from "discord.js";
+import { Client, MessageEmbed, TextChannel } from "discord.js";
 import { ConfigProperty } from "../models/ConfigProperty";
 const placeIDs = [103, 104, 105, 106, 107, 108, 112];
-const foodChannel = "668249652570751017";
-const serverId = "401908664018927626";
+
+/**
+ * This file will be unit tested eventually
+ */
 
 export async function getOpenPlaces(): Promise<FoodPlace[] | null> {
     try {
