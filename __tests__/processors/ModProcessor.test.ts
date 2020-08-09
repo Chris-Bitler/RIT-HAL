@@ -78,6 +78,13 @@ describe("ModProcessor tests", () => {
     });
     describe("Mute user tests", () => {
         test("Should create mute", async () => {
+            ModProcessor.getInstance().mutes.push({
+                memberId: "123",
+                muterId: "2",
+                serverId: "1",
+                reason: "Test",
+                expiration: 1001
+            });
             ConfigProperty.findOne = jest.fn().mockReturnValue({
                 value: "12345"
             });
@@ -116,6 +123,13 @@ describe("ModProcessor tests", () => {
 
     describe("Ban user tests", () => {
         test("Should create Ban", async () => {
+            ModProcessor.getInstance().bans.push({
+                memberId: "123",
+                bannerId: "456",
+                serverId: "1",
+                reason: "Test",
+                expiration: 1001
+            });
             mockDateNow.mockReturnValue(1000);
             const mockCreate = (Punishment.create as jest.MockedFunction<typeof Punishment.create>);
 
