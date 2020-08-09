@@ -1,0 +1,2 @@
+ignore:
+  - "src/processors/FoodProcessor.ts" # Don't count this - still figuring out how to unit test it
