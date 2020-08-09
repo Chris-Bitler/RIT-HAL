@@ -1,4 +1,12 @@
-## HAL Discord Bot
+<p align="center">
+<img alt="HAL profile picture" src="https://cdn.discordapp.com/app-icons/643590178727919616/7a9a0505cdd4f951e34f392e6ef9eba1.png?size=512" />
+</p>
+
+## HAL Discord Bot 
+
+[![codecov](https://codecov.io/gh/Chris-Bitler/RIT-HAL/branch/master/graph/badge.svg)](https://codecov.io/gh/Chris-Bitler/RIT-HAL)
+[![circleci](https://circleci.com/gh/Chris-Bitler/RIT-HAL.svg?style=svg)](https://circleci.com/gh/Chris-Bitler/RIT-HAL)
+
 A discord bot made for the [Unofficial RIT Discord Server](https://discord.gg/rit). Has moderation capabilities along with some other miscellaneous uses.
 ## How to run HAL
 1. Pull the code down via `git clone git@github.com:Chris-Bitler/RIT-HAL.git`
