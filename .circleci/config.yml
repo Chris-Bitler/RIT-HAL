@@ -15,6 +15,6 @@ jobs:
           command: npm ci
       - run:
           name: Run Tests
-          command: jest
+          command: npm test
       - codecov/upload:
           file: "./coverage/clover.xml"
