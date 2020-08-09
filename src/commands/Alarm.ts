@@ -130,7 +130,7 @@ export class Alarm extends Command {
             if (hoursString && minutesString) {
                 let hours = parseInt(hoursString);
                 const minutes = parseInt(minutesString);
-                if (hours && minutes) {
+                if (hours !== null && minutes !== null) {
                     if (hours <= 12 && minutes < 60) {
                         hours =
                             amOrPm.toLowerCase() === "pm" ? hours + 12 : hours;

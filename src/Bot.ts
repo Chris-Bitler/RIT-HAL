@@ -104,6 +104,18 @@ client.on("messageReactionAdd", async (reaction, user) => {
     }
 });
 
+client.on("messageReactionRemove", async (reaction, user) => {
+    if (reaction.message.partial) await reaction.message.fetch();
+    const channel = reaction.message.channel;
+    if (!user.bot && channel instanceof TextChannel) {
+        const emoji = reaction.emoji;
+        const member = channel.guild.members.resolve(await user.fetch());
+        if (member && emoji instanceof GuildEmoji) {
+            await checkReactionToDB(emoji, member, channel, reaction);
+        }
+    }
+});
+
 setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
 setInterval(() => modProcessor.tickPunishments(client), 2000);
 setTimeout(() => alarmProcessor.loadAlarms(), 1000);

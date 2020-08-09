@@ -70,8 +70,6 @@ export async function checkReactionToDB(
                     )
                 );
             }
-
-            await reaction.users.remove(member.id);
         }
     }
 }

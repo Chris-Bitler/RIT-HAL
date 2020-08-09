@@ -45,8 +45,13 @@ export class EmojiRole extends Command {
                 };
             }
 
-            const role = this.getRole(evt, args[1].replace("@", ""));
-            const channel = this.getChannel(evt, args[2].replace("#", ""));
+            const role = this.getRole(evt, args[1].replace("@", "")
+                .replace("!", "")
+                .replace("<", "")
+                .replace(">","")
+                .replace("&", "")
+            );
+            const channel = this.getChannel(evt, args[2].replace("#", "").replace("<", "").replace(">", ""));
             if (channel && channel.constructor.name !== TextChannel.name) {
                 await initialChannel.send(
                     getErrorEmbed("Invalid channel. Try again.")
@@ -79,11 +84,12 @@ export class EmojiRole extends Command {
         );
     }
 
-    getRole(evt: Message, roleText: string): Role | null {
+    getRole(evt: Message, roleId: string): Role | null {
         if (evt.guild) {
+            console.log(roleId);
             return (
                 evt.guild.roles.cache.find(
-                    (role) => role.name.toLowerCase() === roleText.toLowerCase()
+                    (role) => role.id === roleId
                 ) || null
             );
         } else {

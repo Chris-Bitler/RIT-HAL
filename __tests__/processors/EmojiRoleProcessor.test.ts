@@ -91,7 +91,6 @@ describe("EmojiRoleProcessor tests", () => {
 
             expect(member.roles.remove).toHaveBeenCalled();
             expect(member.send).toHaveBeenCalled();
-            expect(messageReaction.users.remove).toHaveBeenCalled();
         });
 
         test("Should add role if exists in database and user does not role", async () => {
@@ -110,7 +109,6 @@ describe("EmojiRoleProcessor tests", () => {
 
             expect(member.roles.add).toHaveBeenCalled();
             expect(member.send).toHaveBeenCalled();
-            expect(messageReaction.users.remove).toHaveBeenCalled();
         });
     });
 });

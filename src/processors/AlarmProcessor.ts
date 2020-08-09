@@ -208,10 +208,10 @@ export class AlarmProcessor {
             const now = Date.now();
             const date = moment().tz("America/New_York");
             const sameHourMoreMinutes = (
-                date.hours() + 1 === alarm.hours &&
-                date.minutes() + 1 >= alarm.minutes
+                date.hours() === alarm.hours &&
+                date.minutes() >= alarm.minutes
             );
-            const moreHours = (date.hours() + 1 > alarm.hours);
+            const moreHours = (date.hours() > alarm.hours);
             if (
                 alarm.lastSent + MS_IN_23_HOURS < now &&
                 (sameHourMoreMinutes || moreHours)
