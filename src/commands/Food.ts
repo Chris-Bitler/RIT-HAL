@@ -2,6 +2,7 @@ import { Command } from "./Command";
 import { Client, Message } from "discord.js";
 import { getFoodEmbed, getOpenPlaces } from "../processors/FoodProcessor";
 import { getErrorEmbed } from "../utils/EmbedUtil";
+import * as sentry from "@sentry/node";
 
 /**
  * Command to show what food places are open on campus right now
@@ -22,7 +23,10 @@ export class Food extends Command {
                 );
             }
         } catch (err) {
-            // TODO: Sentry logging
+            sentry.captureException(err);
+            evt.channel.send(
+                getErrorEmbed("Error occurred trying to process open food places.")
+            );
         }
     }
 

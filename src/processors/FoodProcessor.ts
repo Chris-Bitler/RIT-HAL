@@ -3,6 +3,7 @@ import * as cheerio from "cheerio";
 import { DailyPostInfo, FoodPlace, MenuItem, PlaceMenu } from "../types/Food";
 import { Client, MessageEmbed, TextChannel } from "discord.js";
 import { ConfigProperty } from "../models/ConfigProperty";
+import * as sentry from "@sentry/node";
 const placeIDs = [103, 104, 105, 106, 107, 108, 112];
 
 /**
@@ -38,13 +39,11 @@ export async function getOpenPlaces(): Promise<FoodPlace[] | null> {
                     .text()
                     .replace("&nbsp;", "");
                 const body = $(elem).find("div.panel-body");
-                const weekDay = body.find("div.col-sm-7").text();
                 const times = body.find("div.col-sm-5").text();
 
                 if (times.trim() !== "Closed" && currentLocation) {
                     currentLocation.sections.push({
                         header: header,
-                        day: weekDay,
                         times: times
                     });
                 }
@@ -58,7 +57,7 @@ export async function getOpenPlaces(): Promise<FoodPlace[] | null> {
 
         return places;
     } catch (error) {
-        // TODO: log to sentry
+        sentry.captureException(error);
         return null;
     }
 }
@@ -139,7 +138,7 @@ export async function getSpecials() {
 
         return places;
     } catch (err) {
-        // TODO: Log to sentry
+        sentry.captureException(err);
         return places;
     }
 }

@@ -18,7 +18,7 @@ export class Alarm extends Command {
         evt: Message,
         args: string[]
     ): Promise<void> {
-        if (args.length >= 1 && evt.channel instanceof TextChannel) {
+        if (args.length >= 1 && evt.channel.type === "text") {
             const type = args[0].toLowerCase();
             switch (type) {
                 case "create":
@@ -77,7 +77,7 @@ export class Alarm extends Command {
             if (hours === INVALID_TIME || minutes === INVALID_TIME) {
                 await evt.channel.send(
                     getErrorEmbed(
-                        "Invalid time. Make sure that it is in the form hours:minutes [am|pm]\n" +
+                        "Invalid time. Make sure that it is in the form hours:minutes [am|pm]" +
                             " and that the hours are 12 or less and the minutes are less than 60"
                     )
                 );
@@ -87,10 +87,9 @@ export class Alarm extends Command {
             const messageToSend = mergeArgs(4, args);
             const guild = evt.guild;
             if (guild) {
-                console.log(channel);
                 const guildChannel = guild.channels.resolve(channel);
                 if (guildChannel) {
-                    if (guildChannel instanceof TextChannel) {
+                    if (guildChannel.type === "text") {
                         const channelToUse = guildChannel as TextChannel;
                         await this.alarmProcessor.createAlarm(
                             evt,
@@ -109,11 +108,13 @@ export class Alarm extends Command {
                 } else {
                     evt.channel.send(getErrorEmbed("Cannot find channel"));
                 }
+            } else {
+                evt.channel.send(getErrorEmbed("Not a valid guild"));
             }
         } else {
             await evt.channel.send(
                 getErrorEmbed(
-                    "Incorrect syntax. Try `-alarm create [channel] [time in Hours:Minutes] [am or pm] [message]"
+                    "Incorrect syntax. Try `-alarm create [channel] [time in Hours:Minutes] [am or pm] [message]`"
                 )
             );
         }

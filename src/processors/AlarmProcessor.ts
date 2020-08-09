@@ -3,6 +3,7 @@ import * as moment from "moment-timezone";
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import { Alarm as AlarmModel } from "../models/Alarm";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
+import * as sentry from "@sentry/node";
 
 const MS_IN_23_HOURS = 82800000;
 
@@ -90,7 +91,7 @@ export class AlarmProcessor {
                     )
                 );
             } catch (error) {
-                // TODO: Log error to sentry
+                sentry.captureException(error);
             }
         }
     }

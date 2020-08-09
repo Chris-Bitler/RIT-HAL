@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import { Sequelize } from "sequelize-typescript";
 import * as dotenv from "dotenv";
+import * as sentry from "@sentry/node";
 import { CommandRegistry } from "./commands/CommandRegistry";
 import { EmojiProcessor } from "./processors/EmojiProcessor";
 import { checkReactionToDB } from "./processors/EmojiRoleProcessor";
@@ -32,6 +33,10 @@ const alarmProcessor = AlarmProcessor.getInstance();
 
 const client = new Client({
     partials: ["MESSAGE", "CHANNEL", "REACTION"]
+});
+
+sentry.init({
+    dsn: process.env.sentry_dsn
 });
 
 const {

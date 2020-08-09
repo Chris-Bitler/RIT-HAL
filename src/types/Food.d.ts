@@ -5,7 +5,6 @@ export interface FoodPlace {
 
 export interface PlaceSection {
     header: string;
-    day: string;
     times: string;
 }
 

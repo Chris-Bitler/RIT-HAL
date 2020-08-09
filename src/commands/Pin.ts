@@ -9,6 +9,7 @@ import {
 import { Command } from "./Command";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 import { ConfigProperty } from "../models/ConfigProperty";
+import * as sentry from "@sentry/node";
 
 /**
  * Command to pin a message to a starboard channel
@@ -22,7 +23,7 @@ export class Pin extends Command {
         if (
             args &&
             args[0] !== undefined &&
-            evt.channel instanceof TextChannel
+            evt.channel.type === "text"
         ) {
             const urlParts = args[0].split("/");
             if (urlParts.length >= 2) {
@@ -42,28 +43,35 @@ export class Pin extends Command {
                         );
                         if (
                             messageChannel &&
-                            messageChannel instanceof TextChannel &&
+                            messageChannel.type === "text" &&
                             starChannel &&
-                            starChannel instanceof TextChannel
+                            starChannel.type === "text"
                         ) {
                             await this.getAndSendEmbed(
                                 guild,
                                 evt,
-                                messageChannel,
-                                starChannel,
+                                messageChannel as TextChannel,
+                                starChannel as TextChannel,
                                 messageId,
                                 args[0]
                             );
                         } else {
                             await evt.channel.send(
                                 getErrorEmbed(
-                                    "Please make sure to set the starboard channel id before using this command"
+                                    "Please make sure the starboard channel and the channel the message is in are valid"
                                 )
                             );
                         }
+                    } else {
+                        await evt.channel.send(
+                            getErrorEmbed(
+                                "Please make sure to set the starboard channel id before using this command"
+                            )
+                        );
                     }
                 } catch (exception) {
-                    // TODO: Log to sentry
+                    sentry.captureException(exception);
+                    console.log(exception);
                     await evt.channel.send(
                         getErrorEmbed(
                             "Error sending embed to starboard channel"
@@ -75,6 +83,10 @@ export class Pin extends Command {
                     getErrorEmbed("Please use a valid discord message url")
                 );
             }
+        } else {
+            await evt.channel.send(
+                getErrorEmbed("Incorrect syntax, try `-pin [discord message url]`")
+            )
         }
     }
 

@@ -4,6 +4,7 @@ import { Punishment } from "../models/Punishment";
 import { ConfigProperty } from "../models/ConfigProperty";
 import * as moment from "moment-timezone";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
+import * as sentry from "@sentry/node";
 
 /**
  * Class for processing and tracking moderation actions
@@ -418,7 +419,7 @@ export class ModProcessor {
                 try {
                     this.unmuteUser(guild, mute.memberId);
                 } catch (err) {
-                    // TODO: Log to sentry
+                    sentry.captureException(err);
                 }
             }
         });
@@ -428,7 +429,7 @@ export class ModProcessor {
                 try {
                     this.unbanUser(guild, ban.memberId, true);
                 } catch (err) {
-                    // TODO: Log to sentry
+                    sentry.captureException(err);
                 }
             }
         });

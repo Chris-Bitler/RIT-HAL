@@ -63,6 +63,10 @@ export class Config extends Command {
                     getErrorEmbed("Cannot resolve server to set config for")
                 );
             }
+        } else {
+            evt.channel.send(
+                getErrorEmbed("Not enough arguments. Try `-config [key] [value]`")
+            )
         }
     }
 
