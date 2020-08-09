@@ -11,15 +11,14 @@ import { mergeArgs } from "../utils/StringUtil";
 import { BusProcessor } from "../processors/BusProcessor";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 
-const incorrectSyntaxMessage = getErrorEmbed(
-    "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`"
-);
-
 /**
  * Command used to display various RIT bus related information
  */
 export class Bus extends Command {
     busProcessor: BusProcessor = BusProcessor.getInstance();
+    incorrectSyntaxMessage = getErrorEmbed(
+        "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`"
+    );
 
     async useCommand(
         client: Client,
@@ -31,7 +30,7 @@ export class Bus extends Command {
         );
         if (sender) {
             if (args.length < 1) {
-                evt.channel.send(incorrectSyntaxMessage);
+                evt.channel.send(this.incorrectSyntaxMessage);
                 return;
             }
 
@@ -49,7 +48,7 @@ export class Bus extends Command {
                     );
                     break;
                 default:
-                    evt.channel.send(incorrectSyntaxMessage);
+                    evt.channel.send(this.incorrectSyntaxMessage);
                     break;
             }
         }

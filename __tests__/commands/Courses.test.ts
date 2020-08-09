@@ -2,6 +2,7 @@ import { getClasses } from "../../src/processors/ClassProcessor";
 import { Course } from "../../src/types/Courses";
 import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
 import { Courses } from "../../src/commands/Courses";
+import {getErrorEmbed} from "../../src/utils/EmbedUtil";
 
 jest.mock("../../src/processors/ClassProcessor");
 describe("Courses command tests", () => {
@@ -47,6 +48,8 @@ describe("Courses command tests", () => {
         ];
         mockGetClasses = getClasses as jest.MockedFunction<typeof getClasses>;
         mockGetClasses.mockResolvedValue(courses);
+        Date.now = jest.fn();
+        (Date.now as jest.MockedFunction<typeof Date.now>).mockReturnValue(1);
     });
 
     afterAll(() => {
@@ -129,7 +132,7 @@ describe("Courses command tests", () => {
         const courses = new Courses();
         await courses.useCommand(client, message, []);
         expect(mockSend).toHaveBeenCalledWith(
-            "Incorrect Syntax. Try `-courses [major abbreviation] [course number] (section)`"
+            getErrorEmbed("Incorrect Syntax. Try `-courses [major abbreviation] [course number] (section)`")
         );
     });
 

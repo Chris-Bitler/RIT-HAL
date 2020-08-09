@@ -78,12 +78,15 @@ export class AlarmProcessor {
                 if (hours !== 12) {
                     hoursToSend = hours % 12;
                 }
+                let minutesToSend = minutes.toString();
+                if (minutes < 10) {
+                    minutesToSend = `0${minutesToSend}`;
+                }
 
                 await message.channel.send(
                     getInformationalEmbed(
                         "Alarm created",
-                        `An alarm for ${channel} was created to go off at ${hoursToSend}:${minutes} ${amPm}
-                        saying ${message}`
+                        `An alarm for ${channel} was created to go off at ${hoursToSend}:${minutesToSend} ${amPm} saying ${messageToSend}`
                     )
                 );
             } catch (error) {
@@ -96,7 +99,7 @@ export class AlarmProcessor {
      * Get the alarms for a specific server from the command message
      * @param message The message to use to get the guild id
      */
-    async getAlarms(message: Message): Promise<Alarm[]> {
+    getAlarms(message: Message): Alarm[] {
         const serverId = message.guild?.id;
         if (serverId) {
             return this.alarms.filter((alarm) => {
@@ -132,7 +135,7 @@ export class AlarmProcessor {
      */
     async sendAlarmListEmbed(message: Message): Promise<void> {
         const embed = new MessageEmbed();
-        const alarms = await this.getAlarms(message);
+        const alarms = this.getAlarms(message);
         let description = "";
         embed.setTitle("Alarms");
         if (alarms && alarms.length > 0) {
@@ -142,7 +145,7 @@ export class AlarmProcessor {
                 const amPm = alarm.hours >= 12 ? "pm" : "am";
                 description +=
                     `**ID:** ${alarm.id}\n` +
-                    `**Time:** ${hours}:${minutes} ${amPm}\n` +
+                    `**Time:** ${hours}:${minutes >= 10 ? minutes : `0${minutes}`} ${amPm}\n` +
                     `**Message:** ${alarm.message}\n\n`;
             }
 
@@ -166,30 +169,30 @@ export class AlarmProcessor {
             }
         });
         const guild = message.guild;
-        if (alarm) {
-            if (guild) {
-                if (alarm.serverId === guild.id) {
-                    await AlarmModel.destroy({
-                        where: {
-                            id
-                        }
-                    });
-                    this.alarms = this.alarms.filter((alarm) => {
-                        return alarm.id !== id;
-                    });
-                    await message.channel.send(
-                        getInformationalEmbed(
-                            "Alarm deleted",
-                            `The alarm with the id ${id} was deleted.`
-                        )
-                    );
-                } else {
-                    await message.channel.send(
-                        getErrorEmbed(
-                            "That alarm doesn't belong to this server."
-                        )
-                    );
-                }
+        if (alarm && guild) {
+            if (alarm.serverId === guild.id) {
+                await AlarmModel.destroy({
+                    where: {
+                        id
+                    }
+                });
+
+                this.alarms = this.alarms.filter((alarm) => {
+                    return alarm.id !== id;
+                });
+
+                await message.channel.send(
+                    getInformationalEmbed(
+                        "Alarm deleted",
+                        `The alarm with the id ${id} was deleted.`
+                    )
+                );
+            } else {
+                await message.channel.send(
+                    getErrorEmbed(
+                        "That alarm doesn't belong to this server."
+                    )
+                );
             }
         } else {
             message.channel.send(getErrorEmbed("No alarm with that id exists"));
@@ -204,10 +207,14 @@ export class AlarmProcessor {
         for (const alarm of this.alarms) {
             const now = Date.now();
             const date = moment().tz("America/New_York");
+            const sameHourMoreMinutes = (
+                date.hours() + 1 === alarm.hours &&
+                date.minutes() + 1 >= alarm.minutes
+            );
+            const moreHours = (date.hours() + 1 > alarm.hours);
             if (
                 alarm.lastSent + MS_IN_23_HOURS < now &&
-                date.hour() + 1 >= alarm.hours &&
-                date.minute() + 1 >= alarm.minutes
+                (sameHourMoreMinutes || moreHours)
             ) {
                 const guild = client.guilds.resolve(alarm.serverId);
                 if (guild) {

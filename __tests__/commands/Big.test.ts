@@ -1,6 +1,7 @@
 import { Big } from "../../src/commands/Big";
 import { getEmojiExtension } from "../../src/utils/EmojiUtil";
 import { Client, Message, TextChannel } from "discord.js";
+import {getErrorEmbed} from "../../src/utils/EmbedUtil";
 jest.mock("../../src/utils/EmojiUtil");
 describe("Big command  tests", () => {
     let channel: TextChannel;
@@ -11,6 +12,8 @@ describe("Big command  tests", () => {
         channel = new MockDiscord.TextChannel();
         message = new MockDiscord.Message();
         message.channel = channel;
+        Date.now = jest.fn();
+        (Date.now as jest.MockedFunction<typeof Date.now>).mockReturnValue(1);
     });
     afterAll(() => {
         //normal cleanup things
@@ -21,14 +24,14 @@ describe("Big command  tests", () => {
         const args: string[] = [];
         await big.useCommand(client, message, args);
         expect(channel.send).toHaveBeenCalledWith(
-            "Please use an emoji to embiggen"
+            getErrorEmbed("Please use an emoji to embiggen")
         );
     });
     test("should send no emoji detected if first arg is not an emoji", async () => {
         const big = new Big();
         const args: string[] = ["blah blah blah"];
         await big.useCommand(client, message, args);
-        expect(channel.send).toHaveBeenCalledWith("No valid emoji detected");
+        expect(channel.send).toHaveBeenCalledWith(getErrorEmbed("No valid emoji detected"));
     });
     test("should send attachment if is valid emoji", async () => {
         const mockGetEmojiExtension = getEmojiExtension as jest.MockedFunction<
@@ -52,7 +55,7 @@ describe("Big command  tests", () => {
 
         const big = new Big();
         await big.useCommand(client, message, ["<:12345:>"]);
-        expect(channel.send).toHaveBeenCalledWith("No valid emoji detected");
+        expect(channel.send).toHaveBeenCalledWith(getErrorEmbed("No valid emoji detected"));
     });
     test("command label returns expected", () => {
         const big = new Big();

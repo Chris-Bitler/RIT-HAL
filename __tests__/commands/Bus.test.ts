@@ -11,6 +11,7 @@ import {
 import { Bus } from "../../src/commands/Bus";
 import { BusRoute } from "../../src/types/Bus";
 import { BusProcessor } from "../../src/processors/BusProcessor";
+import {getErrorEmbed} from "../../src/utils/EmbedUtil";
 jest.mock("../../src/processors/BusProcessor");
 
 describe("Bus command tests", () => {
@@ -43,6 +44,9 @@ describe("Bus command tests", () => {
         delete BusProcessor.instance;
         busProcessor = new BusProcessor();
         BusProcessor.getInstance = jest.fn().mockReturnValue(busProcessor);
+        const mockedDate = jest.fn();
+        Date.now = mockedDate;
+        mockedDate.mockReturnValue(1);
     });
     afterAll(() => {
         client.destroy();
@@ -178,9 +182,9 @@ describe("Bus command tests", () => {
         test("Not enough args should send related message", async () => {
             const bus = new Bus();
             await bus.showStops(message, []);
-            expect(mockSend).toHaveBeenCalledWith(
+            expect(mockSend).toHaveBeenCalledWith(getErrorEmbed(
                 "`Incorrect Syntax. Try -bus arrivals [route]`"
-            );
+            ));
         });
         test("No valid route should return error message", async () => {
             mockGetRouteByNumber = busProcessor.getRouteByNumber as jest.MockedFunction<
@@ -189,9 +193,9 @@ describe("Bus command tests", () => {
             mockGetRouteByNumber.mockReturnValue(null);
             const bus = new Bus();
             await bus.showStops(message, ["arrivals", "-1"]);
-            expect(mockSend).toHaveBeenCalledWith(
+            expect(mockSend).toHaveBeenCalledWith(getErrorEmbed(
                 "Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route."
-            );
+            ));
         });
         test("No arrival times should return relevant embed", async () => {
             mockGetArrivalTimes = busProcessor.getArrivalTimes as jest.MockedFunction<
@@ -242,16 +246,16 @@ describe("Bus command tests", () => {
         test("not enough args", () => {
             const bus = new Bus();
             bus.useCommand(client, message, []);
-            expect(message.channel.send).toHaveBeenCalledWith(
+            expect(message.channel.send).toHaveBeenCalledWith(getErrorEmbed(
                 "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`"
-            );
+            ));
         });
         test("invalid argument", () => {
             const bus = new Bus();
             bus.useCommand(client, message, ["blah"]);
-            expect(message.channel.send).toHaveBeenCalledWith(
+            expect(message.channel.send).toHaveBeenCalledWith(getErrorEmbed(
                 "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`"
-            );
+            ));
         });
     });
 
