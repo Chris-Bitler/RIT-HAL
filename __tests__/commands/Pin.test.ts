@@ -6,9 +6,9 @@ import {
     Client,
     VoiceChannel,
     MessageManager,
-    GuildMemberManager, GuildMember, User, MessageAttachment, Collection, Snowflake
+    GuildMemberManager, GuildMember, User, MessageAttachment, Collection, Snowflake, MessageEmbed
 } from "discord.js";
-import {getErrorEmbed} from "../../src/utils/EmbedUtil";
+import {getErrorEmbed, getInformationalEmbed} from "../../src/utils/EmbedUtil";
 import {Pin} from "../../src/commands/Pin";
 import {ConfigProperty} from "../../src/models/ConfigProperty";
 import * as sentry from "@sentry/node";
@@ -165,7 +165,7 @@ describe("Pin command tests", () => {
         guildMemberManager.resolve = jest.fn()
             .mockReturnValue(beingPinned)
             .mockReturnValue(pinner);
-        messageManager.fetch = jest.fn().mockResolvedValue(null);
+        messageManager.fetch = jest.fn().mockResolvedValue(message);
         message.author = messageAuthor;
         messageAuthor.displayAvatarURL = jest.fn().mockReturnValue("http://test/12345.png");
         message.content = "Test"
@@ -176,9 +176,21 @@ describe("Pin command tests", () => {
         collection.set("1", messageAttachment);
         collection.set("2", nonImageMessageAttachment);
         message.attachments = collection;
-
+        const expectedEmbed = new MessageEmbed();
+        expectedEmbed.setAuthor("Test1", message.author.displayAvatarURL());
+        expectedEmbed.setDescription("Test");
+        expectedEmbed.addField("Source", "[Link](https://discordapp.com/channels/401908664018927626/535311735083761705/742107844228415619)")
+        expectedEmbed.addField("Pinned by", pinner.displayName);
+        expectedEmbed.setImage("http://test.com/test.png");
+        expectedEmbed.addField("Attachment", "[test2](http://test.com/test.mp4)");
 
         await pin.useCommand(client, message, ["https://discordapp.com/channels/401908664018927626/535311735083761705/742107844228415619"]);
-        expect(commandChannel.send).toHaveBeenCalledTimes(1);
+        expect(toChannel.send).toHaveBeenCalledWith(expectedEmbed);
+        expect(commandChannel.send).toHaveBeenCalledWith(
+            getInformationalEmbed(
+                "Pinned",
+                "Message from Test1 pinned in starboard."
+            )
+        )
     });
 });

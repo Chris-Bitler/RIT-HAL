@@ -106,7 +106,8 @@ describe("Alarm command tests", () => {
         const alarm = new Alarm();
         alarmProcessor.sendAlarmListEmbed = jest.fn();
 
-        await alarm.listAlarms(message);
+        await alarm.useCommand(client, message, ["list"]);
+
 
         expect(alarmProcessor.sendAlarmListEmbed).toHaveBeenCalledWith(message);
     });
@@ -114,7 +115,7 @@ describe("Alarm command tests", () => {
     describe("Delete alarm tests", () => {
         test("Not enough arguments should give error", async () => {
             const alarm = new Alarm();
-            await alarm.deleteAlarm(message, ["delete"]);
+            await alarm.useCommand(client, message, ["delete"]);
             expect(channel.send).toHaveBeenCalledWith(
                 getErrorEmbed(
                     "Incorrect syntax. Try `-alarm delete [id]` where the ID is the ID of the alarm from `-alarm list`"
@@ -125,7 +126,7 @@ describe("Alarm command tests", () => {
         test("Given id, should try to delete alarm", async () => {
             alarmProcessor.deleteAlarm = jest.fn();
             const alarm = new Alarm();
-            await alarm.deleteAlarm(message, ["delete", "1"]);
+            await alarm.useCommand(client, message, ["delete", "1"]);
             expect(alarmProcessor.deleteAlarm).toHaveBeenCalledWith(message, "1");
         });
     });
