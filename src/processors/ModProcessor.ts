@@ -46,15 +46,10 @@ export class ModProcessor {
             }
 
             const expirationDateTime = Date.now() + expiration;
-            const existingMute = this.mutes.filter(
-                (mute: Mute) => mute.memberId === memberToMute.id
-            );
 
-            if (existingMute) {
-                this.mutes = this.mutes.filter(
-                    (mute) => mute.memberId !== memberToMute.id
-                );
-            }
+            this.mutes = this.mutes.filter(
+                (mute) => mute.memberId !== memberToMute.id
+            );
 
             this.mutes.push({
                 memberId: memberToMute.id,
@@ -117,15 +112,10 @@ export class ModProcessor {
         expiration: number
     ): Promise<void> {
         const expirationDateTime = Date.now() + expiration;
-        const existingBan = this.bans.filter(
-            (ban) => ban.memberId === memberToBan.id
-        );
 
-        if (existingBan) {
-            this.bans = this.bans.filter(
-                (ban) => ban.memberId !== memberToBan.id
-            );
-        }
+        this.bans = this.bans.filter(
+            (ban) => ban.memberId !== memberToBan.id
+        );
 
         this.bans.push({
             memberId: memberToBan.id,
@@ -162,6 +152,7 @@ export class ModProcessor {
             punisherName: banner.user.username,
             type: "ban",
             reason,
+            expiration: 1001,
             active: true,
             serverId: memberToBan.guild.id
         });
@@ -340,7 +331,7 @@ export class ModProcessor {
                 userName: memberToWarn.user.username,
                 punisherId: warner.id,
                 punisherName: warner.user.username,
-                type: "kick",
+                type: "warn",
                 reason,
                 serverId: memberToWarn.guild.id,
                 expiration: 0
