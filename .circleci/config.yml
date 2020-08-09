@@ -10,7 +10,7 @@ jobs:
       - image: circleci/node:12.18.2
     steps:
       - codecov/upload:
-          file: {{./coverage/clover.xml}}
+          file: "./coverage/clover.xml"
 
 workflows:
   node-tests:
