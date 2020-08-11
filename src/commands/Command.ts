@@ -56,4 +56,13 @@ export class Command {
             return [];
         }
     }
+
+    async isCommandEnabled(guildId: string): Promise<boolean> {
+        const enabled = await ConfigProperty.getServerProperty(
+            `${this.getConfigBase()}.commandEnabled`,
+            guildId
+        );
+
+        return enabled !== null ? enabled.value.toLowerCase() === "true" : true;
+    }
 }

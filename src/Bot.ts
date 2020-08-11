@@ -64,7 +64,7 @@ if (postgre_db && postgre_username && postgre_password && postgre_host) {
 
 client.on("message", async (message: Message) => {
     if (!message.partial) {
-        commandRegistry.runCommands(client, message);
+        await commandRegistry.runCommands(client, message);
         await EmojiProcessor.getInstance().logEmojis(message);
     }
 });

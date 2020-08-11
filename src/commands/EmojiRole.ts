@@ -21,7 +21,7 @@ export class EmojiRole extends Command {
         args: string[]
     ): Promise<void> {
         // This might seem hacky but instanceof always fails for jest mocks
-        if (evt.channel.constructor.name !== TextChannel.name) {
+        if (evt.channel.type !== "text") {
             return;
         }
         const initialChannel = evt.channel as TextChannel;
