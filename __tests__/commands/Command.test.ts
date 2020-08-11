@@ -63,4 +63,49 @@ describe("Command tests", () => {
             });
         });
     });
+
+    describe("isCommandEnabled tests", () => {
+        test("Should return false if value other than true is set", async () => {
+            ConfigProperty.findOne = jest.fn().mockReturnValue({
+                value: 'false'
+            });
+            const command = new Command();
+            const enabled: boolean = await command.isCommandEnabled("1");
+            expect(enabled).toEqual(false);
+            expect(ConfigProperty.findOne).toHaveBeenCalledWith({
+                where: {
+                    key: "base.commandEnabled",
+                    serverId: "1"
+                }
+            });
+        });
+
+        test("Should return true if true is set", async () => {
+            ConfigProperty.findOne = jest.fn().mockReturnValue({
+                value: 'true'
+            });
+            const command = new Command();
+            const enabled: boolean = await command.isCommandEnabled("1");
+            expect(enabled).toEqual(true);
+            expect(ConfigProperty.findOne).toHaveBeenCalledWith({
+                where: {
+                    key: "base.commandEnabled",
+                    serverId: "1"
+                }
+            });
+        });
+
+        test("Should return true if no value is set", async () => {
+            ConfigProperty.findOne = jest.fn().mockReturnValue(null);
+            const command = new Command();
+            const enabled: boolean = await command.isCommandEnabled("1");
+            expect(enabled).toEqual(true);
+            expect(ConfigProperty.findOne).toHaveBeenCalledWith({
+                where: {
+                    key: "base.commandEnabled",
+                    serverId: "1"
+                }
+            });
+        });
+    });
 });
