@@ -27,7 +27,7 @@ jobs:
           command: npm ci
       - run:
           name: Run Tests
-          command: jest --maxWorkers=2
+          command: ./node_modules/.bin/jest --maxWorkers=2
       - codecov/upload:
           file: "./coverage/clover.xml"
       - run:
