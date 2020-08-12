@@ -39,28 +39,13 @@ sentry.init({
     dsn: process.env.sentry_dsn
 });
 
-const {
-    postgre_db,
-    postgre_username,
-    postgre_password,
-    postgre_host
-} = process.env;
-if (postgre_db && postgre_username && postgre_password && postgre_host) {
-    const sequelize: Sequelize = new Sequelize(
-        postgre_db,
-        postgre_username,
-        postgre_password,
-        {
-            host: postgre_host,
-            dialect: "postgres",
-            models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm]
-        }
-    );
-    sequelize.sync();
-} else {
-    console.log("Please specify database information");
-    process.exit(1);
-}
+const sequelize: Sequelize = new Sequelize(
+    process.env.DATABASE_URL as string,
+    {
+        dialect: "postgres",
+        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm]
+    });
+sequelize.sync();
 
 client.on("message", async (message: Message) => {
     if (!message.partial) {
