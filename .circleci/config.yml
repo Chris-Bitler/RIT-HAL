@@ -16,7 +16,8 @@ workflows:
             branches:
               only: master
           pre-steps:
-            - run: ./node_modules/.bin/tsc
+            - run: npm install -g typescript
+            - run: tsc
 
 jobs:
   build:
