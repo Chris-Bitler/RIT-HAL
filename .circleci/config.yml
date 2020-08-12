@@ -15,9 +15,6 @@ workflows:
           filters:
             branches:
               only: master
-          pre-steps:
-            - run: npm install -g typescript
-            - run: tsc
 
 jobs:
   build:
@@ -33,3 +30,6 @@ jobs:
           command: npm test
       - codecov/upload:
           file: "./coverage/clover.xml"
+      - run:
+          name: Compile TSC
+          command: ./node_modules/.bin/tsc
