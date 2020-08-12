@@ -16,7 +16,7 @@ workflows:
             branches:
               only: master
           pre-steps:
-            - run: tsc
+            - run: ./node_modules/.bin/tsc
 
 jobs:
   build:
