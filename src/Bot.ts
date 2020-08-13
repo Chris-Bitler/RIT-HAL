@@ -43,6 +43,7 @@ const sequelize: Sequelize = new Sequelize(
     process.env.DATABASE_URL as string,
     {
         dialect: "postgres",
+        logging: false,
         models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm]
     });
 sequelize.sync();
