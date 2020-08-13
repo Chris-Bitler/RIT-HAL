@@ -55,7 +55,7 @@ export class React extends Command {
                 }
             }
         } else {
-            await evt.channel.send(getErrorEmbed("Incorrect syntax. Try -react [reaction] [message id]"));
+            await evt.channel.send(getErrorEmbed("Incorrect syntax. Try -react [reaction] [channel] [message id]"));
         }
     }
 
