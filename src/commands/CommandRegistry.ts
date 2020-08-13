@@ -12,6 +12,7 @@ import {EmojiRole} from "./EmojiRole";
 import {Pin} from "./Pin";
 import {Config} from "./Config";
 import {Alarm} from "./Alarm";
+import {React} from "./React";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -38,6 +39,7 @@ export class CommandRegistry {
             this.registry.push(new Pin());
             this.registry.push(new Config());
             this.registry.push(new Alarm());
+            this.registry.push(new React());
         } else {
             commands.forEach((command) => this.registry.push(command));
         }

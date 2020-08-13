@@ -1,4 +1,5 @@
 import axios from "axios";
+import {Guild, GuildEmoji} from "discord.js";
 
 /**
  * Attempt to resolve the larger url for an emoji
@@ -16,4 +17,15 @@ export function getEmojiExtension(id: string): Promise<string> {
             .then(() => resolve(pngUrl))
             .catch(() => reject("no Valid emoji"));
     });
+}
+
+/**
+ * Attempt to get an emoji from a guild using the emoji's name
+ * @param {Guild} guild - The guild to get the emoji from
+ * @param {string} emojiText - The emoji name
+ */
+export function getEmoji(guild: Guild, emojiText: string): GuildEmoji | null {
+    return (
+        guild.emojis.cache.find((emoji) => emoji.name === emojiText) || null
+    );
 }

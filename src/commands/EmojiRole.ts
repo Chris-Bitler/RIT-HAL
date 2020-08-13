@@ -12,6 +12,7 @@ import {
 import { getErrorEmbed } from "../utils/EmbedUtil";
 import { addEmojiRole } from "../processors/EmojiRoleProcessor";
 import { UnicodeEmoji } from "../types/Emoji";
+import {getEmoji} from "../utils/EmojiUtil";
 
 const emojiRegex = /:(.+):/;
 export class EmojiRole extends Command {
@@ -36,7 +37,7 @@ export class EmojiRole extends Command {
             const emojiMatch = args[0].match(emojiRegex);
             let emoji: GuildEmoji | UnicodeEmoji | null = null;
             if (emojiMatch && emojiMatch.length === 2) {
-                emoji = this.getEmoji(initialChannel.guild, emojiMatch[1]);
+                emoji = getEmoji(initialChannel.guild, emojiMatch[1]);
             } else if (args[0].length === 2) {
                 //Unicode characters
                 emoji = {
@@ -78,12 +79,6 @@ export class EmojiRole extends Command {
         }
     }
 
-    getEmoji(guild: Guild, emojiText: string): GuildEmoji | null {
-        return (
-            guild.emojis.cache.find((emoji) => emoji.name === emojiText) || null
-        );
-    }
-
     getRole(evt: Message, roleId: string): Role | null {
         if (evt.guild) {
             console.log(roleId);
@@ -98,7 +93,6 @@ export class EmojiRole extends Command {
     }
 
     getChannel(evt: Message, channelText: string): GuildChannel | null {
-        channelText = channelText.replace("<", "").replace(">", "");
         if (evt.guild) {
             return (
                 evt.guild.channels.cache.find(
