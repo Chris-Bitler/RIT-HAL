@@ -1,6 +1,6 @@
 import {Command} from "./Command";
 import {Client, GuildEmoji, Message, Permissions, TextChannel} from "discord.js";
-import {getErrorEmbed} from "../utils/EmbedUtil";
+import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
 import {getEmoji} from "../utils/EmojiUtil";
 
 /**
@@ -39,6 +39,12 @@ export class React extends Command {
                         const message = await ((channel as TextChannel).messages.fetch(messageId));
                         if (message) {
                             await message.react(emoji);
+                            await textChannel.send(
+                                getInformationalEmbed(
+                                    "Reaction added",
+                                    `HAL reacted with ${emoji} in ${channel}`
+                                )
+                            )
                             return;
                         }
                     } catch (exception) {

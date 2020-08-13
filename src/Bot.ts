@@ -8,8 +8,8 @@ import {
     Client,
     GuildEmoji,
     GuildMember,
-    Message,
-    TextChannel
+    Message, MessageReaction, PartialUser,
+    TextChannel, User
 } from "discord.js";
 import { Sequelize } from "sequelize-typescript";
 import * as dotenv from "dotenv";
@@ -83,7 +83,7 @@ client.on("guildBanRemove", async (guild, member) => {
     await modProcessor.unbanUser(guild, member.id);
 });
 
-client.on("messageReactionAdd", async (reaction, user) => {
+const handleEmojiReactions = async (reaction: MessageReaction, user: User | PartialUser) => {
     if (reaction.message.partial) await reaction.message.fetch();
     const channel = reaction.message.channel;
     if (!user.bot && channel instanceof TextChannel) {
@@ -93,19 +93,11 @@ client.on("messageReactionAdd", async (reaction, user) => {
             await checkReactionToDB(emoji, member, channel, reaction);
         }
     }
-});
+}
 
-client.on("messageReactionRemove", async (reaction, user) => {
-    if (reaction.message.partial) await reaction.message.fetch();
-    const channel = reaction.message.channel;
-    if (!user.bot && channel instanceof TextChannel) {
-        const emoji = reaction.emoji;
-        const member = channel.guild.members.resolve(await user.fetch());
-        if (member && emoji instanceof GuildEmoji) {
-            await checkReactionToDB(emoji, member, channel, reaction);
-        }
-    }
-});
+client.on("messageReactionAdd", handleEmojiReactions);
+
+client.on("messageReactionRemove", handleEmojiReactions);
 
 setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
 setInterval(() => modProcessor.tickPunishments(client), 2000);
