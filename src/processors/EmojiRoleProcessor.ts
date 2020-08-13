@@ -59,7 +59,7 @@ export async function checkReactionToDB(
                 await member.send(
                     getInformationalEmbed(
                         "Removed role",
-                        `Your role **${role.name}** was removed in the RIT discord server.`
+                        `Your role **${role.name}** was removed in ${channel.guild.name}`
                     )
                 );
             } else {
@@ -67,7 +67,7 @@ export async function checkReactionToDB(
                 await member.send(
                     getInformationalEmbed(
                         "Added role",
-                        `You were given the role **${role.name}** in the RIT discord server.`
+                        `You were given the role **${role.name}** in ${channel.guild.name}`
                     )
                 );
             }
