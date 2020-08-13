@@ -3,7 +3,7 @@ import {
     TextChannel,
     MessageReaction,
     Role,
-    GuildEmoji
+    GuildEmoji, ReactionEmoji
 } from "discord.js";
 import { EmojiToRole } from "../models/EmojiToRole";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
@@ -36,7 +36,7 @@ export async function addEmojiRole(
 }
 
 export async function checkReactionToDB(
-    emote: GuildEmoji,
+    emote: GuildEmoji | ReactionEmoji,
     member: GuildMember,
     channel: TextChannel,
     reaction: MessageReaction

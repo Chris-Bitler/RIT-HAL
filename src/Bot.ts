@@ -89,7 +89,7 @@ client.on("messageReactionAdd", async (reaction, user) => {
     if (!user.bot && channel instanceof TextChannel) {
         const emoji = reaction.emoji;
         const member = channel.guild.members.resolve(await user.fetch());
-        if (member && emoji instanceof GuildEmoji) {
+        if (member && emoji) {
             await checkReactionToDB(emoji, member, channel, reaction);
         }
     }
