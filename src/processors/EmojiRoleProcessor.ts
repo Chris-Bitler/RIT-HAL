@@ -41,9 +41,10 @@ export async function checkReactionToDB(
     channel: TextChannel,
     reaction: MessageReaction
 ): Promise<void> {
+    const emojiId = emote.id ? emote.id : emote.name;
     const emojiToRole = await EmojiToRole.findOne({
         where: {
-            emojiId: emote.id,
+            emojiId,
             channelId: channel.id,
             serverId: channel.guild.id
         },

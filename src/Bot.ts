@@ -86,6 +86,7 @@ client.on("guildBanRemove", async (guild, member) => {
 client.on("messageReactionAdd", async (reaction, user) => {
     if (reaction.message.partial) await reaction.message.fetch();
     const channel = reaction.message.channel;
+    console.log(reaction.emoji.identifier);
     if (!user.bot && channel instanceof TextChannel) {
         const emoji = reaction.emoji;
         const member = channel.guild.members.resolve(await user.fetch());
