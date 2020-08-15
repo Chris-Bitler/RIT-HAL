@@ -9,6 +9,10 @@
 
 A discord bot made for the [Unofficial RIT Discord Server](https://discord.gg/rit). Has moderation capabilities along with some other miscellaneous uses.
 
+
+Currently hosted on Heroku
+
+
 ## How to run HAL
 1. Pull the code down via `git clone git@github.com:Chris-Bitler/RIT-HAL.git`
 2. Replace the discord_token and rapidapi_token in .env.bk with API tokens from the respective services.
@@ -25,11 +29,7 @@ discord_token: The bot token you obtain from a created bot at https://discord.co
 
 rapidapi_token: Register for an account at https://rapidapi.com and obtain a key for https://rapidapi.com/transloc/api/openapi-1-2
 
-postgre_db: The database name that is being used for HAL
+sentry_dsn: The url for logging to sentry
 
-postgre_username: The username to log into postgres
-
-postgre_password:  The password to log into postgres
-
-postgre_host: The host for the postgres instance, including port if it is not on the default port
+DATABASE_URL: Database connection in url format
 ```
