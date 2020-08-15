@@ -54,8 +54,8 @@ export class Bus extends Command {
         }
     }
 
-    getCommand(): string {
-        return "bus";
+    getCommand(): string[] {
+        return ["bus"];
     }
 
     /**

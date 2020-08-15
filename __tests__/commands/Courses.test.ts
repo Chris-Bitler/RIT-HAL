@@ -137,7 +137,7 @@ describe("Courses command tests", () => {
     });
 
     test("getCommand should return courses", () => {
-        expect(new Courses().getCommand()).toEqual("courses");
+        expect(new Courses().getCommand()).toEqual(["courses"]);
     });
 
     test("getConfigBase should return courses", () => {

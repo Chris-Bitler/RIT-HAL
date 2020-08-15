@@ -59,6 +59,6 @@ describe("Big command  tests", () => {
     });
     test("command label returns expected", () => {
         const big = new Big();
-        expect(big.getCommand()).toEqual("big");
+        expect(big.getCommand()).toEqual(["big"]);
     });
 });

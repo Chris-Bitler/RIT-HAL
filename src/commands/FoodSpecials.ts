@@ -15,8 +15,8 @@ export class FoodSpecials extends Command {
         });
     }
 
-    getCommand(): string {
-        return "rit specials";
+    getCommand(): string[] {
+        return ["rit specials"];
     }
 
     getConfigBase(): string {

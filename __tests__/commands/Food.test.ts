@@ -72,7 +72,7 @@ describe("Food command tests", () => {
 
     test("getCommand should return rit food", () => {
         const food = new Food();
-        expect(food.getCommand()).toEqual("rit food")
+        expect(food.getCommand()).toEqual(["rit food"]);
     });
 
     test("getConfigBase should return config base", () => {

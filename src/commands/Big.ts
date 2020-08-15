@@ -32,7 +32,7 @@ export class Big extends Command {
         }
     }
 
-    getCommand(): string {
-        return "big";
+    getCommand(): string[] {
+        return ["big"];
     }
 }

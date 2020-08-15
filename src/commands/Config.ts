@@ -70,8 +70,8 @@ export class Config extends Command {
         }
     }
 
-    getCommand(): string {
-        return "config";
+    getCommand(): string[] {
+        return ["config"];
     }
 
     getConfigBase(): string {

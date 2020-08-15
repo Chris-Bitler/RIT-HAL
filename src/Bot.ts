@@ -25,6 +25,7 @@ import { EmojiToRole } from "./models/EmojiToRole";
 import { Punishment } from "./models/Punishment";
 import { AlarmProcessor } from "./processors/AlarmProcessor";
 import { Alarm } from "./models/Alarm";
+import {MailConfig} from "./models/MailConfig";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
@@ -44,7 +45,7 @@ const sequelize: Sequelize = new Sequelize(
     {
         dialect: "postgres",
         logging: false,
-        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm]
+        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm, MailConfig]
     });
 sequelize.sync();
 
@@ -54,6 +55,7 @@ client.on("message", async (message: Message) => {
         await EmojiProcessor.getInstance().logEmojis(message);
     }
 });
+
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
     const mutedRoleId = await modProcessor.fetchMutedRoleId(newMember.guild.id);

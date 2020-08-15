@@ -154,9 +154,14 @@ describe("Alarm command tests", () => {
         );
     });
 
-    test("configBase should be the same as command", () => {
+    test("configBase should be alarm", () => {
         const alarm = new Alarm();
-        expect(alarm.getConfigBase()).toEqual(alarm.getCommand());
+        expect(alarm.getConfigBase()).toEqual("alarm");
+    });
+
+    test("getCommand should be [alarm]", () => {
+        const alarm = new Alarm();
+        expect(alarm.getCommand()).toEqual(["alarm"]);
     });
 
     test("Expect command to require administrator permission", () => {

@@ -88,7 +88,7 @@ describe("Food Specials tests", () => {
     });
 
     test("getCommand should return rit specials", () => {
-        expect(new FoodSpecials().getCommand()).toEqual("rit specials")
+        expect(new FoodSpecials().getCommand()).toEqual(["rit specials"]);
     });
 
     test("getConfigBase should return specials", () => {

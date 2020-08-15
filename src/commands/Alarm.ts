@@ -53,8 +53,8 @@ export class Alarm extends Command {
         return "alarm";
     }
 
-    getCommand(): string {
-        return "alarm";
+    getCommand(): string[] {
+        return ["alarm"];
     }
 
     getRequiredPermission(): number {

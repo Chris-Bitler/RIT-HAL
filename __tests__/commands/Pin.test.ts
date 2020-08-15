@@ -196,7 +196,7 @@ describe("Pin command tests", () => {
 
     test("command should be set up correctly", () => {
         const pin = new Pin();
-        expect(pin.getCommand()).toEqual("starboard");
+        expect(pin.getCommand()).toEqual(["starboard"]);
         expect(pin.getConfigBase()).toEqual("starboard");
         expect(pin.getRequiredPermission()).toEqual(Permissions.FLAGS.KICK_MEMBERS);
     });

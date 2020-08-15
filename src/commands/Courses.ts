@@ -32,8 +32,8 @@ export class Courses extends Command {
         });
     }
 
-    getCommand(): string {
-        return "courses";
+    getCommand(): string[] {
+        return ["courses"];
     }
 
     /**

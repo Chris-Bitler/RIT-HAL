@@ -22,7 +22,7 @@ export class Command {
     /**
      * Get the textual version of the command minus prefix
      */
-    getCommand(): string {
+    getCommand(): string[] {
         throw new Error("You need to implement getCommand");
     }
 
@@ -64,5 +64,9 @@ export class Command {
         );
 
         return enabled !== null ? enabled.value.toLowerCase() === "true" : true;
+    }
+
+    commandType(): string {
+        return "text";
     }
 }

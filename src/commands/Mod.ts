@@ -66,11 +66,11 @@ export class Mod extends Command {
         }
     }
 
-    getCommand() {
-        return "mod";
+    getCommand(): string[] {
+        return ["mod"];
     }
 
-    getRequiredPermission() {
+    getRequiredPermission(): number {
         return Permissions.FLAGS.KICK_MEMBERS;
     }
 

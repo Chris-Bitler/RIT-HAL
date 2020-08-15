@@ -108,7 +108,7 @@ describe("Config command tests", () => {
 
     test("getCommand to return command name", () => {
         const config = new Config();
-        expect(config.getCommand()).toEqual("config");
+        expect(config.getCommand()).toEqual(["config"]);
     });
     test("getConfigBase to return command name", () => {
         const config = new Config();

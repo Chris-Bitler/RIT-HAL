@@ -21,7 +21,7 @@ describe("EmojiTop tests", () => {
     });
 
     test("test getCommand", () => {
-        expect(new EmojiTop().getCommand()).toEqual("emojitop");
+        expect(new EmojiTop().getCommand()).toEqual(["emojitop"]);
     });
 
     test("test getConfigBase", () => {

@@ -63,8 +63,8 @@ export class React extends Command {
         return "react"
     }
 
-    getCommand(): string {
-        return "react"
+    getCommand(): string[] {
+        return ["react"];
     }
 
     getRequiredPermission(): number {

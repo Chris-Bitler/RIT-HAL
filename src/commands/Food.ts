@@ -30,8 +30,8 @@ export class Food extends Command {
         }
     }
 
-    getCommand(): string {
-        return "rit food";
+    getCommand(): string[] {
+        return ["rit food"];
     }
 
     getConfigBase(): string {

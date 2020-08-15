@@ -32,7 +32,28 @@ describe("Command Registry tests", () => {
         message.channel = channel;
         message.channel.id = "1";
         message.channel.type = "text";
+        dmChannel.type = "dm";
+        message.content = "-bus    1   2";
+        MockCommand.getRequiredPermission = jest.fn().mockReturnValue(Permissions.FLAGS.VIEW_CHANNEL);
     });
+
+    function mockGoodTextCommand() {
+        MockCommand.commandType = jest.fn().mockReturnValue("text");
+        MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
+        MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(true);
+        MockCommand.getProhibitedChannels = jest.fn().mockResolvedValue([]);
+        member.hasPermission = jest.fn().mockReturnValue(true);
+        MockCommand.useCommand = jest.fn();
+    }
+
+    function mockBadTextCommand() {
+        MockCommand.commandType = jest.fn().mockReturnValue("text");
+        MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
+        MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(true);
+        MockCommand.getProhibitedChannels = jest.fn().mockResolvedValue([]);
+        member.hasPermission = jest.fn().mockReturnValue(false);
+        MockCommand.useCommand = jest.fn();
+    }
 
     test("Should return immediately if author is bot", async () => {
         message.author.bot = true;
@@ -42,65 +63,38 @@ describe("Command Registry tests", () => {
         expect(MockCommand.getCommand).not.toHaveBeenCalled();
     });
 
-    test("Should not getCommand if not a text channel", async () => {
-        message.channel = dmChannel;
-        MockCommand.getCommand = jest.fn();
-        const registry = new CommandRegistry([MockCommand]);
-        await registry.runCommands(client, message);
-        expect(MockCommand.getCommand).not.toHaveBeenCalled();
-    });
-
-    test("Should not get is command enabled if not correct command", async () => {
-        message.content = "-bus foo";
-        MockCommand.getCommand = jest.fn().mockReturnValue("asdf123");
+    test("should return if command type isn't correct", async () => {
+        MockCommand.commandType = jest.fn().mockReturnValue("dm");
+        MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
         MockCommand.isCommandEnabled = jest.fn();
         const registry = new CommandRegistry([MockCommand]);
         await registry.runCommands(client, message);
-        expect(MockCommand.getCommand).toHaveBeenCalled();
         expect(MockCommand.isCommandEnabled).not.toHaveBeenCalled();
     });
 
-    test("Should not check prohibited channel if not enabled", async () => {
-        message.content = "-bus foo";
-        MockCommand.getCommand = jest.fn().mockReturnValue("bus");
-        MockCommand.getProhibitedChannels = jest.fn();
-        MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(false);
-        const registry = new CommandRegistry([MockCommand]);
-        await registry.runCommands(client, message);
-        expect(MockCommand.getCommand).toHaveBeenCalled();
-        expect(MockCommand.isCommandEnabled).toHaveBeenCalled();
-        expect(MockCommand.getProhibitedChannels).not.toHaveBeenCalled();
+    describe("Text command tests", () => {
+        test("Text command happy path", async () => {
+            mockGoodTextCommand();
+            const registry = new CommandRegistry([MockCommand]);
+            await registry.runCommands(client, message);
+            expect(MockCommand.useCommand).toHaveBeenCalled();
+        });
+
+        test("Text command sad path", async () => {
+            mockBadTextCommand();
+            const registry = new CommandRegistry([MockCommand]);
+            await registry.runCommands(client, message);
+            expect(MockCommand.useCommand).not.toHaveBeenCalled();
+        });
     });
 
-    test("Should not check permission if in prohibited channels", async () => {
-        message.content = "-bus foo";
-        MockCommand.getCommand = jest.fn().mockReturnValue("bus");
-        MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(true);
-        MockCommand.getProhibitedChannels = jest.fn().mockResolvedValue(["1"]);
-        MockCommand.getRequiredPermission = jest.fn();
+    test("DM Command test", async () => {
+        MockCommand.commandType = jest.fn().mockReturnValue("dm");
+        message.channel = dmChannel;
+        MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
         const registry = new CommandRegistry([MockCommand]);
         await registry.runCommands(client, message);
-        expect(MockCommand.getCommand).toHaveBeenCalled();
-        expect(MockCommand.isCommandEnabled).toHaveBeenCalled();
-        expect(MockCommand.getProhibitedChannels).toHaveBeenCalled();
-        expect(MockCommand.getRequiredPermission).not.toHaveBeenCalled();
-    });
-
-    test("Should call useCommand if user has permission", async () => {
-        message.content = "-bus    1    3";
-        MockCommand.getCommand = jest.fn().mockReturnValue("bus");
-        MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(true);
-        MockCommand.getProhibitedChannels = jest.fn().mockResolvedValue([]);
-        MockCommand.getRequiredPermission = jest.fn().mockReturnValue(Permissions.FLAGS.VIEW_CHANNEL);
-        MockCommand.useCommand = jest.fn();
-        member.hasPermission = jest.fn().mockReturnValue(true);
-        const registry = new CommandRegistry([MockCommand]);
-        await registry.runCommands(client, message);
-        expect(MockCommand.getCommand).toHaveBeenCalled();
-        expect(MockCommand.isCommandEnabled).toHaveBeenCalled();
-        expect(MockCommand.getProhibitedChannels).toHaveBeenCalled();
-        expect(MockCommand.getRequiredPermission).toHaveBeenCalled();
-        expect(MockCommand.useCommand).toHaveBeenCalledWith(client, message, ["1", "3"])
+        expect(MockCommand.useCommand).toHaveBeenCalled();
     });
 
     test("test command registry constructor", () => {

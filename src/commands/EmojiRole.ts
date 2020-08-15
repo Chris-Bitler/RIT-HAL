@@ -104,8 +104,8 @@ export class EmojiRole extends Command {
         }
     }
 
-    getCommand(): string {
-        return "emojirole";
+    getCommand(): string[] {
+        return ["emojirole"];
     }
 
     getRequiredPermission(): number {

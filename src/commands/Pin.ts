@@ -158,8 +158,8 @@ export class Pin extends Command {
         }
     }
 
-    getCommand(): string {
-        return "starboard";
+    getCommand(): string[] {
+        return ["starboard"];
     }
 
     getConfigBase(): string {

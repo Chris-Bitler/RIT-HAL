@@ -12,8 +12,8 @@ export class EmojiTop extends Command {
         await this.emojiProcessor.getTopEmojis(evt);
     }
 
-    getCommand(): string {
-        return "emojitop";
+    getCommand(): string[] {
+        return ["emojitop"];
     }
 
     getConfigBase(): string {

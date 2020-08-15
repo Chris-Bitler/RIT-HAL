@@ -260,7 +260,7 @@ describe("Bus command tests", () => {
     });
 
     test("getCommand", () => {
-        expect(new Bus().getCommand()).toEqual("bus");
+        expect(new Bus().getCommand()).toEqual(["bus"]);
     });
 
     test("getBaseConfig", () => {

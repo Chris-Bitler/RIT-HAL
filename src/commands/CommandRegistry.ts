@@ -1,4 +1,4 @@
-import {Client, Message} from "discord.js";
+import {Client, Message, TextChannel} from "discord.js";
 import {Command} from "./Command";
 import {Big} from "./Big";
 import {Bus} from "./Bus";
@@ -13,6 +13,8 @@ import {Pin} from "./Pin";
 import {Config} from "./Config";
 import {Alarm} from "./Alarm";
 import {React} from "./React";
+import {Mail} from "./Mail";
+import { MailConfig } from "./MailConfig";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -40,9 +42,23 @@ export class CommandRegistry {
             this.registry.push(new Config());
             this.registry.push(new Alarm());
             this.registry.push(new React());
+            this.registry.push(new Mail());
+            this.registry.push(new MailConfig());
         } else {
             commands.forEach((command) => this.registry.push(command));
         }
+    }
+
+    /**
+     * Get the command that the alias at the beginning of the message correspond to
+     * @param messageText The message contents
+     */
+    getCommand(messageText: string): Command|undefined {
+        return this.registry.find((command) => {
+            return command.getCommand().some((commandText) => {
+                return messageText.startsWith(`-${commandText}`);
+            });
+        })
     }
 
     /**
@@ -59,41 +75,55 @@ export class CommandRegistry {
         if (messageEvent.author.bot) {
             return;
         }
-        if (messageEvent.channel.type === "text") {
-            for (const command of this.registry) {
-                // TODO: Make string of IFs less hideous
-                if (
-                    messageEvent.content
-                        .toLowerCase()
-                        .startsWith(`-${command.getCommand()}`)
-                ) {
-                    const enabled =
-                        await command.isCommandEnabled(messageEvent.channel.guild.id);
-                    if (enabled) {
-                        const prohibitedChannels = await command.getProhibitedChannels(
-                            messageEvent.channel.guild.id
-                        );
-                        if (!prohibitedChannels.includes(messageEvent.channel.id)) {
-                            if (
-                                messageEvent.member &&
-                                messageEvent.member.hasPermission(
-                                    command.getRequiredPermission()
-                                )
-                            ) {
-                                const args = messageEvent.content
-                                    .trim()
-                                    .split(" ")
-                                    .slice(1);
-                                await command.useCommand(
-                                    client,
-                                    messageEvent,
-                                    removeEmptyArgs(args)
-                                );
-                            }
-                        }
-                    }
-                }
+
+        const command = this.getCommand(messageEvent.content);
+
+        if(command?.commandType() !== messageEvent.channel.type) {
+            return;
+        }
+
+        if (command) {
+            switch (messageEvent.channel.type) {
+                case "text":
+                    await this.runGuildCommand(command, client, messageEvent);
+                    break;
+                case "dm":
+                    await this.runGuildDM(command, client, messageEvent);
+                    break;
+                default:
+                    break;
             }
         }
+    }
+
+    async runGuildCommand(command: Command, client: Client, message: Message): Promise<void> {
+        const channel = message.channel as TextChannel;
+        const enabled =
+            await command.isCommandEnabled(channel.guild.id);
+        const prohibitedChannels = await command.getProhibitedChannels(
+            channel.guild.id
+        );
+        const hasPermission = !!message.member &&
+            message.member.hasPermission(command.getRequiredPermission());
+
+        if (enabled && !prohibitedChannels.includes(channel.id) && hasPermission) {
+            const args = removeEmptyArgs(
+                message.content
+                    .trim()
+                    .split(" ")
+                    .slice(1)
+            );
+            await command.useCommand(client, message, args);
+        }
+    }
+
+    async runGuildDM(command: Command, client: Client, message: Message): Promise<void> {
+        const args = removeEmptyArgs(
+            message.content
+                .trim()
+                .split(" ")
+                .slice(1)
+        );
+        await command.useCommand(client, message, args);
     }
 }
