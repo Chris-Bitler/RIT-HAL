@@ -6,10 +6,10 @@ import {
     RoleManager,
     GuildMemberRoleManager,
     GuildMember,
-    MessageReaction, Collection, ReactionUserManager
+    MessageReaction, Collection, ReactionUserManager, Message, GuildChannelManager, GuildChannel
 } from "discord.js";
 import {EmojiToRole} from "../../src/models/EmojiToRole";
-import {addEmojiRole, checkReactionToDB} from "../../src/processors/EmojiRoleProcessor";
+import {addEmojiRole, checkReactionToDB, getChannel, getRole} from "../../src/processors/EmojiRoleProcessor";
 describe("EmojiRoleProcessor tests", () => {
    let initialChannel: TextChannel;
    let guildEmoji: GuildEmoji;
@@ -21,6 +21,10 @@ describe("EmojiRoleProcessor tests", () => {
    let roleManager: RoleManager;
    let guildMemberRoleManager: GuildMemberRoleManager;
    let reactionUserManager: ReactionUserManager;
+   let message: Message;
+   let channelManager: GuildChannelManager;
+   let channelCache: Collection<string, GuildChannel>;
+   let roleCache: Collection<string, Role>;
    let collection: Collection<string, Role>;
    beforeEach(() => {
        const MockDiscord = jest.genMockFromModule<any>("discord.js");
@@ -35,6 +39,14 @@ describe("EmojiRoleProcessor tests", () => {
        member = new MockDiscord.GuildMember();
        messageReaction = new MockDiscord.MessageReaction();
        collection = new MockDiscord.Collection();
+       message = new MockDiscord.Message();
+       channelManager = new MockDiscord.GuildChannelManager();
+       channelCache = new Collection<string, GuildChannel>();
+       roleCache = new Collection<string, Role>();
+       Object.defineProperty(message, "guild", {
+           value: guild,
+           writable: true
+       });
        guildEmoji.id = "1";
        role.id = "1";
        guild.id = "1";
@@ -46,6 +58,11 @@ describe("EmojiRoleProcessor tests", () => {
        });
        member.roles.cache = collection;
        messageReaction.users = reactionUserManager;
+       guild.channels = channelManager;
+       channelManager.cache = channelCache;
+       roleManager.cache = roleCache;
+       channelCache.set("test", channel);
+       roleCache.set("test", role);
    });
 
    test("addEmojiRole - create and send message", async () => {
@@ -111,4 +128,35 @@ describe("EmojiRoleProcessor tests", () => {
             expect(member.send).toHaveBeenCalled();
         });
     });
+
+    describe("getRole tests", () => {
+        test("should return undefined if guild doesn't exist", () => {
+            Object.defineProperty(message, "guild", {
+                value: null
+            });
+            const result = getRole(message, "1");
+            expect(result).toBeUndefined();
+        });
+
+        test("should return role if guild exists", () => {
+            const result = getRole(message, "1");
+            expect(result).toEqual(role);
+        });
+    });
+
+    describe("getChannel tests", () => {
+        test("should return undefined if guild doesn't exist", () => {
+            Object.defineProperty(message, "guild", {
+                value: null
+            });
+            const result = getChannel(message, "1");
+            expect(result).toBeUndefined();
+        });
+
+        test("should return channel if guild exists", () => {
+            const result = getChannel(message, "1");
+            expect(result).toEqual(channel);
+        });
+    });
+
 });

@@ -23,6 +23,10 @@ describe("Food Specials tests", () => {
         mockGetSpecialsEmbed.mockReset();
     });
 
+    afterAll(() => {
+        client.destroy();
+    });
+
     test("No place menus should not call getSpecialsEmbed", async () => {
         const foodSpecials = new FoodSpecials();
         mockGetSpecials.mockResolvedValue([]);

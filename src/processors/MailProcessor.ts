@@ -14,7 +14,7 @@ export const sendMessageToChannel = async (
     const mailConfig = await getMailConfig(serverName);
     if (mailConfig) {
         const channel = client.guilds.resolve(mailConfig.serverId)?.channels?.resolve(mailConfig.adminChannelId);
-        if (channel && channel.type === "text") {
+        if (channel?.type === "text") {
             const textChannel = channel as TextChannel;
             await textChannel.send(makeEmbed(message));
             return MESSAGE_SENT;

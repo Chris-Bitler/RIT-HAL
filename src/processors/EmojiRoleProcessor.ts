@@ -3,7 +3,7 @@ import {
     TextChannel,
     MessageReaction,
     Role,
-    GuildEmoji, ReactionEmoji
+    GuildEmoji, ReactionEmoji, Message, GuildChannel
 } from "discord.js";
 import { EmojiToRole } from "../models/EmojiToRole";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
@@ -73,4 +73,14 @@ export async function checkReactionToDB(
             }
         }
     }
+}
+
+export function getRole(evt: Message, roleId: string): Role | undefined {
+    return evt.guild?.roles.cache.find((role) => role.id === roleId);
+}
+
+export function getChannel(evt: Message, channelText: string): GuildChannel | undefined {
+    return evt.guild?.channels.cache.find(
+        (channel) => channel.id === channelText
+    );
 }

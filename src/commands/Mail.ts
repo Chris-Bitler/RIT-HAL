@@ -18,7 +18,6 @@ export class Mail extends Command {
                     ));
                     break;
                 case NO_SERVER:
-                default:
                     evt.channel.send(getErrorEmbed(
                         "No server with that name was found"
                     ));
