@@ -26,6 +26,7 @@ import { Punishment } from "./models/Punishment";
 import { AlarmProcessor } from "./processors/AlarmProcessor";
 import { Alarm } from "./models/Alarm";
 import {MailConfig} from "./models/MailConfig";
+import {SendEmbedStateMachine} from "./stateMachines/SendEmbedStateMachine";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
@@ -51,8 +52,11 @@ sequelize.sync();
 
 client.on("message", async (message: Message) => {
     if (!message.partial) {
-        await commandRegistry.runCommands(client, message);
+        const ranCommand = await commandRegistry.runCommands(client, message);
         await EmojiProcessor.getInstance().logEmojis(message);
+        if (!ranCommand) {
+            SendEmbedStateMachine.getInstance().handleStep(client, message);
+        }
     }
 });
 

@@ -15,6 +15,7 @@ import {Alarm} from "./Alarm";
 import {React} from "./React";
 import {Mail} from "./Mail";
 import { MailConfig } from "./MailConfig";
+import {SendEmbed} from "./SendEmbed";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -44,6 +45,7 @@ export class CommandRegistry {
             this.registry.push(new React());
             this.registry.push(new Mail());
             this.registry.push(new MailConfig());
+            this.registry.push(new SendEmbed());
         } else {
             commands.forEach((command) => this.registry.push(command));
         }
@@ -70,30 +72,33 @@ export class CommandRegistry {
      * If all checks pass, call the useCommand method on the command
      * @param client Discord Client
      * @param messageEvent The discord.js message
+     * @returns Whether or not the command was run
      */
-    async runCommands(client: Client, messageEvent: Message): Promise<void> {
+    async runCommands(client: Client, messageEvent: Message): Promise<boolean> {
         if (messageEvent.author.bot) {
-            return;
+            return false;
         }
 
         const command = this.getCommand(messageEvent.content);
 
         if(command?.commandType() !== messageEvent.channel.type) {
-            return;
+            return false;
         }
 
         if (command) {
             switch (messageEvent.channel.type) {
                 case "text":
                     await this.runGuildCommand(command, client, messageEvent);
-                    break;
+                    return true;
                 case "dm":
                     await this.runGuildDM(command, client, messageEvent);
-                    break;
+                    return true;
                 default:
-                    break;
+                    return false;
             }
         }
+
+        return false;
     }
 
     async runGuildCommand(command: Command, client: Client, message: Message): Promise<void> {
