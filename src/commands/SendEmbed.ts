@@ -8,7 +8,7 @@ export class SendEmbed extends Command {
     }
 
     getCommand(): string[] {
-        return ["sendEmbed", "se"]
+        return ["sendEmbed"];
     }
 
     getRequiredPermission(): number {
