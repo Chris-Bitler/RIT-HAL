@@ -27,6 +27,7 @@ import { AlarmProcessor } from "./processors/AlarmProcessor";
 import { Alarm } from "./models/Alarm";
 import {MailConfig} from "./models/MailConfig";
 import {SendEmbedStateMachine} from "./stateMachines/SendEmbedStateMachine";
+import {LogProcessor} from "./processors/LogProcessor";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
@@ -68,6 +69,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
             oldMember.roles.cache.get(mutedRoleId) &&
             !newMember.roles.cache.get(mutedRoleId)
         ) {
+            LogProcessor.getLogger().info(`Removing mute in db for ${newMember?.user?.username}`);
             await modProcessor.unmuteUser(newMember.guild, newMember.id);
         }
     }
@@ -81,6 +83,7 @@ client.on("guildMemberAdd", async (member) => {
         guildMember = member;
     }
     if (modProcessor.isUserMuted(guildMember)) {
+        LogProcessor.getLogger().info(`Adding mute back for ${member?.user?.username}`);
         await modProcessor.reassignUserMutedRole(guildMember);
     }
 });

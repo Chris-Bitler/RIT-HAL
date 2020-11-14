@@ -5,6 +5,8 @@ import { ConfigProperty } from "../models/ConfigProperty";
 import * as moment from "moment-timezone";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 import * as sentry from "@sentry/node";
+import {logger} from "sequelize/types/lib/utils/logger";
+import {LogProcessor} from "./LogProcessor";
 
 /**
  * Class for processing and tracking moderation actions
@@ -208,6 +210,7 @@ export class ModProcessor {
      */
     async unmuteUser(guild: Guild, user: User | string): Promise<void> {
         const memberToUnmute: GuildMember | null = guild.members.resolve(user);
+        LogProcessor.getLogger().info(`Attempting to unmute ${user}`);
         if (memberToUnmute) {
             let userMuted = false;
             this.mutes = this.mutes.filter((mute) => {
@@ -218,9 +221,13 @@ export class ModProcessor {
                 return true;
             });
 
+            LogProcessor.getLogger().info(`Mute found for user ${user}: ${userMuted}`);
+
             if (userMuted) {
                 const mutedRoleId = await this.fetchMutedRoleId(guild.id);
+                LogProcessor.getLogger().info(`Muted role found: ${mutedRoleId}`);
                 if (mutedRoleId) {
+                    LogProcessor.getLogger().info(`Attempting to unmute ${user}`);
                     await memberToUnmute.roles.remove(mutedRoleId);
                 }
                 await Punishment.update(
@@ -235,6 +242,7 @@ export class ModProcessor {
                         }
                     }
                 );
+                LogProcessor.getLogger().info(`DB punishment updated for ${user}`);
             }
         }
     }
@@ -415,20 +423,26 @@ export class ModProcessor {
         );
         expiredMutes.forEach((mute) => {
             const guild = client.guilds.resolve(mute.serverId);
+            LogProcessor.getLogger().info(`Attempting to unmute ${mute.memberId} - expired`);
             if (guild) {
+                LogProcessor.getLogger().info(`Unmuting ${mute.memberId} in ${guild.name}`);
                 try {
                     this.unmuteUser(guild, mute.memberId);
                 } catch (err) {
+                    LogProcessor.getLogger().info(`Error unmuting user: ${err}`);
                     sentry.captureException(err);
                 }
             }
         });
         expiredBans.forEach((ban) => {
             const guild = client.guilds.resolve(ban.serverId);
+            LogProcessor.getLogger().info(`Attempting to unban ${ban.memberId} - expired`);
             if (guild) {
+                LogProcessor.getLogger().info(`Unbanning ${ban.memberId} in ${guild.name}`);
                 try {
                     this.unbanUser(guild, ban.memberId, true);
                 } catch (err) {
+                    LogProcessor.getLogger().info(`Error unbanning user: ${err}`);
                     sentry.captureException(err);
                 }
             }

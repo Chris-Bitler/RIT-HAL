@@ -20,6 +20,8 @@
     "@types/moment-timezone": "^0.5.13",
     "@types/node": "^14.0.27",
     "@types/validator": "^13.1.0",
+    "@types/winston": "^2.4.4",
+    "@types/winston-loggly-bulk": "^3.0.0",
     "@types/ws": "^7.2.6",
     "axios": "^0.19.1",
     "cheerio": "^1.0.0-rc.3",
@@ -34,7 +36,9 @@
     "sequelize": "^5.22.3",
     "sequelize-typescript": "^1.1.0",
     "sqlite3": "^4.1.0",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "winston": "^3.3.3",
+    "winston-loggly-bulk": "^3.1.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.8",
