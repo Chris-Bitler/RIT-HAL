@@ -14,6 +14,18 @@ import {ModProcessor} from "../../src/processors/ModProcessor";
 import {Punishment} from "../../src/models/Punishment";
 import {getErrorEmbed} from "../../src/utils/EmbedUtil";
 
+jest.mock('../../src/processors/LogProcessor', () => {
+    return {
+        LogProcessor: {
+            getLogger: () => {
+                return {
+                    info: jest.fn()
+                }
+            }
+        }
+    }
+});
+
 describe("ModProcessor tests", () => {
     let member: GuildMember;
     let user: User;
