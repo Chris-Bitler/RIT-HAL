@@ -133,6 +133,7 @@ export class ModProcessor {
             .format("MMMM Do YYYY, h:mm:ss a");
 
         try {
+            await memberToBan.ban({ reason: reason });
             await memberToBan.send(
                 getInformationalEmbed(
                     "You have been banned",
@@ -141,7 +142,6 @@ export class ModProcessor {
                     }** until ${expirationDateString}`
                 )
             );
-            await memberToBan.ban({ reason: reason });
         } catch (err) {
             await banner.send(
                 getErrorEmbed("An error occurred when trying to ban that user.")
@@ -155,7 +155,7 @@ export class ModProcessor {
             punisherName: banner.user.username,
             type: "ban",
             reason,
-            expiration: 1001,
+            expiration: expirationDateTime,
             active: true,
             serverId: memberToBan.guild.id
         });
