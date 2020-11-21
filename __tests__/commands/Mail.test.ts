@@ -1,5 +1,5 @@
 import {MESSAGE_SENT, NO_SERVER, sendMessageToChannel} from "../../src/processors/MailProcessor";
-import {Client, DMChannel, Message} from "discord.js";
+import {Client, DMChannel, Message, User} from "discord.js";
 import {Mail} from "../../src/commands/Mail";
 import {getErrorEmbed, getInformationalEmbed} from "../../src/utils/EmbedUtil";
 
@@ -9,13 +9,17 @@ describe("Mail command", () => {
     let client: Client;
     let channel: DMChannel;
     let message: Message;
+    let author: User;
     let mockSend: jest.MockedFunction<typeof channel.send>;
     beforeEach(() => {
         const MockDiscord = jest.genMockFromModule<any>("discord.js");
         message = new MockDiscord.Message();
         channel = new MockDiscord.DMChannel();
+        author = new MockDiscord.User();
+        author.username = 'test';
         client = new Client();
         message.channel = channel;
+        message.author = author;
         mockSend = jest.fn();
         message.channel.send = mockSend;
         Date.now = jest.fn().mockReturnValue(1);

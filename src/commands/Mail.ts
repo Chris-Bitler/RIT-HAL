@@ -9,7 +9,7 @@ export class Mail extends Command {
         if (args.length > 1) {
             const serverName = args[0];
             const message = mergeArgs(1, args);
-            const result = await sendMessageToChannel(client, serverName, message);
+            const result = await sendMessageToChannel(client, serverName, evt.author.username, message);
             switch (result) {
                 case MESSAGE_SENT:
                     evt.channel.send(getInformationalEmbed(

@@ -9,6 +9,7 @@ export const NO_SERVER = "NO_SERVER";
 export const sendMessageToChannel = async (
     client: Client,
     serverName: string,
+    sender: string,
     message: string
 ): Promise<string> => {
     const mailConfig = await getMailConfig(serverName);
@@ -16,17 +17,18 @@ export const sendMessageToChannel = async (
         const channel = client.guilds.resolve(mailConfig.serverId)?.channels?.resolve(mailConfig.adminChannelId);
         if (channel?.type === "text") {
             const textChannel = channel as TextChannel;
-            await textChannel.send(makeEmbed(message));
+            await textChannel.send(makeEmbed(sender, message));
             return MESSAGE_SENT;
         }
     }
     return NO_SERVER;
 }
 
-export const makeEmbed = (message: string): MessageEmbed => {
+export const makeEmbed = (sender: string, message: string): MessageEmbed => {
     const embed = new MessageEmbed();
     return embed.setTitle("Admin mail")
         .setDescription(message)
+        .setFooter(`From: ${sender}`)
         .setTimestamp(Date.now())
 }
 
