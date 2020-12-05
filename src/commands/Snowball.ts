@@ -8,15 +8,6 @@ import {COOLDOWN_TYPE, getCooldownRemainingMillis, isInCooldown, setCooldown} fr
  */
 
 const COOLDOWN = 1000*60*10;
-const IMAGES = [
-    "https://cdn.discordapp.com/attachments/535311735083761705/784621745909792796/article-0-0F22E4F300000578-182_634x440.png",
-    "https://cdn.discordapp.com/attachments/535311735083761705/784621760292978718/tiger-cubs-get-christmas-presents-c-zsl-london.png",
-    "https://cdn.discordapp.com/attachments/535311735083761705/784621816856838164/taronga-tiger-cubs.png",
-    "https://cdn.discordapp.com/attachments/535311735083761705/784621940501118986/xmas8_t1160.png",
-    "https://cdn.discordapp.com/attachments/535311735083761705/784621967902507069/Tiger2Bgets2Bin2Ba2Btangle2Bwith2Bher2Bearly2BChristmas2Bpresent2B3.png",
-    "https://cdn.discordapp.com/attachments/535311735083761705/784622011879784518/eggmhud3w3631.png",
-    "https://cdn.discordapp.com/attachments/535311735083761705/784622331796127754/61bd4c3d64ba113e5bfe3a33517ad097.png"
-];
 
 export class Snowball extends Command {
     async useCommand(
