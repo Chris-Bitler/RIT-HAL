@@ -5,7 +5,7 @@ pg.defaults.parseInt8 = true;
 
 import { ModProcessor } from "./processors/ModProcessor";
 import {
-    Client,
+    Client, DMChannel,
     GuildEmoji,
     GuildMember,
     Message, MessageReaction, PartialUser,
@@ -28,6 +28,7 @@ import { Alarm } from "./models/Alarm";
 import {MailConfig} from "./models/MailConfig";
 import {SendEmbedStateMachine} from "./stateMachines/SendEmbedStateMachine";
 import {LogProcessor} from "./processors/LogProcessor";
+import {initCooldowns} from "./utils/CooldownUtil";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
@@ -113,7 +114,7 @@ setInterval(() => modProcessor.tickPunishments(client), 2000);
 setTimeout(() => alarmProcessor.loadAlarms(), 1000);
 setInterval(() => alarmProcessor.tickAlarms(client), 1000);
 
-client.login(process.env.discord_token);
+client.login(process.env.discord_token)
 
 client.on("ready", async () => {
     await checkFoodDaily(client);
@@ -121,6 +122,8 @@ client.on("ready", async () => {
 });
 
 BusProcessor.getInstance().refreshInformation();
+
+initCooldowns();
 
 setInterval(
     () => BusProcessor.getInstance().refreshInformation(),
