@@ -30,9 +30,10 @@ export class Present extends Command {
                 const mentioned = evt.mentions.members?.first();
                 if (mentioned) {
                     const image = IMAGES[Math.floor(Math.random()*IMAGES.length)];
+                    const emoji = evt.guild?.emojis.resolve("642150570429382656") || null;
                     const embed = new MessageEmbed();
                     embed.setTitle("Presents!");
-                    embed.setDescription(`${evt.member} has gifted ${mentioned} a present! :gift: :TigerNya:`);
+                    embed.setDescription(`${evt.member} has gifted ${mentioned} a present! :gift: ${emoji || ""}`);
                     embed.setImage(image);
                     await evt.channel.send(embed);
                     setCooldown(COOLDOWN_TYPE.PRESENT, evt.member, Date.now() + COOLDOWN);
