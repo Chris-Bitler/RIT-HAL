@@ -54,34 +54,38 @@ export async function checkReactionToDB(
     });
 
     logger.info(`Searching for emoji to role for emoji id ${emojiId} for ${member} in channel ${channel.id}`);
-    if (emojiToRole) {
-        const { roleId } = emojiToRole;
-        logger.info(`Found role id ${roleId} for ${emojiId}`);
-        const role = channel.guild.roles.resolve(roleId);
-        if (role) {
-            logger.info(`Found role ${role} for ${roleId}`);
-            if (member.roles.cache.get(roleId)) {
-                logger.info(`${member} has role, attempting to remove`);
-                await member.roles.remove(role);
-                await member.send(
-                    getInformationalEmbed(
-                        "Removed role",
-                        `Your role **${role.name}** was removed in ${channel.guild.name}`
-                    )
-                );
-                logger.info(`${member} had role ${role} removed`);
-            } else {
-                logger.info(`${member} does not have role, attempting to add`);
-                await member.roles.add(role);
-                await member.send(
-                    getInformationalEmbed(
-                        "Added role",
-                        `You were given the role **${role.name}** in ${channel.guild.name}`
-                    )
-                );
-                logger.info(`${member} had role ${role} added`);
+    try {
+        if (emojiToRole) {
+            const {roleId} = emojiToRole;
+            logger.info(`Found role id ${roleId} for ${emojiId}`);
+            const role = channel.guild.roles.resolve(roleId);
+            if (role) {
+                logger.info(`Found role ${role} for ${roleId}`);
+                if (member.roles.cache.get(roleId)) {
+                    logger.info(`${member} has role, attempting to remove`);
+                    await member.roles.remove(role);
+                    await member.send(
+                        getInformationalEmbed(
+                            "Removed role",
+                            `Your role **${role.name}** was removed in ${channel.guild.name}`
+                        )
+                    );
+                    logger.info(`${member} had role ${role} removed`);
+                } else {
+                    logger.info(`${member} does not have role, attempting to add`);
+                    await member.roles.add(role);
+                    await member.send(
+                        getInformationalEmbed(
+                            "Added role",
+                            `You were given the role **${role.name}** in ${channel.guild.name}`
+                        )
+                    );
+                    logger.info(`${member} had role ${role} added`);
+                }
             }
         }
+    } catch (err) {
+        logger.error(`Error ${err} trying to add ${emojiId} to ${member.displayName}`);
     }
 }
 
