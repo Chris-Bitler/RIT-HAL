@@ -99,6 +99,7 @@ const handleEmojiReactions = async (reaction: MessageReaction, user: User | Part
     if (!user.bot && channel instanceof TextChannel) {
         const emoji = reaction.emoji;
         const member = channel.guild.members.resolve(await user.fetch());
+        LogProcessor.getLogger().info(`Checking emoji role for ${member} for ${emoji}`);
         if (member && emoji) {
             await checkReactionToDB(emoji, member, channel, reaction);
         }

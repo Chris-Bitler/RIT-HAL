@@ -8,6 +8,7 @@ import {
 import { EmojiToRole } from "../models/EmojiToRole";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 import { UnicodeEmoji } from "../types/Emoji";
+import {LogProcessor} from "./LogProcessor";
 
 export async function addEmojiRole(
     initialChannel: TextChannel,
@@ -42,6 +43,7 @@ export async function checkReactionToDB(
     reaction: MessageReaction
 ): Promise<void> {
     const emojiId = emote.id ? emote.id : emote.name;
+    const logger = LogProcessor.getLogger();
     const emojiToRole = await EmojiToRole.findOne({
         where: {
             emojiId,
@@ -50,11 +52,16 @@ export async function checkReactionToDB(
         },
         order: [["id", "DESC"]]
     });
+
+    logger.info(`Searching for emoji to role for emoji id ${emojiId} for ${member} in channel ${channel.id}`);
     if (emojiToRole) {
         const { roleId } = emojiToRole;
+        logger.info(`Found role id ${roleId} for ${emojiId}`);
         const role = channel.guild.roles.resolve(roleId);
         if (role) {
+            logger.info(`Found role ${role} for ${roleId}`);
             if (member.roles.cache.get(roleId)) {
+                logger.info(`${member} has role, attempting to remove`);
                 await member.roles.remove(role);
                 await member.send(
                     getInformationalEmbed(
@@ -62,7 +69,9 @@ export async function checkReactionToDB(
                         `Your role **${role.name}** was removed in ${channel.guild.name}`
                     )
                 );
+                logger.info(`${member} had role ${role} removed`);
             } else {
+                logger.info(`${member} does not have role, attempting to add`);
                 await member.roles.add(role);
                 await member.send(
                     getInformationalEmbed(
@@ -70,6 +79,7 @@ export async function checkReactionToDB(
                         `You were given the role **${role.name}** in ${channel.guild.name}`
                     )
                 );
+                logger.info(`${member} had role ${role} added`);
             }
         }
     }
