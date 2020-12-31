@@ -10,6 +10,19 @@ import {
 } from "discord.js";
 import {EmojiToRole} from "../../src/models/EmojiToRole";
 import {addEmojiRole, checkReactionToDB, getChannel, getRole} from "../../src/processors/EmojiRoleProcessor";
+
+jest.mock('../../src/processors/LogProcessor', () => {
+    return {
+        LogProcessor: {
+            getLogger: () => {
+                return {
+                    info: jest.fn()
+                }
+            }
+        }
+    }
+});
+
 describe("EmojiRoleProcessor tests", () => {
    let initialChannel: TextChannel;
    let guildEmoji: GuildEmoji;
