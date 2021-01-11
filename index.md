@@ -1,37 +1,24 @@
-## Welcome to GitHub Pages
+## RIT-HAL
+<img src="images/hal.png" width="350" height="350" title="hover text">
 
-You can use the [editor on GitHub](https://github.com/Chris-Bitler/RIT-HAL/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+### [Discord Bot for the Unofficial RIT Discord](https://github.com/Chris-Bitler/RIT-HAL)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+HAL is a discord bot aimed at helping students gain access to information related to the university, along with helping with the maintenance of the discord server.
 
-### Markdown
+This includes allowing for things such as
+- Adding alerts to be displayed on a daily basis
+- Helping streamline the moderation of the server
+- Allowing users to contact the admins of the server for help
+- Allows students to see bus schedule information
+- Allows students to see what food is being served where on campus
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+#### Technologies in use
+HAL was originally written in JS using Node.JS, but has since been rewritten in Typescript to allow the project to be more maintainable.
 
-```markdown
-Syntax highlighted code block
+Other technologies include Jest for unit testing, Circle-CI for continuous integration, and Heroku for Continuous deployment.
 
-# Header 1
-## Header 2
-### Header 3
+#### Contributing
+Contributions are welcome to the project as pull requests on the repository or as issues for future improvements that can be added.
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Chris-Bitler/RIT-HAL/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+### Changelog
+*1/11/2021* - Github pages site created
