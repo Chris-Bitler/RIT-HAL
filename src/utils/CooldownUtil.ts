@@ -5,7 +5,8 @@ const cooldowns: CooldownContainer = {};
 
 export enum COOLDOWN_TYPE {
     SNOWBALL,
-    PRESENT
+    PRESENT,
+    MELO
 }
 
 /**

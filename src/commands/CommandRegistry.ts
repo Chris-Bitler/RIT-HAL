@@ -16,8 +16,7 @@ import {React} from "./React";
 import {Mail} from "./Mail";
 import { MailConfig } from "./MailConfig";
 import {SendEmbed} from "./SendEmbed";
-import {Snowball} from "./Snowball";
-import {Present} from "./Present";
+import {Melo} from "./Melo";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -48,8 +47,9 @@ export class CommandRegistry {
             this.registry.push(new Mail());
             this.registry.push(new MailConfig());
             this.registry.push(new SendEmbed());
-            this.registry.push(new Snowball());
-            this.registry.push(new Present());
+            //this.registry.push(new Snowball());
+            //this.registry.push(new Present());
+            this.registry.push(new Melo());
         } else {
             commands.forEach((command) => this.registry.push(command));
         }
