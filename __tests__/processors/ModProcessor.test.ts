@@ -7,7 +7,7 @@ import {
     Collection,
     Role,
     User,
-    GuildMemberManager, GuildManager
+    GuildMemberManager, GuildManager, GuildChannelManager
 } from "discord.js";
 import {ConfigProperty} from "../../src/models/ConfigProperty";
 import {ModProcessor} from "../../src/processors/ModProcessor";
@@ -36,6 +36,7 @@ describe("ModProcessor tests", () => {
     let guild: Guild;
     let memberManager: GuildMemberManager;
     let roleManager: GuildMemberRoleManager;
+    let guildChannelManager: GuildChannelManager;
     let guildManager: GuildManager;
     let roleCollection: Collection<string, Role>;
     let role: Role;
@@ -54,6 +55,8 @@ describe("ModProcessor tests", () => {
         guildManager = new MockDiscord.GuildManager();
         roleManager = new MockDiscord.RoleManager();
         memberManager = new MockDiscord.GuildMemberManager();
+        guildChannelManager = new MockDiscord.GuildChannelManager();
+        guild.channels = guildChannelManager;
         role = new MockDiscord.Role();
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -66,6 +69,7 @@ describe("ModProcessor tests", () => {
         Punishment.create = jest.fn();
         sendMock = jest.fn();
         channel.send = sendMock;
+        guildChannelManager.resolve = jest.fn().mockReturnValue(null);
         mockDateNow = jest.fn();
         roleManager.remove = jest.fn();
         Date.now = mockDateNow;
