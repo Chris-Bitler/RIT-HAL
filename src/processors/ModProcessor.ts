@@ -1,12 +1,18 @@
-import { Ban, Mute } from "../types/Punishment";
-import { Client, Guild, GuildMember, TextChannel, User } from "discord.js";
-import { Punishment } from "../models/Punishment";
-import { ConfigProperty } from "../models/ConfigProperty";
+import {Ban, Mute} from "../types/Punishment";
+import {Client, Guild, GuildMember, TextChannel, User} from "discord.js";
+import {Punishment} from "../models/Punishment";
+import {ConfigProperty} from "../models/ConfigProperty";
 import * as moment from "moment-timezone";
-import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
+import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
 import * as sentry from "@sentry/node";
-import {logger} from "sequelize/types/lib/utils/logger";
 import {LogProcessor} from "./LogProcessor";
+
+export enum PunishmentType {
+    warn = "warn",
+    mute = "mute",
+    kick = "kick",
+    ban = "ban"
+}
 
 /**
  * Class for processing and tracking moderation actions
@@ -84,6 +90,14 @@ export class ModProcessor {
                     `${memberToMute} has been muted for ${reason} until ${expirationDateString}`
                 )
             );
+            await this.logPunishmentToChannel(
+                memberToMute.guild,
+                PunishmentType.mute,
+                muter,
+                memberToMute,
+                reason,
+                expirationDateString
+            );
             await memberToMute.send(
                 getInformationalEmbed(
                     "You have been muted",
@@ -134,6 +148,14 @@ export class ModProcessor {
 
         try {
             await memberToBan.ban({ reason: reason });
+            await this.logPunishmentToChannel(
+                memberToBan.guild,
+                PunishmentType.ban,
+                banner,
+                memberToBan,
+                reason,
+                expirationDateString
+            );
             await memberToBan.send(
                 getInformationalEmbed(
                     "You have been banned",
@@ -279,6 +301,13 @@ export class ModProcessor {
                 expiration: 0
             });
             await memberToKick.kick(reason.trim());
+            await this.logPunishmentToChannel(
+                memberToKick.guild,
+                PunishmentType.kick,
+                kicker,
+                memberToKick,
+                reason
+            );
         } catch (err) {
             await kicker.send(
                 getErrorEmbed(
@@ -329,6 +358,13 @@ export class ModProcessor {
                 serverId: memberToWarn.guild.id,
                 expiration: 0
             });
+            await this.logPunishmentToChannel(
+                memberToWarn.guild,
+                PunishmentType.warn,
+                warner,
+                memberToWarn,
+                reason
+            );
         } catch (err) {
             await warner.send(
                 getErrorEmbed(
@@ -467,6 +503,94 @@ export class ModProcessor {
     }
 
     /**
+     * Get the channel for a punishment logging
+     * @param serverId The guild's id
+     * @param punishmentType The punishment type
+     */
+    async getChannelForPunishment(
+        serverId: string,
+        punishmentType: PunishmentType
+    ): Promise<string | null> {
+        let channelId = null;
+        switch (punishmentType) {
+            case PunishmentType.warn:
+                channelId = this.fetchWarnLogChannel(serverId);
+                break;
+                case PunishmentType.mute:
+                    channelId = this.fetchMuteLogChannel(serverId);
+                    break;
+                case PunishmentType.kick:
+                    channelId = this.fetchKickLogChannel(serverId);
+                    break;
+                case PunishmentType.ban:
+                    channelId = this.fetchBanLogChannel(serverId);
+                    break;
+                default:
+                    break;
+        }
+        return channelId;
+    }
+
+    /**
+     * Log punishments to a specific channel for review purposes
+     * @param guild The guild the punishment took place in
+     * @param punishmentType The type of punishment
+     * @param punisher The person doing the punishing
+     * @param punishee The person being punished
+     * @param reason The reason they were punished
+     * @param expirationTime The expiration time for punishing
+     */
+    async logPunishmentToChannel(
+        guild: Guild,
+        punishmentType: PunishmentType,
+        punisher: GuildMember,
+        punishee: GuildMember,
+        reason: string,
+        expirationTime?: string
+    ): Promise<void> {
+        const channelId = await this.getChannelForPunishment(guild.id, punishmentType);
+        if (channelId != null) {
+            const channel = guild.channels.resolve(channelId);
+            if (channel && channel instanceof TextChannel) {
+                switch (punishmentType) {
+                    case PunishmentType.warn:
+                        await channel.send(
+                            getInformationalEmbed(
+                                "User warned",
+                                `${punisher} has warned ${punishee} for ${reason}`
+                            )
+                        );
+                        break;
+                    case PunishmentType.mute:
+                        await channel.send(
+                            getInformationalEmbed(
+                                "User muted",
+                                `${punisher} has muted ${punishee} for ${reason} until ${expirationTime}`
+                            )
+                        );
+                        break;
+                    case PunishmentType.kick:
+                        await channel.send(
+                            getInformationalEmbed(
+                                "User kicked",
+                                `${punisher} has kicked ${punishee} for ${reason}`
+                            )
+                        );
+                        break;
+                    case PunishmentType.ban:
+                        await channel.send(
+                            getInformationalEmbed(
+                                "User banned",
+                                `${punisher} has banned ${punishee} for ${reason} until ${expirationTime}`
+                            )
+                        );
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
      * Attempt to fetch the muted role id for a specific server
      * @param serverId The guild id to fetch the muted role id for
      */
@@ -477,6 +601,70 @@ export class ModProcessor {
         );
         if (mutedRoleId?.value) {
             return mutedRoleId.value;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Fetch the channel ids that the warn actions will be logged to
+     * @param serverId The guild id to fetch the log channels for
+     */
+    async fetchWarnLogChannel(serverId: string): Promise<string | null> {
+        const modWarnLogChannels = await ConfigProperty.getServerProperty(
+            "mod.action.logs.warn",
+            serverId
+        );
+        if (modWarnLogChannels?.value) {
+            return modWarnLogChannels.value;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Fetch the channel ids that the kick actions will be logged to
+     * @param serverId The guild id to fetch the log channels for
+     */
+    async fetchKickLogChannel(serverId: string): Promise<string | null> {
+        const modKickLogChannels = await ConfigProperty.getServerProperty(
+            "mod.action.logs.kick",
+            serverId
+        );
+        if (modKickLogChannels?.value) {
+            return modKickLogChannels.value;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Fetch the channel ids that the mute actions will be logged to
+     * @param serverId The guild id to fetch the log channels for
+     */
+    async fetchMuteLogChannel(serverId: string): Promise<string | null> {
+        const modMuteLogChannels = await ConfigProperty.getServerProperty(
+            "mod.action.logs.mute",
+            serverId
+        );
+        if (modMuteLogChannels?.value) {
+            return modMuteLogChannels.value;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Fetch the channel ids that the ban actions will be logged to
+     * @param serverId The guild id to fetch the log channels for
+     */
+    async fetchBanLogChannel(serverId: string): Promise<string | null> {
+        const modBanLogChannels = await ConfigProperty.getServerProperty(
+            "mod.action.logs.ban",
+            serverId
+        );
+        if (modBanLogChannels?.value) {
+            return modBanLogChannels.value;
         } else {
             return null;
         }

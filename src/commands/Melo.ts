@@ -1,5 +1,5 @@
 import { Command } from "./Command";
-import {Client, Message, MessageEmbed} from "discord.js";
+import {Client, Message} from "discord.js";
 import { getErrorEmbed } from "../utils/EmbedUtil";
 import {COOLDOWN_TYPE, getCooldownRemainingMillis, isInCooldown, setCooldown} from "../utils/CooldownUtil";
 
