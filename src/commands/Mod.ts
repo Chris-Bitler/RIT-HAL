@@ -6,11 +6,11 @@ import {
     Permissions,
     TextChannel
 } from "discord.js";
-import { CommandArgs, CommandArgsTime } from "../types/Mod";
+import {CommandArgs, CommandArgsTime, ListArgs} from "../types/Mod";
 import { Command } from "./Command";
 import * as moment from "moment-timezone";
 import { parseModDateString } from "../utils/DateUtil";
-import { ModProcessor } from "../processors/ModProcessor";
+import {ModProcessor, PunishmentType} from "../processors/ModProcessor";
 import { Punishment } from "../models/Punishment";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 
@@ -54,11 +54,15 @@ export class Mod extends Command {
                     await this.kickUser(channel, sender, cmdArgs);
                     break;
                 case "actions":
-                    await this.listActions(
-                        channel,
-                        sender,
-                        args.length >= 2 ? args[1] : "N/A"
-                    );
+                    cmdArgs = this.parseListArgs(evt, args);
+                    if (cmdArgs && cmdArgs.name) {
+                        await this.listActions(
+                            channel,
+                            sender,
+                            cmdArgs.name,
+                            cmdArgs?.type
+                        );
+                    }
                     break;
                 default:
                     break;
@@ -147,6 +151,45 @@ export class Mod extends Command {
         }
 
         return cmdArgs;
+    }
+
+    /**
+     * Parse args for the list command
+     * @param evt The message from discord
+     * @param args The message arguments
+     */
+    parseListArgs(evt: Message, args: string[]): ListArgs | null {
+        let type: PunishmentType|undefined = undefined;
+        // If 3 or more arghs, try to parse type
+        if (args.length >= 3) {
+            type = PunishmentType[args[2] as keyof typeof PunishmentType];
+            if (!type) {
+                evt.channel.send(
+                    getErrorEmbed("-mod actions [user] [type] requires a valid type (warn/mute/kick/ban)")
+                );
+                return null;
+            }
+        }
+        if (args.length >= 2) {
+            // Try to use mention for name if it exists
+            let name = args[1];
+            const firstMention:
+                | GuildMember
+                | undefined = evt.mentions.members?.first();
+            if (firstMention) {
+                name = firstMention.user.username;
+            }
+
+            return {
+                type: type,
+                name: name
+            }
+        } else {
+            evt.channel.send(
+                getErrorEmbed("-mod actions [user] requires a valid user display name or ping")
+            );
+            return null;
+        }
     }
 
     /**
@@ -307,11 +350,13 @@ export class Mod extends Command {
      * @param channel The channel to place the embed in
      * @param sender The person querying for the embed
      * @param name The name of the person whose actions are being checked-
+     * @param punishmentType The type of punishment, if specified
      */
     async listActions(
         channel: TextChannel,
         sender: GuildMember,
-        name: string
+        name: string,
+        punishmentType?: PunishmentType
     ): Promise<void> {
         const members = channel.guild.members.cache.filter((member) =>
             member.user.username.toLowerCase().includes(name.toLowerCase())
@@ -323,10 +368,13 @@ export class Mod extends Command {
                 channel.guild.id,
                 id
             );
+            const titleAddition = punishmentType ? ` - ${punishmentType}s` : '';
             const embed = new MessageEmbed().setTitle(
-                `Found punishments - ${member.nickname || member.displayName}`
+                `Found punishments - ${member.nickname || member.displayName}${titleAddition}`
             );
             punishments.forEach((punishment) => {
+                if (punishmentType && punishmentType !== punishment.type)
+                    return;
                 const expirationDateString = moment
                     .tz(punishment.expiration, "America/New_York")
                     .format("MMMM Do YYYY, h:mm:ss a");
