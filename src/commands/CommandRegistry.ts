@@ -17,6 +17,7 @@ import {Mail} from "./Mail";
 import { MailConfig } from "./MailConfig";
 import {SendEmbed} from "./SendEmbed";
 import {Melo} from "./Melo";
+import {Censor} from "./Censor";
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -50,6 +51,7 @@ export class CommandRegistry {
             //this.registry.push(new Snowball());
             //this.registry.push(new Present());
             this.registry.push(new Melo());
+            this.registry.push(new Censor());
         } else {
             commands.forEach((command) => this.registry.push(command));
         }

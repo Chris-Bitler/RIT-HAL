@@ -29,6 +29,8 @@ import {MailConfig} from "./models/MailConfig";
 import {SendEmbedStateMachine} from "./stateMachines/SendEmbedStateMachine";
 import {LogProcessor} from "./processors/LogProcessor";
 import {initCooldowns} from "./utils/CooldownUtil";
+import {CensorProcessor} from "./processors/CensorProcessor";
+import {CensorEntry} from "./models/CensorEntry";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
@@ -48,7 +50,7 @@ const sequelize: Sequelize = new Sequelize(
     {
         dialect: "postgres",
         logging: false,
-        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm, MailConfig]
+        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm, MailConfig, CensorEntry]
     });
 sequelize.sync();
 
@@ -56,6 +58,7 @@ client.on("message", async (message: Message) => {
     if (!message.partial) {
         const ranCommand = await commandRegistry.runCommands(client, message);
         await EmojiProcessor.getInstance().logEmojis(message);
+        await CensorProcessor.getInstance().processMessage(message);
         if (!ranCommand) {
             SendEmbedStateMachine.getInstance().handleStep(client, message);
         }
@@ -113,6 +116,7 @@ client.on("messageReactionRemove", handleEmojiReactions);
 setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
 setInterval(() => modProcessor.tickPunishments(client), 2000);
 setTimeout(() => alarmProcessor.loadAlarms(), 1000);
+setTimeout(() => CensorProcessor.getInstance().loadCensoredWords(), 1000)
 setInterval(() => alarmProcessor.tickAlarms(client), 1000);
 
 client.login(process.env.discord_token)
