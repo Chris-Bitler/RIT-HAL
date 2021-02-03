@@ -69,4 +69,8 @@ export class Command {
     commandType(): string {
         return "text";
     }
+
+    allowEmptyArgs(): boolean {
+        return false;
+    }
 }

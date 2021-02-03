@@ -35,7 +35,7 @@ export class CensorProcessor {
                 censoredWords.forEach((censoredWord) => {
                     if (censoredWord.includes('%')) {
                         // Replace % with . and create regex
-                        const regex = new RegExp(`/${censoredWord.replace('%', '.')}/gi`);
+                        const regex = new RegExp(`/${censoredWord.replace('%', '.').replace('_', '\\s')}`,'gi');
                         if (regex.test(messageContent)) {
                             this.handleCensoredWord(message, censoredWord);
                         }

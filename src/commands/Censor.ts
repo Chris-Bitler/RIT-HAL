@@ -1,6 +1,7 @@
 import { Command } from "./Command";
 import {Channel, Client, Message, Permissions, TextChannel} from "discord.js";
 import {CensorProcessor} from "../processors/CensorProcessor";
+import {mergeArgs} from "../utils/StringUtil";
 
 /**
  * Used to show a larger version of an emoji in the channel
@@ -65,7 +66,7 @@ export class Censor extends Command {
     async handleCensorList(channel: TextChannel, args: string[]) {
         let query = undefined;
         if (args.length >= 2) {
-            query = args[1];
+            query = mergeArgs(1,args);
         }
 
         const matchingResults = this.processor.queryCensoredWords(channel.guild.id, query);
@@ -87,7 +88,7 @@ export class Censor extends Command {
             return;
         }
 
-        const word = args[1];
+        const word = mergeArgs(1,args);
         const guild = evt.guild;
         if (guild) {
             const success = await this.processor.addCensoredWord(guild.id, word);
@@ -110,7 +111,7 @@ export class Censor extends Command {
             return;
         }
 
-        const word = args[1];
+        const word = mergeArgs(1,args);
         const guild = evt.guild;
         if (guild) {
             const success = await this.processor.removeCensoredWord(guild.id, word);
@@ -128,5 +129,9 @@ export class Censor extends Command {
 
     getRequiredPermission(): number {
         return Permissions.FLAGS.ADMINISTRATOR;
+    }
+
+    allowEmptyArgs(): boolean {
+        return true;
     }
 }

@@ -117,24 +117,23 @@ export class CommandRegistry {
         const hasPermission = !!message.member &&
             message.member.hasPermission(command.getRequiredPermission());
 
+        const allowEmpty = command.allowEmptyArgs();
+
         if (enabled && !prohibitedChannels.includes(channel.id) && hasPermission) {
-            const args = removeEmptyArgs(
-                message.content
-                    .trim()
-                    .split(" ")
-                    .slice(1)
-            );
+            const args = this.getArgsFromContent(message.content, allowEmpty);
             await command.useCommand(client, message, args);
         }
     }
 
     async runGuildDM(command: Command, client: Client, message: Message): Promise<void> {
-        const args = removeEmptyArgs(
-            message.content
-                .trim()
-                .split(" ")
-                .slice(1)
-        );
+        const allowEmpty = command.allowEmptyArgs();
+        const args = this.getArgsFromContent(message.content, allowEmpty);
         await command.useCommand(client, message, args);
+    }
+
+    getArgsFromContent(content: string, allowEmpty: boolean): string[] {
+        const contentToUse = allowEmpty ? content : content.trim();
+        const split = contentToUse.split(" ").slice(1);
+        return allowEmpty ? split : removeEmptyArgs(split);
     }
 }
