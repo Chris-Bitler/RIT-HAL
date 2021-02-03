@@ -39,6 +39,7 @@ describe("Command Registry tests", () => {
 
     function mockGoodTextCommand() {
         MockCommand.commandType = jest.fn().mockReturnValue("text");
+        MockCommand.allowEmptyArgs = jest.fn().mockReturnValue(false);
         MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
         MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(true);
         MockCommand.getProhibitedChannels = jest.fn().mockResolvedValue([]);
@@ -48,6 +49,7 @@ describe("Command Registry tests", () => {
 
     function mockBadTextCommand() {
         MockCommand.commandType = jest.fn().mockReturnValue("text");
+        MockCommand.allowEmptyArgs = jest.fn().mockReturnValue(false);
         MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
         MockCommand.isCommandEnabled = jest.fn().mockResolvedValue(true);
         MockCommand.getProhibitedChannels = jest.fn().mockResolvedValue([]);
@@ -90,6 +92,7 @@ describe("Command Registry tests", () => {
 
     test("DM Command test", async () => {
         MockCommand.commandType = jest.fn().mockReturnValue("dm");
+        MockCommand.allowEmptyArgs = jest.fn().mockReturnValue(false);
         message.channel = dmChannel;
         MockCommand.getCommand = jest.fn().mockReturnValue(["bus"]);
         const registry = new CommandRegistry([MockCommand]);
