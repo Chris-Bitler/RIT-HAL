@@ -205,17 +205,6 @@ describe("ModProcessor tests", () => {
                 }
             });
         });
-
-        test("Should not unban user if ban doesn't exist", async () => {
-            const unbanMock = jest.fn();
-            const updateMock = jest.fn();
-            memberManager.unban = unbanMock;
-            Punishment.update = updateMock;
-
-            await ModProcessor.getInstance().unbanUser(guild, user, true);
-            expect(unbanMock).not.toHaveBeenCalled();
-            expect(updateMock).not.toHaveBeenCalled();
-        });
     });
 
     describe("Unmute tests", () => {

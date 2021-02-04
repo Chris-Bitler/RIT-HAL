@@ -205,11 +205,11 @@ export class ModProcessor {
             return true;
         });
 
-        if (userBanned) {
-            if (automatic) {
-                await guild.members.unban(user);
-            }
+        if (automatic) {
+            await guild.members.unban(user);
+        }
 
+        if (userBanned) {
             await Punishment.update(
                 {
                     active: false
@@ -243,15 +243,16 @@ export class ModProcessor {
                 return true;
             });
 
+            const mutedRoleId = await this.fetchMutedRoleId(guild.id);
+            LogProcessor.getLogger().info(`Muted role found: ${mutedRoleId}`);
+            if (mutedRoleId) {
+                LogProcessor.getLogger().info(`Attempting to unmute ${user}`);
+                await memberToUnmute.roles.remove(mutedRoleId);
+            }
+
             LogProcessor.getLogger().info(`Mute found for user ${user}: ${userMuted}`);
 
             if (userMuted) {
-                const mutedRoleId = await this.fetchMutedRoleId(guild.id);
-                LogProcessor.getLogger().info(`Muted role found: ${mutedRoleId}`);
-                if (mutedRoleId) {
-                    LogProcessor.getLogger().info(`Attempting to unmute ${user}`);
-                    await memberToUnmute.roles.remove(mutedRoleId);
-                }
                 await Punishment.update(
                     {
                         active: false
