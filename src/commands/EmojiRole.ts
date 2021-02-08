@@ -13,6 +13,7 @@ import { getErrorEmbed } from "../utils/EmbedUtil";
 import {addEmojiRole, getChannel, getRole, listEmojiRoles, removeEmojiRole} from "../processors/EmojiRoleProcessor";
 import { UnicodeEmoji } from "../types/Emoji";
 import {getEmoji} from "../utils/EmojiUtil";
+import {containsNonLatinCodepoints} from "../utils/StringUtil";
 
 const emojiRegex = /:(.+):/;
 const errorText = "Incorrect syntax. Try one of the following:\n" +
@@ -145,7 +146,7 @@ export class EmojiRole extends Command {
         let emoji: GuildEmoji | UnicodeEmoji | null = null;
         if (emojiMatch?.[1]) {
             emoji = getEmoji(channel.guild, emojiMatch[1]);
-        } else if (emojiText.length === 2) {
+        } else if (containsNonLatinCodepoints(emojiText)) {
             //Unicode characters
             emoji = {
                 id: emojiText,

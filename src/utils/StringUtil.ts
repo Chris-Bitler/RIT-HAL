@@ -22,3 +22,8 @@ export function removeEmptyArgs(args: string[]): string[] {
 export function isNumeric(str: string): boolean {
     return /^\d+$/.test(str);
 }
+
+export function containsNonLatinCodepoints(str: string): boolean {
+    // eslint-disable-next-line no-control-regex
+    return /[^\u0000-\u00ff]/.test(str);
+}
