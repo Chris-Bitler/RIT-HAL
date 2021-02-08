@@ -146,9 +146,3 @@ process.on('uncaughtException', function(err) {
     // handle the error safely
     LogProcessor.getLogger().error(err);
 });
-
-client.on("debug", (e) => console.info(e));
-client.on("error", (e) => console.error(e));
-client.on("warn", (e) => console.warn(e));
-
-client.on('raw', console.log);

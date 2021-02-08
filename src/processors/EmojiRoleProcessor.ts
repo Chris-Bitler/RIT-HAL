@@ -94,17 +94,24 @@ export async function listEmojiRoles(
         }
     }
 
+    LogProcessor.getLogger().info(`Listing emoji role for g:${channel.guild.id} c: ${channel.id} e: ${emote}`);
+
     const emojiToRoles = await EmojiToRole.findAll({
         where: whereClause,
         order: [["id", "DESC"]]
     });
+    LogProcessor.getLogger().info(`Found emoji roles: ${emojiToRoles.length}`);
     const embed = new MessageEmbed();
     embed.setTitle(`Emoji roles for ${channel.name} ${emote ? ` and emote ${emote}` : ''}`);
     let embedText = '';
     emojiToRoles.forEach((emojiToRole) => {
-        const guildEmote = channel.guild.emojis.resolve(emojiToRole.emojiId);
-        const role = channel.guild.roles.resolve(emojiToRole.roleId);
-        embedText += `${guildEmote ? guildEmote : emojiToRole.emojiId}: ${role ? role : emojiToRole.roleId}\n`;
+        try {
+            const guildEmote = channel.guild.emojis.resolve(emojiToRole.emojiId);
+            const role = channel.guild.roles.resolve(emojiToRole.roleId);
+            embedText += `${guildEmote ? guildEmote : emojiToRole.emojiId}: ${role ? role : emojiToRole.roleId}\n`;
+        } catch (err) {
+            embedText += `Can't resolve emote or role for ${emojiToRole.emojiId}: ${emojiToRole.roleId}`;
+        }
     });
     embed.setDescription(embedText);
     await channel.send(embed);
