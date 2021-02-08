@@ -3,12 +3,13 @@ import {
     TextChannel,
     MessageReaction,
     Role,
-    GuildEmoji, ReactionEmoji, Message, GuildChannel
+    GuildEmoji, ReactionEmoji, Message, GuildChannel, MessageEmbed
 } from "discord.js";
 import { EmojiToRole } from "../models/EmojiToRole";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 import { UnicodeEmoji } from "../types/Emoji";
 import {LogProcessor} from "./LogProcessor";
+import {isNumeric} from "../utils/StringUtil";
 
 export async function addEmojiRole(
     initialChannel: TextChannel,
@@ -34,6 +35,79 @@ export async function addEmojiRole(
             getErrorEmbed("An error occurred adding that emoji->role")
         );
     }
+}
+
+export async function removeEmojiRole(
+    initialChannel: TextChannel,
+    emote: GuildEmoji | UnicodeEmoji | null,
+    channel: TextChannel
+): Promise<void> {
+    if (!emote) {
+        await initialChannel.send(
+            getErrorEmbed(
+                "Cannot remove non-existent emoji to role"
+            )
+        );
+        return;
+    }
+    const emojiToRole = await EmojiToRole.findOne({
+        where: {
+            emojiId: emote.id ? emote.id : emote.id,
+            channelId: channel.id,
+            serverId: channel.guild.id
+        },
+        order: [["id", "DESC"]]
+    });
+
+    if (emojiToRole) {
+        const role = channel.guild.roles.resolve(emojiToRole.roleId);
+        LogProcessor.getLogger().info(`Emoji ${emote} had the role ${role ? role : emojiToRole.roleId} removed.`);
+        await emojiToRole.destroy();
+        await initialChannel.send(
+            getInformationalEmbed(
+                "Role reaction removed",
+                `The role reaction of ${role} for ${emote} was removed`
+            )
+        );
+    } else {
+        await initialChannel.send(
+            getErrorEmbed(
+                `Cannot find role reaction of ${emote}`
+            )
+        );
+    }
+}
+
+export async function listEmojiRoles(
+    channel: TextChannel,
+    emote?: GuildEmoji | UnicodeEmoji
+): Promise<void> {
+    let whereClause: any = {
+        serverId: channel.guild.id,
+        channelId: channel.id,
+    };
+
+    if (emote) {
+        whereClause = {
+            ...whereClause,
+            emojiId: emote.id
+        }
+    }
+
+    const emojiToRoles = await EmojiToRole.findAll({
+        where: whereClause,
+        order: [["id", "DESC"]]
+    });
+    const embed = new MessageEmbed();
+    embed.setTitle(`Emoji roles for ${channel.name} ${emote ? ` and emote ${emote}` : ''}`);
+    let embedText = '';
+    emojiToRoles.forEach((emojiToRole) => {
+        const guildEmote = channel.guild.emojis.resolve(emojiToRole.emojiId);
+        const role = channel.guild.roles.resolve(emojiToRole.roleId);
+        embedText += `${guildEmote ? guildEmote : emojiToRole.emojiId}: ${role ? role : emojiToRole.roleId}\n`;
+    });
+    embed.setDescription(embedText);
+    await channel.send(embed);
 }
 
 export async function checkReactionToDB(
@@ -90,11 +164,23 @@ export async function checkReactionToDB(
 }
 
 export function getRole(evt: Message, roleId: string): Role | undefined {
-    return evt.guild?.roles.cache.find((role) => role.id === roleId);
+    const replacedId = roleId.replace(/[!@#&<>]+/g, "");
+    if (isNumeric(replacedId)) {
+        return evt.guild?.roles.cache.find((role) => role.id === replacedId);
+    } else {
+        const replacedName = roleId.replace(/^@/g, "");
+        return evt.guild?.roles.cache.find((role) => role.name === replacedName);
+    }
 }
 
 export function getChannel(evt: Message, channelText: string): GuildChannel | undefined {
-    return evt.guild?.channels.cache.find(
-        (channel) => channel.id === channelText
-    );
+    const replacedId = channelText.replace(/[<>#]+/g, "");
+    if (isNumeric(replacedId)) {
+        return evt.guild?.channels.resolve(replacedId) ?? undefined;
+    } else {
+        const replacedName = channelText.replace(/^#/g, "");
+        return evt.guild?.channels.cache.find(
+            (channel) => channel.name === replacedName
+        )
+    }
 }

@@ -7,7 +7,7 @@ import { ModProcessor } from "./processors/ModProcessor";
 import {
     Client, DMChannel,
     GuildEmoji,
-    GuildMember,
+    GuildMember, Intents,
     Message, MessageReaction, PartialUser,
     TextChannel, User
 } from "discord.js";
@@ -38,7 +38,10 @@ const modProcessor = ModProcessor.getInstance();
 const alarmProcessor = AlarmProcessor.getInstance();
 
 const client = new Client({
-    partials: ["MESSAGE", "CHANNEL", "REACTION"]
+    partials: ["MESSAGE", "CHANNEL", "REACTION"],
+    ws: {
+        intents: Intents.ALL
+    }
 });
 
 sentry.init({
@@ -142,4 +145,10 @@ setInterval(
 process.on('uncaughtException', function(err) {
     // handle the error safely
     LogProcessor.getLogger().error(err);
-})
+});
+
+client.on("debug", (e) => console.info(e));
+client.on("error", (e) => console.error(e));
+client.on("warn", (e) => console.warn(e));
+
+client.on('raw', console.log);

@@ -14,3 +14,11 @@ export function mergeArgs(start: number, args: string[]): string {
 export function removeEmptyArgs(args: string[]): string[] {
     return args.filter((arg) => arg !== "");
 }
+
+/**
+ * Test if a string is numeric
+ * @param str The input string
+ */
+export function isNumeric(str: string): boolean {
+    return /^?\d+$/.test(str);
+}
