@@ -7,7 +7,7 @@
 [![codecov](https://codecov.io/gh/Chris-Bitler/RIT-HAL/branch/master/graph/badge.svg)](https://codecov.io/gh/Chris-Bitler/RIT-HAL)
 [![circleci](https://circleci.com/gh/Chris-Bitler/RIT-HAL.svg?style=svg)](https://circleci.com/gh/Chris-Bitler/RIT-HAL)
 
-A discord bot made for the [Unofficial RIT Discord Server](https://discord.gg/rit). Has moderation capabilities along with some other miscellaneous uses.
+A discord bot made for the [Unofficial RIT Discord Server](https://discord.gg/mGGxMHd). Has moderation capabilities along with some other miscellaneous uses.
 
 
 Currently hosted on Heroku
