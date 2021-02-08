@@ -20,5 +20,5 @@ export function removeEmptyArgs(args: string[]): string[] {
  * @param str The input string
  */
 export function isNumeric(str: string): boolean {
-    return /^?\d+$/.test(str);
+    return /^\d+$/.test(str);
 }

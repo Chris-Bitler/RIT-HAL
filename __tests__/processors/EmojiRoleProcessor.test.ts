@@ -74,6 +74,7 @@ describe("EmojiRoleProcessor tests", () => {
        guild.channels = channelManager;
        channelManager.cache = channelCache;
        roleManager.cache = roleCache;
+       channelManager.resolve = jest.fn().mockReturnValue(channel);
        channelCache.set("test", channel);
        roleCache.set("test", role);
    });
