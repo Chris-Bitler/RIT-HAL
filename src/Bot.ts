@@ -97,8 +97,12 @@ client.on("guildBanRemove", async (guild, member) => {
 });
 
 const handleEmojiReactions = async (reaction: MessageReaction, user: User | PartialUser) => {
-    if (reaction.message.partial) await reaction.message.fetch();
+    LogProcessor.getLogger().info(`Handling emoji reaction for ${user.username} - reaction ${reaction.emoji}`);
+    if (reaction.message.partial)
+        LogProcessor.getLogger().info(`Fetching message as it had partial for ${user.username}`);
+        await reaction.message.fetch();
     const channel = reaction.message.channel;
+    LogProcessor.getLogger().info(`debug: ${channel instanceof TextChannel} - is channel text channel and not bot - ${user.bot}`);
     if (!user.bot && channel instanceof TextChannel) {
         const emoji = reaction.emoji;
         const member = channel.guild.members.resolve(await user.fetch());
@@ -134,3 +138,8 @@ setInterval(
     () => BusProcessor.getInstance().refreshInformation(),
     1000 * 60 * 30
 ); // 30 minutes
+
+process.on('uncaughtException', function(err) {
+    // handle the error safely
+    LogProcessor.getLogger().error(err);
+})
