@@ -130,7 +130,7 @@ export class EmojiRole extends Command {
         }
 
         if (channel instanceof TextChannel) {
-            await listEmojiRoles(channel, emote);
+            await listEmojiRoles(initialChannel, channel, emote);
         } else {
             await initialChannel.send(
                 getErrorEmbed(

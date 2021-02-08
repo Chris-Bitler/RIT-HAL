@@ -79,6 +79,7 @@ export async function removeEmojiRole(
 }
 
 export async function listEmojiRoles(
+    initialChannel: TextChannel,
     channel: TextChannel,
     emote?: GuildEmoji | UnicodeEmoji
 ): Promise<void> {
@@ -114,7 +115,7 @@ export async function listEmojiRoles(
         }
     });
     embed.setDescription(embedText);
-    await channel.send(embed);
+    await initialChannel.send(embed);
 }
 
 export async function checkReactionToDB(
