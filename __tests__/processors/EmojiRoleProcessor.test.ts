@@ -118,7 +118,7 @@ describe("EmojiRoleProcessor tests", () => {
             member.roles.remove = jest.fn();
             messageReaction.users.remove = jest.fn();
 
-            await checkReactionToDB(guildEmoji, member, channel, messageReaction);
+            await checkReactionToDB(guildEmoji, member, channel);
 
             expect(member.roles.remove).toHaveBeenCalled();
             expect(member.send).toHaveBeenCalled();
@@ -136,7 +136,7 @@ describe("EmojiRoleProcessor tests", () => {
             member.roles.cache.get = jest.fn().mockReturnValue(null);
             member.roles.add = jest.fn();
 
-            await checkReactionToDB(guildEmoji, member, channel, messageReaction);
+            await checkReactionToDB(guildEmoji, member, channel);
 
             expect(member.roles.add).toHaveBeenCalled();
             expect(member.send).toHaveBeenCalled();
