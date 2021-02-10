@@ -8,7 +8,7 @@ import {
     Client, DMChannel,
     GuildEmoji,
     GuildMember, Intents,
-    Message, MessageReaction, PartialUser,
+    Message, MessageReaction, PartialMessage, PartialUser,
     TextChannel, User
 } from "discord.js";
 import { Sequelize } from "sequelize-typescript";
@@ -31,10 +31,14 @@ import {LogProcessor} from "./processors/LogProcessor";
 import {initCooldowns} from "./utils/CooldownUtil";
 import {CensorProcessor} from "./processors/CensorProcessor";
 import {CensorEntry} from "./models/CensorEntry";
+import {StarboardProcessor} from "./processors/StarboardProcessor";
+import {StarboardedMessage} from "./models/StarboardedMessage";
+import {safelyFetchMessage} from "./utils/messageUtils";
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
 const modProcessor = ModProcessor.getInstance();
+const starboardProcessor = new StarboardProcessor();
 const alarmProcessor = AlarmProcessor.getInstance();
 
 const client = new Client({
@@ -53,7 +57,7 @@ const sequelize: Sequelize = new Sequelize(
     {
         dialect: "postgres",
         logging: false,
-        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm, MailConfig, CensorEntry]
+        models: [ConfigProperty, Emoji, EmojiToRole, Punishment, Alarm, MailConfig, CensorEntry, StarboardedMessage]
     });
 sequelize.sync();
 
@@ -68,6 +72,13 @@ client.on("message", async (message: Message) => {
     }
 });
 
+client.on("messageDelete", async (message: Message | PartialMessage) => {
+    let deletedMessage = message;
+    if (message.partial) {
+        deletedMessage = await message.fetch();
+    }
+    await starboardProcessor.handleRemovedMessage(deletedMessage);
+});
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
     const mutedRoleId = await modProcessor.fetchMutedRoleId(newMember.guild.id);
@@ -99,7 +110,10 @@ client.on("guildBanRemove", async (guild, member) => {
     await modProcessor.unbanUser(guild, member.id);
 });
 
-const handleEmojiReactions = async (reaction: MessageReaction, user: User | PartialUser) => {
+const handleEmojiReactions = async (messageReaction: MessageReaction, user: User|PartialUser) => {
+    let reaction = messageReaction;
+    if (reaction.count === null)
+        reaction = await reaction.fetch();
     LogProcessor.getLogger().info(`Handling emoji reaction for ${user.username} - reaction ${reaction.emoji}`);
     if (reaction.message.partial)
         LogProcessor.getLogger().info(`Fetching message as it had partial for ${user.username}`);
@@ -111,19 +125,26 @@ const handleEmojiReactions = async (reaction: MessageReaction, user: User | Part
         const member = channel.guild.members.resolve(await user.fetch());
         LogProcessor.getLogger().info(`Checking emoji role for ${member?.displayName} for ${emoji}`);
         if (member && emoji) {
-            await checkReactionToDB(emoji, member, channel, reaction);
+            await checkReactionToDB(emoji, member, channel);
         }
     }
 }
 
-client.on("messageReactionAdd", handleEmojiReactions);
+client.on("messageReactionAdd", async (reaction: MessageReaction, user: User|PartialUser) => {
+    handleEmojiReactions(reaction, user);
+    starboardProcessor.respondToStarReaction(await user.fetch(), reaction);
+});
 
-client.on("messageReactionRemove", handleEmojiReactions);
+client.on("messageReactionRemove", async (reaction: MessageReaction, user: User|PartialUser) => {
+    handleEmojiReactions(reaction, user);
+    starboardProcessor.respondToStarReaction(await user.fetch(), reaction);
+});
 
 setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
 setInterval(() => modProcessor.tickPunishments(client), 2000);
 setTimeout(() => alarmProcessor.loadAlarms(), 1000);
-setTimeout(() => CensorProcessor.getInstance().loadCensoredWords(), 1000)
+setTimeout(() => CensorProcessor.getInstance().loadCensoredWords(), 1000);
+setTimeout(() => starboardProcessor.loadStarredMessages(), 1000);
 setInterval(() => alarmProcessor.tickAlarms(client), 1000);
 
 client.login(process.env.discord_token)

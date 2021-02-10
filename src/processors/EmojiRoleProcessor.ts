@@ -122,7 +122,6 @@ export async function checkReactionToDB(
     emote: GuildEmoji | ReactionEmoji,
     member: GuildMember,
     channel: TextChannel,
-    reaction: MessageReaction
 ): Promise<void> {
     const emojiId = emote.id ? emote.id : emote.name;
     const logger = LogProcessor.getLogger();
