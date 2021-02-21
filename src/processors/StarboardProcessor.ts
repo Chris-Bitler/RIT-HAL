@@ -69,7 +69,7 @@ export class StarboardProcessor {
         if (reaction.count === null) {
             reaction = await messageReaction.fetch();
         }
-        if (!messageReaction.message || messageReaction.message?.content.trim().length == 0) {
+        if (!messageReaction.message || (messageReaction.message?.content.trim().length == 0 && messageReaction.message.attachments.size == 0)) {
             // Don't try to starboard blank messages or embeds
             return;
         }
@@ -121,7 +121,9 @@ export class StarboardProcessor {
             const embed = new MessageEmbed();
             embed.addField("Stars", `${reaction.count} ⭐ <#${originalChannel.id}>`);
             embed.setAuthor(author.displayName, author.user.displayAvatarURL());
-            embed.setDescription(message.content);
+            if (message.content) {
+                embed.setDescription(message.content);
+            }
             embed.addField("Source", `[Link](${message.url})`);
             if (message.attachments.size > 0) {
                 message.attachments.forEach((attachment) => {
