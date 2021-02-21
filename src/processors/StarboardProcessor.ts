@@ -69,6 +69,10 @@ export class StarboardProcessor {
         if (reaction.count === null) {
             reaction = await messageReaction.fetch();
         }
+        if (!messageReaction.message || messageReaction.message?.content.trim().length == 0) {
+            // Don't try to starboard blank messages or embeds
+            return;
+        }
         const channel = reaction.message.channel;
         if (channel instanceof TextChannel && reaction.emoji.name === '⭐') {
             const requiredAmount = await this.fetchStarboardRequiredCount(channel.guild.id);
@@ -119,11 +123,27 @@ export class StarboardProcessor {
             embed.setAuthor(author.displayName, author.user.displayAvatarURL());
             embed.setDescription(message.content);
             embed.addField("Source", `[Link](${message.url})`);
+            if (message.attachments.size > 0) {
+                message.attachments.forEach((attachment) => {
+                    if (!this.isImage(attachment.url)) {
+                        embed.addField(
+                            "Attachment",
+                            "[" +
+                            attachment.name +
+                            "](" +
+                            attachment.url +
+                            ")"
+                        );
+                    } else {
+                        embed.setImage(attachment.url);
+                    }
+                });
+            }
             embed.setTimestamp(Date.now());
             const starboardMessage = await starboardChannel.send(embed);
             const newStarboardMessage = await StarboardedMessage.create({
                 originalMessageId: reaction.message.id,
-                starboardMessageId:starboardMessage.id,
+                starboardMessageId: starboardMessage.id,
                 removed: 0
             });
             this.messages.push(newStarboardMessage);
@@ -141,9 +161,11 @@ export class StarboardProcessor {
         const starboardMessage = await safelyFetchMessage(starboardChannel, starboardedMessage.starboardMessageId);
         if (starboardMessage) {
             const embed = starboardMessage.embeds[0] as MessageEmbed;
-            const field = embed.fields[0];
-            field.value = `${reaction.count} ⭐ <#${originalChannel.id}>`;
-            await starboardMessage.edit(embed);
+            const field = embed.fields?.[0];
+            if (field) {
+                field.value = `${reaction.count} ⭐ <#${originalChannel.id}>`;
+                await starboardMessage.edit(embed);
+            }
         }
     }
 
@@ -177,5 +199,18 @@ export class StarboardProcessor {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Get if a filename is an image
+     * @param filename
+     */
+    isImage(filename: string): boolean {
+        return (
+            filename.endsWith(".png") ||
+            filename.endsWith(".jpg") ||
+            filename.endsWith(".jpeg") ||
+            filename.endsWith("gif")
+        );
     }
 }
