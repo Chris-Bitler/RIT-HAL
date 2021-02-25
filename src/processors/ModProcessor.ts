@@ -549,9 +549,13 @@ export class ModProcessor {
         reason: string,
         expirationTime?: string
     ): Promise<void> {
+        LogProcessor.getLogger().info(`Getting punishment log channel for ${punishmentType} in ${guild.id}`);
         const channelId = await this.getChannelForPunishment(guild.id, punishmentType);
+        LogProcessor.getLogger().info(`Resulting punishment log channel id: ${channelId}`);
         if (channelId != null) {
+            LogProcessor.getLogger().info(`Attempting to find channel`);
             const channel = guild.channels.resolve(channelId);
+            LogProcessor.getLogger().info(`Channel ${channel?.name} found, type is ${channel?.type}`);
             if (channel && channel instanceof TextChannel) {
                 switch (punishmentType) {
                     case PunishmentType.warn:
