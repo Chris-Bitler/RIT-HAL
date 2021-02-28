@@ -24,7 +24,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: npm ci
+          command: yarn install
       - run:
           name: Run Tests
           command: ./node_modules/.bin/jest --maxWorkers=2
