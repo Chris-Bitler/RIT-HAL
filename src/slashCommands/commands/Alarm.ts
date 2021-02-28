@@ -11,7 +11,6 @@ export class Alarm extends ExtendedSlashCommand {
             name: 'alarm',
             description: 'Set an alarm to go off at a specific time every day or at a specific date/time',
             requiredPermissions: ["ADMINISTRATOR"],
-            guildIDs: ['308082055860977665'],
             options: [{
                 type: CommandOptionType.SUB_COMMAND,
                 name: 'date',

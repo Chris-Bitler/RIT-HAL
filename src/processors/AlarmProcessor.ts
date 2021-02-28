@@ -1,5 +1,5 @@
 import { Alarm } from "../types/Alarm";
-import * as moment from "moment-timezone";
+import moment from "moment-timezone";
 import {Client, Guild, MessageEmbed, TextChannel} from "discord.js";
 import { Alarm as AlarmModel } from "../models/Alarm";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";

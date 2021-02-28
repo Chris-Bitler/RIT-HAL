@@ -6,7 +6,7 @@ import {
     ArrivalTimes,
     Stop
 } from "../types/Bus";
-import * as moment from "moment";
+import moment from "moment";
 
 const AGENCY_ID = 643; // TODO: Make config changeable
 let axiosInstance: AxiosInstance;

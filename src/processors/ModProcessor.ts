@@ -2,7 +2,7 @@ import {Ban, Mute} from "../types/Punishment";
 import {Client, Guild, GuildMember, TextChannel, User} from "discord.js";
 import {Punishment} from "../models/Punishment";
 import {ConfigProperty} from "../models/ConfigProperty";
-import * as moment from "moment-timezone";
+import moment from "moment-timezone";
 import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
 import * as sentry from "@sentry/node";
 import {LogProcessor} from "./LogProcessor";
