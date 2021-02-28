@@ -11,7 +11,6 @@ import {FoodSpecials} from "./FoodSpecials";
 import {EmojiRole} from "./EmojiRole";
 import {Pin} from "./Pin";
 import {Config} from "./Config";
-import {Alarm} from "./Alarm";
 import {React} from "./React";
 import {Mail} from "./Mail";
 import { MailConfig } from "./MailConfig";
@@ -43,7 +42,6 @@ export class CommandRegistry {
             this.registry.push(new EmojiTop());
             this.registry.push(new Pin());
             this.registry.push(new Config());
-            this.registry.push(new Alarm());
             this.registry.push(new React());
             this.registry.push(new Mail());
             this.registry.push(new MailConfig());

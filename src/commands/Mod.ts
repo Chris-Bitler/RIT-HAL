@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import {CommandArgs, CommandArgsTime, ListArgs} from "../types/Mod";
 import { Command } from "./Command";
-import * as moment from "moment-timezone";
+import moment from "moment-timezone";
 import { parseModDateString } from "../utils/DateUtil";
 import {ModProcessor, PunishmentType} from "../processors/ModProcessor";
 import { Punishment } from "../models/Punishment";

@@ -1,6 +1,6 @@
 import { Message, MessageEmbed, TextChannel } from "discord.js";
 import { Emoji } from "../models/Emoji";
-import * as memoize from "memoizee";
+import memoize from "memoizee";
 import { ConfigProperty } from "../models/ConfigProperty";
 
 /**
