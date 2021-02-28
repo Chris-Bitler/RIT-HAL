@@ -1,3 +1,5 @@
+import * as chrono from 'chrono-node';
+import {ParsingResult} from "chrono-node/dist/results";
 // Constants for various units of time
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
@@ -66,3 +68,21 @@ export const parseModDateString = (string: string): number => {
 
     return timeToAdd * 1000;
 };
+
+/**
+ * Get chrono custom in EST
+ */
+export const getChronoCustom = () => {
+    const custom = new chrono.Chrono();
+    custom.refiners.push({
+        refine: (context, results): ParsingResult[] => {
+            results.forEach((result) => {
+                result.start.imply('timezoneOffset', -300);
+                result.end && result.end.imply('timezoneOffset', -300);
+            });
+            return results;
+        }
+    });
+
+    return custom;
+}
