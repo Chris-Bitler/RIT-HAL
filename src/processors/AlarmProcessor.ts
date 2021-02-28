@@ -4,7 +4,7 @@ import {Client, Guild, MessageEmbed, TextChannel} from "discord.js";
 import { Alarm as AlarmModel } from "../models/Alarm";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 import * as sentry from "@sentry/node";
-import { DateTime } from "luxon";
+import {DateTime, Zone} from "luxon";
 
 const MS_IN_23_HOURS = 82800000;
 const DATE_FORMAT = 'MM/dd/yy hh:mm:ss a ZZZZ';
@@ -128,7 +128,8 @@ export class AlarmProcessor {
                     id: alarm.id
                 });
 
-                const luxonDate = DateTime.fromJSDate(date);
+                let luxonDate = DateTime.fromJSDate(date);
+                luxonDate = luxonDate.setZone('UTC-5');
 
                 await commandChannel.send(
                     getInformationalEmbed(
