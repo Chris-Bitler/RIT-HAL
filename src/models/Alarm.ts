@@ -1,4 +1,4 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {AllowNull, Column, DataType, Model, Table} from "sequelize-typescript";
 
 @Table
 export class Alarm extends Model<Alarm> {
@@ -11,11 +11,24 @@ export class Alarm extends Model<Alarm> {
     @Column
     messageToSend!: string;
 
-    @Column
-    hours!: number;
+    @AllowNull
+    @Column(DataType.INTEGER)
+    hours: number | undefined;
+
+    @AllowNull
+    @Column(DataType.INTEGER)
+    minutes: number | undefined;
+
+    @AllowNull
+    @Column(DataType.BIGINT)
+    date: number | undefined;
+
+    @AllowNull
+    @Column(DataType.BOOLEAN)
+    sent: boolean | undefined;
 
     @Column
-    minutes!: number;
+    type!: string;
 
     @Column
     serverId!: string;

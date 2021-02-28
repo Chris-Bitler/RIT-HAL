@@ -1,11 +1,13 @@
 import { Alarm } from "../types/Alarm";
 import * as moment from "moment-timezone";
-import { Client, Message, MessageEmbed, TextChannel } from "discord.js";
+import {Client, Guild, MessageEmbed, TextChannel} from "discord.js";
 import { Alarm as AlarmModel } from "../models/Alarm";
 import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 import * as sentry from "@sentry/node";
+import { DateTime } from "luxon";
 
 const MS_IN_23_HOURS = 82800000;
+const DATE_FORMAT = 'MM/dd/yy hh:mm:ss a ZZZZ';
 
 /**
  * Class to manage alarms that send messages in discord channels
@@ -27,67 +29,111 @@ export class AlarmProcessor {
 
     /**
      * Create an alarm and store it in the in-memory array and database
-     * @param message Discord.js message from the -alarm command
-     * @param channel The channel to send the alarm message in
+     * @param guild The guild the command was used in
+     * @param commandChannel The channel the command was sent in
+     * @param targetChannel The channel to send the alarm message in
      * @param hours The hours [0-12] to send the alarm at
      * @param minutes The minutes [0-59] to send the alarm at
+     * @param meridiem AM or PM
      * @param messageToSend The message to send as the alarm
      */
-    async createAlarm(
-        message: Message,
-        channel: TextChannel,
+    async createAlarmTime(
+        guild: Guild,
+        commandChannel: TextChannel,
+        targetChannel: TextChannel,
         hours: number,
         minutes: number,
+        meridiem: string,
         messageToSend: string
     ): Promise<void> {
-        if (message.guild) {
+        try {
+            let lastUsed = 0;
+            const hoursToUse: number = meridiem == 'AM' ? hours : hours + (12);
+
+            // Deal with times that have already passed today
+            const current = moment().tz("America/New_York");
+            current.hours(hoursToUse);
+            current.minutes(minutes);
+            if (Date.now() > current.valueOf()) {
+                lastUsed = current.valueOf();
+            }
+
+            const alarm = await AlarmModel.create({
+                lastUsed: lastUsed,
+                channelId: targetChannel.id,
+                serverId: guild.id,
+                hoursToUse,
+                minutes,
+                messageToSend
+            });
+
+            this.alarms.push({
+                type: 'time',
+                hours: hoursToUse,
+                minutes,
+                message: messageToSend,
+                lastSent: lastUsed,
+                channelId: targetChannel.id,
+                serverId: guild.id,
+                id: alarm.id
+            });
+
+            let minutesToSend = minutes.toString();
+            if (minutes < 10) {
+                minutesToSend = `0${minutesToSend}`;
+            }
+            await commandChannel.send(
+                getInformationalEmbed(
+                    "Alarm created",
+                    `An alarm for ${targetChannel} was created to go off at ${hours}:${minutesToSend} ${meridiem.toUpperCase()} saying ${messageToSend}`
+                )
+            );
+        } catch (error) {
+            sentry.captureException(error);
+        }
+    }
+
+    /**
+     * Create a date-based alarm
+     * @param guild The guild the command was used in
+     * @param commandChannel The channel the command was used in
+     * @param targetChannel The channel the alarm should be sent in
+     * @param date The date it should be sent at
+     * @param messageToSend The message to send
+     */
+    async createAlarmDate(
+        guild: Guild,
+        commandChannel: TextChannel,
+        targetChannel: TextChannel,
+        date: Date,
+        messageToSend: string
+    ): Promise<void> {
+        if (guild) {
             try {
-                let lastUsed = 0;
-
-                // Deal with times that have already passed today
-                const current = moment().tz("America/New_York");
-                current.hours(hours);
-                current.minutes(minutes);
-                if (Date.now() > current.valueOf()) {
-                    lastUsed = current.valueOf();
-                }
-
                 const alarm = await AlarmModel.create({
-                    lastUsed: lastUsed,
-                    channelId: channel.id,
-                    serverId: message.guild.id,
-                    hours,
-                    minutes,
-                    messageToSend
+                    channelId: targetChannel.id,
+                    serverId: guild.id,
+                    messageToSend,
+                    date: date.getTime(),
+                    sent: false
                 });
 
                 this.alarms.push({
-                    hours,
-                    minutes,
+                    type: 'date',
+                    date: date.getTime(),
+                    sent: false,
                     message: messageToSend,
-                    lastSent: lastUsed,
-                    channelId: channel.id,
-                    serverId: message.guild.id,
+                    channelId: targetChannel.id,
+                    serverId: guild.id,
                     id: alarm.id
                 });
 
-                let amPm = "am";
-                if (hours > 12) {
-                    amPm = "pm";
-                }
-                let hoursToSend = hours;
-                if (hours !== 12) {
-                    hoursToSend = hours % 12;
-                }
-                let minutesToSend = minutes.toString();
-                if (minutes < 10) {
-                    minutesToSend = `0${minutesToSend}`;
-                }
+                const luxonDate = DateTime.fromJSDate(date);
 
-                await message.channel.send(
+                await commandChannel.send(
                     getInformationalEmbed(
                         "Alarm created",
-                        `An alarm for ${channel} was created to go off at ${hoursToSend}:${minutesToSend} ${amPm} saying ${messageToSend}`
+                        `An alarm for ${targetChannel} was created to go off at ${luxonDate.toFormat(DATE_FORMAT)} saying ${messageToSend}`
                     )
                 );
             } catch (error) {
@@ -98,10 +144,10 @@ export class AlarmProcessor {
 
     /**
      * Get the alarms for a specific server from the command message
-     * @param message The message to use to get the guild id
+     * @param guild The guild the command was used in
      */
-    getAlarms(message: Message): Alarm[] {
-        const serverId = message.guild?.id;
+    getAlarms(guild: Guild): Alarm[] {
+        const serverId = guild.id;
         if (serverId) {
             return this.alarms.filter((alarm) => {
                 return alarm.serverId === serverId;
@@ -117,59 +163,83 @@ export class AlarmProcessor {
     async loadAlarms(): Promise<void> {
         const alarms = await AlarmModel.findAll();
         for (const alarm of alarms) {
-            this.alarms.push({
-                lastSent: alarm.lastUsed,
-                hours: alarm.hours,
-                minutes: alarm.minutes,
-                message: alarm.messageToSend,
-                channelId: alarm.channelId,
-                serverId: alarm.serverId,
-                id: alarm.id
-            });
+            if (alarm.type === 'time') {
+                this.alarms.push({
+                    type: alarm.type,
+                    lastSent: alarm.lastUsed,
+                    hours: alarm.hours ?? 0,
+                    minutes: alarm.minutes ?? 0,
+                    message: alarm.messageToSend,
+                    channelId: alarm.channelId,
+                    serverId: alarm.serverId,
+                    id: alarm.id
+                })
+            } else if (alarm.type === 'date') {
+                this.alarms.push({
+                    type: alarm.type,
+                    message: alarm.messageToSend,
+                    channelId: alarm.channelId,
+                    serverId: alarm.serverId,
+                    id: alarm.id,
+                    date: alarm.date ?? 0,
+                    sent: alarm.sent ?? false
+                })
+            }
         }
     }
 
     /**
      * Send the alarm list embed.
      * This function mainly handles formatting and sending.
-     * @param message The message from the command
+     * @param guild The guild the command was sent in
+     * @param commandChannel The channel the command was sent in
      */
-    async sendAlarmListEmbed(message: Message): Promise<void> {
+    async sendAlarmListEmbed(guild: Guild, commandChannel: TextChannel): Promise<void> {
         const embed = new MessageEmbed();
-        const alarms = this.getAlarms(message);
+        const alarms = this.getAlarms(guild);
         let description = "";
         embed.setTitle("Alarms");
         if (alarms && alarms.length > 0) {
             for (const alarm of alarms) {
-                const hours = alarm.hours !== 12 ? alarm.hours % 12 : 12;
-                const minutes = alarm.minutes;
-                const amPm = alarm.hours >= 12 ? "pm" : "am";
-                description +=
-                    `**ID:** ${alarm.id}\n` +
-                    `**Time:** ${hours}:${minutes >= 10 ? minutes : `0${minutes}`} ${amPm}\n` +
-                    `**Message:** ${alarm.message}\n\n`;
+                if (alarm.type === 'time') {
+                    const hours = alarm.hours !== 12 ? alarm.hours % 12 : 12;
+                    const minutes = alarm.minutes;
+                    const amPm = alarm.hours >= 12 ? "pm" : "am";
+                    description +=
+                        `**ID:** ${alarm.id}\n` +
+                        `**Time:** ${hours}:${minutes >= 10 ? minutes : `0${minutes}`} ${amPm}\n` +
+                        `**Message:** ${alarm.message}\n\n`;
+                } else if (alarm.type === 'date') {
+                    const date = DateTime.fromMillis(alarm.date);
+                    const formattedDate = date.toFormat('MM/dd/yy hh:mm:ss a ZZZZ');
+                    description +=
+                        `**ID:** ${alarm.id}\n` +
+                        `**Date:** ${formattedDate}\n` +
+                        `**Message:** ${alarm.message}\n` +
+                        `**Sent:** ${alarm.sent}\n\n`;
+                }
             }
 
             embed.addField("Alarms", description);
 
-            await message.channel.send(embed);
+            await commandChannel.send(embed);
         } else {
-            await message.channel.send(getErrorEmbed("No alarms found"));
+            await commandChannel.send(getErrorEmbed("No alarms found"));
         }
     }
 
     /**
      * Delete an alarm from the database and in-memory storage
-     * @param message The message from the command
+     * @param guild the guild the command was used in
+     * @param commandChannel the channel the command was used in
      * @param id The id of the alarm
      */
-    async deleteAlarm(message: Message, id: string): Promise<void> {
+    async deleteAlarm(guild: Guild, commandChannel: TextChannel, id: string): Promise<void> {
         const alarm = await AlarmModel.findOne({
             where: {
                 id
             }
         });
-        const guild = message.guild;
         if (alarm && guild) {
             if (alarm.serverId === guild.id) {
                 await AlarmModel.destroy({
@@ -182,21 +252,57 @@ export class AlarmProcessor {
                     return alarm.id !== id;
                 });
 
-                await message.channel.send(
+                await commandChannel.send(
                     getInformationalEmbed(
                         "Alarm deleted",
                         `The alarm with the id ${id} was deleted.`
                     )
                 );
             } else {
-                await message.channel.send(
+                await commandChannel.send(
                     getErrorEmbed(
                         "That alarm doesn't belong to this server."
                     )
                 );
             }
         } else {
-            message.channel.send(getErrorEmbed("No alarm with that id exists"));
+            await commandChannel.send(getErrorEmbed("No alarm with that id exists"));
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    async sendAlarm(client: Client, alarm: Alarm) {
+        const guild = client.guilds.resolve(alarm.serverId);
+        const now = Date.now();
+        if (guild) {
+            const channel = client.channels.resolve(
+                alarm.channelId
+            ) as TextChannel;
+            if (channel) {
+                await channel.send(alarm.message);
+                if (alarm.type === 'time') {
+                    alarm.lastSent = now;
+                    await AlarmModel.update(
+                        {
+                            lastUsed: now
+                        },
+                        {
+                            where: {
+                                id: alarm.id
+                            }
+                        }
+                    );
+                } else if (alarm.type === 'date') {
+                    alarm.sent = true;
+                    await AlarmModel.update({
+                        sent: true
+                    }, {
+                        where: {
+                            id: alarm.id
+                        }
+                    });
+                }
+            }
         }
     }
 
@@ -208,34 +314,22 @@ export class AlarmProcessor {
         for (const alarm of this.alarms) {
             const now = Date.now();
             const date = moment().tz("America/New_York");
-            const sameHourMoreMinutes = (
-                date.hours() === alarm.hours &&
-                date.minutes() >= alarm.minutes
-            );
-            const moreHours = (date.hours() > alarm.hours);
-            if (
-                alarm.lastSent + MS_IN_23_HOURS < now &&
-                (sameHourMoreMinutes || moreHours)
-            ) {
-                const guild = client.guilds.resolve(alarm.serverId);
-                if (guild) {
-                    const channel = client.channels.resolve(
-                        alarm.channelId
-                    ) as TextChannel;
-                    if (channel) {
-                        await channel.send(alarm.message);
-                        alarm.lastSent = now;
-                        await AlarmModel.update(
-                            {
-                                lastUsed: now
-                            },
-                            {
-                                where: {
-                                    id: alarm.id
-                                }
-                            }
-                        );
-                    }
+            if (alarm.type === 'date') {
+                const timePassed = alarm.date < Date.now();
+                if (timePassed && !alarm.sent) {
+                    await this.sendAlarm(client, alarm);
+                }
+            } else if (alarm.type === 'time') {
+                const sameHourMoreMinutes = (
+                    date.hours() === alarm.hours &&
+                    date.minutes() >= alarm.minutes
+                );
+                const moreHours = (date.hours() > alarm.hours);
+                if (
+                    alarm.lastSent + MS_IN_23_HOURS < now &&
+                    (sameHourMoreMinutes || moreHours)
+                ) {
+                    await this.sendAlarm(client, alarm);
                 }
             }
         }

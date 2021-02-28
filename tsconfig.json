@@ -3,7 +3,7 @@
     "outDir": "./dist",
     "allowJs": true,
     "strict": true,
-    "target": "es6",
+    "target": "es2017",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "moduleResolution": "node",

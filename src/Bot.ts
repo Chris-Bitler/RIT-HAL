@@ -5,11 +5,10 @@ pg.defaults.parseInt8 = true;
 
 import { ModProcessor } from "./processors/ModProcessor";
 import {
-    Client, DMChannel,
-    GuildEmoji,
+    Client,
     GuildMember, Intents,
     Message, MessageReaction, PartialMessage, PartialUser,
-    TextChannel, User
+    TextChannel, User, WSEventType
 } from "discord.js";
 import { Sequelize } from "sequelize-typescript";
 import * as dotenv from "dotenv";
@@ -25,6 +24,7 @@ import { EmojiToRole } from "./models/EmojiToRole";
 import { Punishment } from "./models/Punishment";
 import { AlarmProcessor } from "./processors/AlarmProcessor";
 import { Alarm } from "./models/Alarm";
+import { Alarm as AlarmSlashCommand } from './slashCommands/commands/Alarm';
 import {MailConfig} from "./models/MailConfig";
 import {SendEmbedStateMachine} from "./stateMachines/SendEmbedStateMachine";
 import {LogProcessor} from "./processors/LogProcessor";
@@ -33,7 +33,7 @@ import {CensorProcessor} from "./processors/CensorProcessor";
 import {CensorEntry} from "./models/CensorEntry";
 import {StarboardProcessor} from "./processors/StarboardProcessor";
 import {StarboardedMessage} from "./models/StarboardedMessage";
-import {safelyFetchMessage} from "./utils/messageUtils";
+import { SlashCreator, GatewayServer } from 'slash-create';
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
@@ -47,6 +47,24 @@ const client = new Client({
         intents: Intents.ALL
     }
 });
+
+const creator = new SlashCreator({
+    applicationID: process.env.discord_application_id ?? '',
+    publicKey: process.env.discord_public_key ?? '',
+    token: process.env.discord_token ?? ''
+});
+
+(async () => {
+    try {
+        await creator.registerCommand(new AlarmSlashCommand(client, creator)).syncCommands();
+    } catch (e) {
+        console.error(e);
+    }
+})();
+
+creator.withServer(new GatewayServer((handler) => client.ws.on(<WSEventType>'INTERACTION_CREATE', handler)))
+
+creator.on('debug', console.log);
 
 sentry.init({
     dsn: process.env.sentry_dsn
