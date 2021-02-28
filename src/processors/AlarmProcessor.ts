@@ -129,7 +129,7 @@ export class AlarmProcessor {
                 });
 
                 let luxonDate = DateTime.fromJSDate(date);
-                luxonDate = luxonDate.setZone('UTC-5');
+                luxonDate = luxonDate.setZone('EST');
 
                 await commandChannel.send(
                     getInformationalEmbed(
