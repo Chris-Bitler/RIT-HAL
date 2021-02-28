@@ -1,8 +1,8 @@
 import {CommandContext, CommandOptionType, SlashCreator} from "slash-create";
 import {Client, Guild, TextChannel} from "discord.js";
-import * as chrono from "chrono-node";
 import {ExtendedSlashCommand} from "../ExtendedSlashCommand";
 import {AlarmProcessor} from "../../processors/AlarmProcessor";
+import {getChronoCustom} from "../../utils/DateUtil";
 
 export class Alarm extends ExtendedSlashCommand {
     client: Client;
@@ -121,6 +121,7 @@ export class Alarm extends ExtendedSlashCommand {
             const date = dateOptions.date as string;
             const channel = dateOptions.channel as string;
             const message = dateOptions.message as string;
+            const chrono = getChronoCustom();
             const parsedDate = chrono.parseDate(date);
             if (parsedDate) {
                 const targetChannel = guild.channels.resolve(channel);
