@@ -37,16 +37,19 @@ export class WeatherProcessor {
             `**Wind Speed**: ${weather.wind.speed} mph\n` +
             (weather.wind.gust ? `**Wind Gust**: ${weather.wind.gust} mph\n` : '')
         );
-        if (weather.rain) {
+        if (weather?.rain) {
             embed.addField(
                 'Rain',
-                `**Last 3 hours**: ${weather.rain['3h']} mm`
+                (weather?.rain?.['1h'] ? `**Last hour**: ${weather.rain['1h']} mm\n` : '') +
+                (weather?.rain?.['3h'] ? `**Last 3 hours**: ${weather.rain['3h']} mm` : '')
             );
         }
-        if (weather.snow) {
+
+        if (weather?.snow) {
             embed.addField(
                 'Snow',
-                `**Last 3 hours**: ${weather.snow['3h']} mm`
+                (weather?.snow?.['1h'] ? `**Last hour**: ${weather.snow['1h']} mm\n` : '') +
+                (weather?.snow?.['3h'] ? `**Last 3 hours**: ${weather.snow['3h']} mm` : '')
             );
         }
 
