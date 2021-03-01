@@ -240,7 +240,7 @@ export class AlarmProcessor {
                     description +=
                         `**ID:** ${alarm.id}\n` +
                         `**Date:** ${formattedDate}\n` +
-                        `**Message:** ${alarm.message}\n`;
+                        `**Message:** ${alarm.message}\n\n`;
                 }
             }
 
