@@ -65,7 +65,7 @@ export class AlarmProcessor {
                 lastUsed: lastUsed,
                 channelId: targetChannel.id,
                 serverId: guild.id,
-                hoursToUse,
+                hours: hoursToUse,
                 minutes,
                 messageToSend
             });
