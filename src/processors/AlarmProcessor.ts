@@ -5,9 +5,7 @@ import { Alarm as AlarmModel } from '../models/Alarm';
 import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
 import * as sentry from '@sentry/node';
 import { DateTime } from 'luxon';
-import {WeatherProcessor} from "./WeatherProcessor";
-import {WeatherResponse} from "../types/Weather";
-import {arch} from "os";
+import {WeatherProcessor} from './WeatherProcessor';
 
 const MS_IN_23_HOURS = 82800000;
 const DATE_FORMAT = 'MM/dd/yy hh:mm:ss a ZZZZ';
