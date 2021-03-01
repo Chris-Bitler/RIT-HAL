@@ -95,6 +95,11 @@ export class Alarm extends ExtendedSlashCommand {
                 },
                 {
                     type: CommandOptionType.SUB_COMMAND,
+                    name: 'archive',
+                    description: 'list the archived alarms'
+                },
+                {
+                    type: CommandOptionType.SUB_COMMAND,
                     name: 'delete',
                     description: 'delete an alarm',
                     options: [
@@ -127,6 +132,9 @@ export class Alarm extends ExtendedSlashCommand {
                         break;
                     case 'list':
                         await this.handleListCommand(guild, channel, context);
+                        break;
+                    case 'archive':
+                        await this.handleArchiveCommand(guild, channel, context);
                         break;
                     case 'delete':
                         await this.handleDeleteCommand(guild, channel, context);
@@ -225,6 +233,19 @@ export class Alarm extends ExtendedSlashCommand {
         await AlarmProcessor.getInstance().sendAlarmListEmbed(
             guild,
             commandChannel
+        );
+        await context.acknowledge(false);
+    }
+
+    async handleArchiveCommand(
+        guild: Guild,
+        commandChannel: TextChannel,
+        context: CommandContext
+    ) {
+        await AlarmProcessor.getInstance().sendAlarmListEmbed(
+            guild,
+            commandChannel,
+            true
         );
         await context.acknowledge(false);
     }

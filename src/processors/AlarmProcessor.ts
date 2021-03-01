@@ -5,8 +5,7 @@ import { Alarm as AlarmModel } from '../models/Alarm';
 import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
 import * as sentry from '@sentry/node';
 import { DateTime } from 'luxon';
-import {WeatherProcessor} from "./WeatherProcessor";
-import {WeatherResponse} from "../types/Weather";
+import {WeatherProcessor} from './WeatherProcessor';
 
 const MS_IN_23_HOURS = 82800000;
 const DATE_FORMAT = 'MM/dd/yy hh:mm:ss a ZZZZ';
@@ -152,12 +151,21 @@ export class AlarmProcessor {
     /**
      * Get the alarms for a specific server from the command message
      * @param guild The guild the command was used in
+     * @param getArchived Whether to get only the archived alarms
      */
-    getAlarms(guild: Guild): Alarm[] {
+    getAlarms(guild: Guild, getArchived = false): Alarm[] {
         const serverId = guild.id;
         if (serverId) {
             return this.alarms.filter((alarm) => {
-                return alarm.serverId === serverId;
+                const isInServer = alarm.serverId === serverId;
+                if (alarm.type === 'time' && !getArchived) {
+                    return isInServer
+                }
+                if (alarm.type === 'date') {
+                    return (
+                        (getArchived && alarm.sent) || (!getArchived && !alarm.sent)
+                    ) && isInServer
+                }
             });
         } else {
             return [];
@@ -200,15 +208,17 @@ export class AlarmProcessor {
      * This function mainly handles formatting and sending.
      * @param guild The guild the command was sent in
      * @param commandChannel The channel the command was sent in
+     * @param sendArchived Whether to send archived alarms or ones yet to be sent
      */
     async sendAlarmListEmbed(
         guild: Guild,
-        commandChannel: TextChannel
+        commandChannel: TextChannel,
+        sendArchived = false
     ): Promise<void> {
         const embed = new MessageEmbed();
-        const alarms = this.getAlarms(guild);
+        const alarms = this.getAlarms(guild, sendArchived);
         let description = '';
-        embed.setTitle('Alarms');
+        embed.setTitle(`${sendArchived ? 'Archived ' : ''}Alarms`);
         if (alarms && alarms.length > 0) {
             for (const alarm of alarms) {
                 if (alarm.type === 'time') {
@@ -230,8 +240,7 @@ export class AlarmProcessor {
                     description +=
                         `**ID:** ${alarm.id}\n` +
                         `**Date:** ${formattedDate}\n` +
-                        `**Message:** ${alarm.message}\n` +
-                        `**Sent:** ${alarm.sent}\n\n`;
+                        `**Message:** ${alarm.message}\n`;
                 }
             }
 
@@ -239,7 +248,7 @@ export class AlarmProcessor {
 
             await commandChannel.send(embed);
         } else {
-            await commandChannel.send(getErrorEmbed('No alarms found'));
+            await commandChannel.send(getErrorEmbed(`No ${sendArchived ? 'archived ' : ''}alarms found`));
         }
     }
 
