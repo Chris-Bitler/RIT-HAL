@@ -220,7 +220,8 @@ export class AlarmProcessor {
                         } ${amPm}\n` +
                         `**Message:** ${alarm.message}\n\n`;
                 } else if (alarm.type === 'date') {
-                    const date = DateTime.fromMillis(alarm.date);
+                    let date = DateTime.fromMillis(alarm.date);
+                    date = date.setZone('America/New_York');
                     const formattedDate = date.toFormat(
                         'MM/dd/yy hh:mm:ss a ZZZZ'
                     );
