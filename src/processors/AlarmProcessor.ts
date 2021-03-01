@@ -61,10 +61,11 @@ export class AlarmProcessor {
             }
 
             const alarm = await AlarmModel.create({
+                type: 'time',
                 lastUsed: lastUsed,
                 channelId: targetChannel.id,
                 serverId: guild.id,
-                hoursToUse,
+                hours: hoursToUse,
                 minutes,
                 messageToSend
             });
