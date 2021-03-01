@@ -267,7 +267,7 @@ export class AlarmProcessor {
                 });
 
                 this.alarms = this.alarms.filter((alarm) => {
-                    return alarm.id !== id;
+                    return parseInt(alarm.id) !== parseInt(id);
                 });
 
                 await commandChannel.send(
