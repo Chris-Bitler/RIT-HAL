@@ -5,11 +5,11 @@ import {
     MessageEmbed,
     Permissions,
     TextChannel
-} from "discord.js";
-import { Command } from "./Command";
-import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
-import { ConfigProperty } from "../models/ConfigProperty";
-import * as sentry from "@sentry/node";
+} from 'discord.js';
+import { Command } from './Command';
+import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
+import { ConfigProperty } from '../models/ConfigProperty';
+import * as sentry from '@sentry/node';
 
 /**
  * Command to pin a message to a starboard channel
@@ -20,12 +20,8 @@ export class Pin extends Command {
         evt: Message,
         args: string[]
     ): Promise<void> {
-        if (
-            args &&
-            args[0] !== undefined &&
-            evt.channel.type === "text"
-        ) {
-            const urlParts = args[0].split("/");
+        if (args && args[0] !== undefined && evt.channel.type === 'text') {
+            const urlParts = args[0].split('/');
             if (urlParts.length >= 2) {
                 const messageId = urlParts[urlParts.length - 1];
                 const channelId = urlParts[urlParts.length - 2];
@@ -43,9 +39,9 @@ export class Pin extends Command {
                         );
                         if (
                             messageChannel &&
-                            messageChannel.type === "text" &&
+                            messageChannel.type === 'text' &&
                             starChannel &&
-                            starChannel.type === "text"
+                            starChannel.type === 'text'
                         ) {
                             await this.getAndSendEmbed(
                                 guild,
@@ -58,14 +54,14 @@ export class Pin extends Command {
                         } else {
                             await evt.channel.send(
                                 getErrorEmbed(
-                                    "Please make sure the starboard channel and the channel the message is in are valid"
+                                    'Please make sure the starboard channel and the channel the message is in are valid'
                                 )
                             );
                         }
                     } else {
                         await evt.channel.send(
                             getErrorEmbed(
-                                "Please make sure to set the starboard channel id before using this command"
+                                'Please make sure to set the starboard channel id before using this command'
                             )
                         );
                     }
@@ -73,19 +69,21 @@ export class Pin extends Command {
                     sentry.captureException(exception);
                     await evt.channel.send(
                         getErrorEmbed(
-                            "Error sending embed to starboard channel"
+                            'Error sending embed to starboard channel'
                         )
                     );
                 }
             } else {
                 await evt.channel.send(
-                    getErrorEmbed("Please use a valid discord message url")
+                    getErrorEmbed('Please use a valid discord message url')
                 );
             }
         } else {
             await evt.channel.send(
-                getErrorEmbed("Incorrect syntax, try `-pin [discord message url]`")
-            )
+                getErrorEmbed(
+                    'Incorrect syntax, try `-pin [discord message url]`'
+                )
+            );
         }
     }
 
@@ -117,18 +115,18 @@ export class Pin extends Command {
                     message.author.displayAvatarURL()
                 );
                 embed.setDescription(message.content);
-                embed.addField("Source", "[Link](" + url + ")");
-                embed.addField("Pinned by", pinningMember.displayName);
+                embed.addField('Source', '[Link](' + url + ')');
+                embed.addField('Pinned by', pinningMember.displayName);
                 if (message.attachments.size > 0) {
                     message.attachments.forEach((attachment) => {
                         if (!this.isImage(attachment.url)) {
                             embed.addField(
-                                "Attachment",
-                                "[" +
+                                'Attachment',
+                                '[' +
                                     attachment.name +
-                                    "](" +
+                                    '](' +
                                     attachment.url +
-                                    ")"
+                                    ')'
                             );
                         } else {
                             embed.setImage(attachment.url);
@@ -138,32 +136,32 @@ export class Pin extends Command {
                 await starboardChannel.send(embed);
                 await evt.channel.send(
                     getInformationalEmbed(
-                        "Pinned",
-                        "Message from " +
+                        'Pinned',
+                        'Message from ' +
                             messageMember.displayName +
-                            " pinned in starboard."
+                            ' pinned in starboard.'
                     )
                 );
             } else {
                 await evt.channel.send(
                     getErrorEmbed(
-                        "Cannot resolve member who posted the message to pin"
+                        'Cannot resolve member who posted the message to pin'
                     )
                 );
             }
         } else {
             await evt.channel.send(
-                getErrorEmbed("Cannot resolve message to pin")
+                getErrorEmbed('Cannot resolve message to pin')
             );
         }
     }
 
     getCommand(): string[] {
-        return ["starboard"];
+        return ['starboard'];
     }
 
     getConfigBase(): string {
-        return "starboard"
+        return 'starboard';
     }
 
     getRequiredPermission(): number {
@@ -176,10 +174,10 @@ export class Pin extends Command {
      */
     isImage(filename: string): boolean {
         return (
-            filename.endsWith(".png") ||
-            filename.endsWith(".jpg") ||
-            filename.endsWith(".jpeg") ||
-            filename.endsWith("gif")
+            filename.endsWith('.png') ||
+            filename.endsWith('.jpg') ||
+            filename.endsWith('.jpeg') ||
+            filename.endsWith('gif')
         );
     }
 
@@ -189,7 +187,7 @@ export class Pin extends Command {
      */
     async fetchStarboardChannelId(serverId: string): Promise<string | null> {
         const starboardId = await ConfigProperty.getServerProperty(
-            "starboard.channel",
+            'starboard.channel',
             serverId
         );
         if (starboardId?.value) {

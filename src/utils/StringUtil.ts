@@ -4,7 +4,7 @@
  * @param args The list of arguments
  */
 export function mergeArgs(start: number, args: string[]): string {
-    return args.slice(start).join(" ").trim();
+    return args.slice(start).join(' ').trim();
 }
 
 /**
@@ -12,7 +12,7 @@ export function mergeArgs(start: number, args: string[]): string {
  * @param args The list of arguments
  */
 export function removeEmptyArgs(args: string[]): string[] {
-    return args.filter((arg) => arg !== "");
+    return args.filter((arg) => arg !== '');
 }
 
 /**

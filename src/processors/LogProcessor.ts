@@ -1,5 +1,5 @@
 import * as winston from 'winston';
-import {Loggly} from 'winston-loggly-bulk';
+import { Loggly } from 'winston-loggly-bulk';
 
 export class LogProcessor {
     static logger: winston.Logger;
@@ -7,23 +7,21 @@ export class LogProcessor {
     /**
      * Get the singleton instance of AlarmProcessor
      */
-    static getLogger(): winston.Logger  {
+    static getLogger(): winston.Logger {
         if (!this.logger) {
             this.logger = winston.createLogger({
                 transports: [
                     new Loggly({
                         token: process.env.loggly_token || '',
                         subdomain: process.env.loggly_subdomain || '',
-                        tags: ["Winston-NodeJS"],
+                        tags: ['Winston-NodeJS'],
                         json: true
                     })
                 ]
-            })
-            this.logger.info("Winston logger setup");
+            });
+            this.logger.info('Winston logger setup');
         }
 
         return this.logger;
     }
-
-
 }

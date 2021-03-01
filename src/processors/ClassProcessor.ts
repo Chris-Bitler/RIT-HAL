@@ -1,5 +1,5 @@
-import axios from "axios";
-import { Course } from "../types/Courses";
+import axios from 'axios';
+import { Course } from '../types/Courses';
 
 /**
  * Get an array of courses from tigercenter's api based on arguments
@@ -10,15 +10,15 @@ import { Course } from "../types/Courses";
 export async function getClasses(
     majorAbbrev: string,
     courseNumber: string,
-    section = ""
+    section = ''
 ): Promise<Course[]> {
     const result = (
         await axios.post(
-            "https://tigercenter.rit.edu/tigerCenterApp/tc/class-search",
+            'https://tigercenter.rit.edu/tigerCenterApp/tc/class-search',
             {
                 searchParams: {
                     query: `${majorAbbrev} ${courseNumber} ${section}`.trim(),
-                    term: "2201",
+                    term: '2201',
                     isAdvanced: false,
                     courseAttributeOptions: [],
                     courseAttributeOptionsPassed: []

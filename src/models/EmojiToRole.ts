@@ -1,4 +1,4 @@
-import { Column, Model, Table } from "sequelize-typescript";
+import { Column, Model, Table } from 'sequelize-typescript';
 
 /**
  * TBA

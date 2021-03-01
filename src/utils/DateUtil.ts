@@ -1,5 +1,5 @@
 import * as chrono from 'chrono-node';
-import {ParsingResult} from "chrono-node/dist/results";
+import { ParsingResult } from 'chrono-node/dist/results';
 // Constants for various units of time
 const SECONDS_IN_MINUTE = 60;
 const MINUTES_IN_HOUR = 60;
@@ -85,4 +85,4 @@ export const getChronoCustom = () => {
     });
 
     return custom;
-}
+};

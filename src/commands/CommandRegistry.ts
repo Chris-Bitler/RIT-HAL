@@ -1,22 +1,22 @@
-import {Client, Message, TextChannel} from "discord.js";
-import {Command} from "./Command";
-import {Big} from "./Big";
-import {Bus} from "./Bus";
-import {EmojiTop} from "./EmojiTop";
-import {Courses} from "./Courses";
-import {removeEmptyArgs} from "../utils/StringUtil";
-import {Mod} from "./Mod";
-import {Food} from "./Food";
-import {FoodSpecials} from "./FoodSpecials";
-import {EmojiRole} from "./EmojiRole";
-import {Pin} from "./Pin";
-import {Config} from "./Config";
-import {React} from "./React";
-import {Mail} from "./Mail";
-import { MailConfig } from "./MailConfig";
-import {SendEmbed} from "./SendEmbed";
-import {Melo} from "./Melo";
-import {Censor} from "./Censor";
+import { Client, Message, TextChannel } from 'discord.js';
+import { Command } from './Command';
+import { Big } from './Big';
+import { Bus } from './Bus';
+import { EmojiTop } from './EmojiTop';
+import { Courses } from './Courses';
+import { removeEmptyArgs } from '../utils/StringUtil';
+import { Mod } from './Mod';
+import { Food } from './Food';
+import { FoodSpecials } from './FoodSpecials';
+import { EmojiRole } from './EmojiRole';
+import { Pin } from './Pin';
+import { Config } from './Config';
+import { React } from './React';
+import { Mail } from './Mail';
+import { MailConfig } from './MailConfig';
+import { SendEmbed } from './SendEmbed';
+import { Melo } from './Melo';
+import { Censor } from './Censor';
 
 /**
  * Class to contain the registry of commands for the discord bot
@@ -59,12 +59,12 @@ export class CommandRegistry {
      * Get the command that the alias at the beginning of the message correspond to
      * @param messageText The message contents
      */
-    getCommand(messageText: string): Command|undefined {
+    getCommand(messageText: string): Command | undefined {
         return this.registry.find((command) => {
             return command.getCommand().some((commandText) => {
                 return messageText.startsWith(`-${commandText}`);
             });
-        })
+        });
     }
 
     /**
@@ -85,16 +85,16 @@ export class CommandRegistry {
 
         const command = this.getCommand(messageEvent.content);
 
-        if(command?.commandType() !== messageEvent.channel.type) {
+        if (command?.commandType() !== messageEvent.channel.type) {
             return false;
         }
 
         if (command) {
             switch (messageEvent.channel.type) {
-                case "text":
+                case 'text':
                     await this.runGuildCommand(command, client, messageEvent);
                     return true;
-                case "dm":
+                case 'dm':
                     await this.runGuildDM(command, client, messageEvent);
                     return true;
                 default:
@@ -105,25 +105,37 @@ export class CommandRegistry {
         return false;
     }
 
-    async runGuildCommand(command: Command, client: Client, message: Message): Promise<void> {
+    async runGuildCommand(
+        command: Command,
+        client: Client,
+        message: Message
+    ): Promise<void> {
         const channel = message.channel as TextChannel;
-        const enabled =
-            await command.isCommandEnabled(channel.guild.id);
+        const enabled = await command.isCommandEnabled(channel.guild.id);
         const prohibitedChannels = await command.getProhibitedChannels(
             channel.guild.id
         );
-        const hasPermission = !!message.member &&
+        const hasPermission =
+            !!message.member &&
             message.member.hasPermission(command.getRequiredPermission());
 
         const allowEmpty = command.allowEmptyArgs();
 
-        if (enabled && !prohibitedChannels.includes(channel.id) && hasPermission) {
+        if (
+            enabled &&
+            !prohibitedChannels.includes(channel.id) &&
+            hasPermission
+        ) {
             const args = this.getArgsFromContent(message.content, allowEmpty);
             await command.useCommand(client, message, args);
         }
     }
 
-    async runGuildDM(command: Command, client: Client, message: Message): Promise<void> {
+    async runGuildDM(
+        command: Command,
+        client: Client,
+        message: Message
+    ): Promise<void> {
         const allowEmpty = command.allowEmptyArgs();
         const args = this.getArgsFromContent(message.content, allowEmpty);
         await command.useCommand(client, message, args);
@@ -131,7 +143,7 @@ export class CommandRegistry {
 
     getArgsFromContent(content: string, allowEmpty: boolean): string[] {
         const contentToUse = allowEmpty ? content : content.trim();
-        const split = contentToUse.split(" ").slice(1);
+        const split = contentToUse.split(' ').slice(1);
         return allowEmpty ? split : removeEmptyArgs(split);
     }
 }

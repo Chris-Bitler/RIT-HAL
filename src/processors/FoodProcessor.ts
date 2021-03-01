@@ -1,9 +1,9 @@
-import axios from "axios";
-import * as cheerio from "cheerio";
-import { DailyPostInfo, FoodPlace, MenuItem, PlaceMenu } from "../types/Food";
-import { Client, MessageEmbed, TextChannel } from "discord.js";
-import { ConfigProperty } from "../models/ConfigProperty";
-import * as sentry from "@sentry/node";
+import axios from 'axios';
+import * as cheerio from 'cheerio';
+import { DailyPostInfo, FoodPlace, MenuItem, PlaceMenu } from '../types/Food';
+import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import { ConfigProperty } from '../models/ConfigProperty';
+import * as sentry from '@sentry/node';
 const placeIDs = [103, 104, 105, 106, 107, 108, 112];
 
 /**
@@ -14,34 +14,34 @@ export async function getOpenPlaces(): Promise<FoodPlace[] | null> {
     try {
         const places: FoodPlace[] = [];
         const response = await axios.get(
-            "https://www.rit.edu/fa/diningservices/places-to-eat/hours"
+            'https://www.rit.edu/fa/diningservices/places-to-eat/hours'
         );
         const data = response.data;
         const $ = cheerio.load(data);
         let currentLocation: FoodPlace | null = null;
         const locationsAndInformation = $(
-            ".view-content > div.hours-title,div.hours-all-panel"
+            '.view-content > div.hours-title,div.hours-all-panel'
         );
         locationsAndInformation.each((i, elem) => {
-            if ($(elem).hasClass("hours-title")) {
+            if ($(elem).hasClass('hours-title')) {
                 // This seems backwards, but this inserts existing places after they have their sections filled
                 if (currentLocation) {
                     places.push(currentLocation);
                 }
 
                 currentLocation = {
-                    name: $(elem).find("h3").find("a").text(),
+                    name: $(elem).find('h3').find('a').text(),
                     sections: []
                 };
-            } else if ($(elem).hasClass("hours-all-panel")) {
+            } else if ($(elem).hasClass('hours-all-panel')) {
                 const header = $(elem)
-                    .find("div > div > h4")
+                    .find('div > div > h4')
                     .text()
-                    .replace("&nbsp;", "");
-                const body = $(elem).find("div.panel-body");
-                const times = body.find("div.col-sm-5").text();
+                    .replace('&nbsp;', '');
+                const body = $(elem).find('div.panel-body');
+                const times = body.find('div.col-sm-5').text();
 
-                if (times.trim() !== "Closed" && currentLocation) {
+                if (times.trim() !== 'Closed' && currentLocation) {
                     currentLocation.sections.push({
                         header: header,
                         times: times
@@ -66,7 +66,7 @@ export async function getSpecials() {
     const places: PlaceMenu[] = [];
     try {
         const response = await axios.get(
-            "https://www.rit.edu/fa/diningservices/daily-specials"
+            'https://www.rit.edu/fa/diningservices/daily-specials'
         );
         const data = response.data;
         const $ = cheerio.load(data);
@@ -88,14 +88,14 @@ export async function getSpecials() {
             if (breakfastContainer.length > 0) {
                 currentPlace.breakfast = [];
                 breakfastContainer.each((i, elem) => {
-                    const menuItems = $(elem).find("div.menu-items").html();
+                    const menuItems = $(elem).find('div.menu-items').html();
                     if (currentPlace.breakfast && menuItems) {
                         currentPlace.breakfast.push({
-                            category: $(elem).find("div.menu-category").text(),
+                            category: $(elem).find('div.menu-category').text(),
                             items: menuItems
-                                .split("<br>")
+                                .split('<br>')
                                 .filter((item) => item.trim())
-                                .map((item) => item.replace("&amp;", "&"))
+                                .map((item) => item.replace('&amp;', '&'))
                         });
                     }
                 });
@@ -104,14 +104,14 @@ export async function getSpecials() {
             if (lunchContainer.length > 0) {
                 currentPlace.lunch = [];
                 lunchContainer.each((i, elem) => {
-                    const menuItems = $(elem).find("div.menu-items").html();
+                    const menuItems = $(elem).find('div.menu-items').html();
                     if (currentPlace.lunch && menuItems) {
                         currentPlace.lunch.push({
-                            category: $(elem).find("div.menu-category").text(),
+                            category: $(elem).find('div.menu-category').text(),
                             items: menuItems
-                                .split("<br>")
+                                .split('<br>')
                                 .filter((item) => item.trim())
-                                .map((item) => item.replace("&amp;", "&"))
+                                .map((item) => item.replace('&amp;', '&'))
                         });
                     }
                 });
@@ -120,14 +120,14 @@ export async function getSpecials() {
             if (dinnerContainer.length > 0) {
                 currentPlace.dinner = [];
                 dinnerContainer.each((i, elem) => {
-                    const menuItems = $(elem).find("div.menu-items").html();
+                    const menuItems = $(elem).find('div.menu-items').html();
                     if (currentPlace.dinner && menuItems) {
                         currentPlace.dinner.push({
-                            category: $(elem).find("div.menu-category").text(),
+                            category: $(elem).find('div.menu-category').text(),
                             items: menuItems
-                                .split("<br>")
+                                .split('<br>')
                                 .filter((item) => item.trim())
-                                .map((item) => item.replace("&amp;", "&"))
+                                .map((item) => item.replace('&amp;', '&'))
                         });
                     }
                 });
@@ -164,21 +164,21 @@ function addSpecialsSections(
 ): MessageEmbed {
     if (place.breakfast) {
         embed = embed.addField(
-            "Breakfast",
+            'Breakfast',
             constructDescriptionForSpecialsCategory(place.breakfast)
         );
     }
 
     if (place.lunch) {
         embed = embed.addField(
-            "Lunch",
+            'Lunch',
             constructDescriptionForSpecialsCategory(place.lunch)
         );
     }
 
     if (place.dinner) {
         embed = embed.addField(
-            "Dinner",
+            'Dinner',
             constructDescriptionForSpecialsCategory(place.dinner)
         );
     }
@@ -187,17 +187,17 @@ function addSpecialsSections(
 }
 
 function constructDescriptionForSpecialsCategory(category: MenuItem[]) {
-    let description = "";
+    let description = '';
     category.forEach((categoryItem) => {
         description += `__${categoryItem.category}__\n`;
         categoryItem.items.forEach((item, index) => {
             if (index !== 0) {
-                description += ",";
+                description += ',';
             }
 
-            description += `_${item.replace("&amp;", "&")}_`;
+            description += `_${item.replace('&amp;', '&')}_`;
         });
-        description += "\n\n";
+        description += '\n\n';
     });
 
     return description;
@@ -222,7 +222,7 @@ export async function checkFoodDaily(client: Client) {
                     {
                         where: {
                             serverId: guild.id,
-                            key: "food.last"
+                            key: 'food.last'
                         }
                     }
                 );
@@ -265,15 +265,15 @@ export async function checkFoodDaily(client: Client) {
  */
 async function fetchLastDailyInfo(serverId: string): Promise<DailyPostInfo> {
     const lastTime = await ConfigProperty.getServerProperty(
-        "food.last",
+        'food.last',
         serverId
     );
     const channel = await ConfigProperty.getServerProperty(
-        "food.channel",
+        'food.channel',
         serverId
     );
     const enabled = await ConfigProperty.getServerProperty(
-        "food.enabled",
+        'food.enabled',
         serverId
     );
     const dailyPostInfo: DailyPostInfo = {};
@@ -284,7 +284,7 @@ async function fetchLastDailyInfo(serverId: string): Promise<DailyPostInfo> {
         dailyPostInfo.channel = channel.value;
     }
     if (enabled?.value) {
-        dailyPostInfo.enabled = enabled.value.toLowerCase() === "true";
+        dailyPostInfo.enabled = enabled.value.toLowerCase() === 'true';
     }
 
     return dailyPostInfo;

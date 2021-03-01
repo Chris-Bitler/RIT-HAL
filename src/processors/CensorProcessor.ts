@@ -1,9 +1,9 @@
-import {Message, Permissions, TextChannel} from "discord.js";
-import {ServerCensors} from "../types/Censor";
-import {CensorEntry} from "../models/CensorEntry";
-import {LogProcessor} from "./LogProcessor";
-import {ConfigProperty} from "../models/ConfigProperty";
-import {getInformationalEmbed} from "../utils/EmbedUtil";
+import { Message, Permissions, TextChannel } from 'discord.js';
+import { ServerCensors } from '../types/Censor';
+import { CensorEntry } from '../models/CensorEntry';
+import { LogProcessor } from './LogProcessor';
+import { ConfigProperty } from '../models/ConfigProperty';
+import { getInformationalEmbed } from '../utils/EmbedUtil';
 
 /**
  * Processor for censors
@@ -33,16 +33,25 @@ export class CensorProcessor {
             if (censoredWords) {
                 const messageContent = message.cleanContent.toLowerCase();
                 censoredWords.forEach((censoredWord) => {
-                    if (censoredWord.includes('%') || censoredWord.includes('^') || censoredWord.includes('_') || censoredWord.includes('$')) {
+                    if (
+                        censoredWord.includes('%') ||
+                        censoredWord.includes('^') ||
+                        censoredWord.includes('_') ||
+                        censoredWord.includes('$')
+                    ) {
                         // Replace % with . and create regex
-                        const regex = new RegExp(`${censoredWord.replace('%', '.').replace('_', '\\s')}`,'gi');
+                        const regex = new RegExp(
+                            `${censoredWord
+                                .replace('%', '.')
+                                .replace('_', '\\s')}`,
+                            'gi'
+                        );
                         if (regex.test(messageContent)) {
                             this.handleCensoredWord(message, censoredWord);
                         }
                     } else if (messageContent.includes(censoredWord)) {
                         this.handleCensoredWord(message, censoredWord);
                     }
-
                 });
             }
         }
@@ -58,21 +67,31 @@ export class CensorProcessor {
         if (message.guild) {
             try {
                 const dmChannel = await sender.createDM();
-                dmChannel.send(getInformationalEmbed(
-                    `Your message in ${message.guild.name} was deleted`,
-                    "You sent a message with a censored word so it was deleted"
-                ))
+                dmChannel.send(
+                    getInformationalEmbed(
+                        `Your message in ${message.guild.name} was deleted`,
+                        'You sent a message with a censored word so it was deleted'
+                    )
+                );
             } catch (error) {
-                LogProcessor.getLogger().error(`Error sending censored message delete to ${message.author.username}`);
+                LogProcessor.getLogger().error(
+                    `Error sending censored message delete to ${message.author.username}`
+                );
             }
-            const warningChannelId = await this.fetchWarningChannel(message.guild.id);
+            const warningChannelId = await this.fetchWarningChannel(
+                message.guild.id
+            );
             if (warningChannelId) {
-                const warningChannel = message.guild.channels.resolve(warningChannelId) as TextChannel;
+                const warningChannel = message.guild.channels.resolve(
+                    warningChannelId
+                ) as TextChannel;
                 if (warningChannel) {
-                    await warningChannel.send(getInformationalEmbed(
-                        `Deleted censored word from ${message.author.username}`,
-                        `User sent ${message.cleanContent} which matched ${censoredWord}`
-                    ))
+                    await warningChannel.send(
+                        getInformationalEmbed(
+                            `Deleted censored word from ${message.author.username}`,
+                            `User sent ${message.cleanContent} which matched ${censoredWord}`
+                        )
+                    );
                 }
             }
             await message.delete();
@@ -93,7 +112,9 @@ export class CensorProcessor {
             this.createWordArrayIfDoesNotExist(serverId);
             this.censors[serverId].push(word.toLowerCase());
         } catch (error) {
-            LogProcessor.getLogger().error(`Error trying to add censored word for ${serverId}: ${error}`);
+            LogProcessor.getLogger().error(
+                `Error trying to add censored word for ${serverId}: ${error}`
+            );
             return false;
         }
 
@@ -118,7 +139,9 @@ export class CensorProcessor {
             });
             if (censoredWord) {
                 await censoredWord.destroy();
-                this.censors[serverId] = censor.filter((censoredWord) => censoredWord !== wordToUse);
+                this.censors[serverId] = censor.filter(
+                    (censoredWord) => censoredWord !== wordToUse
+                );
                 return true;
             }
 
@@ -136,9 +159,11 @@ export class CensorProcessor {
     queryCensoredWords(serverId: string, query?: string): string[] {
         const censoredWords = this.censors[serverId];
         if (censoredWords) {
-            return query ? censoredWords.filter((word) => {
-                word.includes(query.toLowerCase())
-            }) : censoredWords;
+            return query
+                ? censoredWords.filter((word) => {
+                      word.includes(query.toLowerCase());
+                  })
+                : censoredWords;
         }
 
         return [];
@@ -153,7 +178,7 @@ export class CensorProcessor {
             this.createWordArrayIfDoesNotExist(entry.serverId);
             const censor = this.censors[entry.serverId];
             censor.push(entry.censoredWord);
-        })
+        });
     }
 
     /**
@@ -172,7 +197,7 @@ export class CensorProcessor {
      */
     async fetchWarningChannel(serverId: string): Promise<string | null> {
         const warningChannelId = await ConfigProperty.getServerProperty(
-            "censor.warning",
+            'censor.warning',
             serverId
         );
         if (warningChannelId?.value) {

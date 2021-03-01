@@ -1,13 +1,18 @@
-import { Command } from "./Command";
-import {Client, Message} from "discord.js";
-import { getErrorEmbed } from "../utils/EmbedUtil";
-import {COOLDOWN_TYPE, getCooldownRemainingMillis, isInCooldown, setCooldown} from "../utils/CooldownUtil";
+import { Command } from './Command';
+import { Client, Message } from 'discord.js';
+import { getErrorEmbed } from '../utils/EmbedUtil';
+import {
+    COOLDOWN_TYPE,
+    getCooldownRemainingMillis,
+    isInCooldown,
+    setCooldown
+} from '../utils/CooldownUtil';
 
 /**
  * Used to react to a message with a melon
  */
 
-const COOLDOWN = 1000*30;
+const COOLDOWN = 1000 * 30;
 
 export class Melo extends Command {
     async useCommand(
@@ -19,18 +24,29 @@ export class Melo extends Command {
             const inCooldown = isInCooldown(COOLDOWN_TYPE.MELO, evt.member);
             if (!inCooldown) {
                 await evt.react('🍈');
-                setCooldown(COOLDOWN_TYPE.MELO, evt.member, Date.now() + COOLDOWN);
+                setCooldown(
+                    COOLDOWN_TYPE.MELO,
+                    evt.member,
+                    Date.now() + COOLDOWN
+                );
             } else {
-                const cooldown = getCooldownRemainingMillis(COOLDOWN_TYPE.MELO, evt.member);
+                const cooldown = getCooldownRemainingMillis(
+                    COOLDOWN_TYPE.MELO,
+                    evt.member
+                );
                 if (cooldown) {
                     const seconds = Math.ceil(cooldown / 1000);
-                    evt.channel.send(getErrorEmbed(`You melo'd. Try again in about ${seconds} seconds`));
+                    evt.channel.send(
+                        getErrorEmbed(
+                            `You melo'd. Try again in about ${seconds} seconds`
+                        )
+                    );
                 }
             }
         }
     }
 
     getCommand(): string[] {
-        return ["melo"];
+        return ['melo'];
     }
 }

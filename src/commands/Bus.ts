@@ -4,12 +4,12 @@ import {
     TextChannel,
     Permissions,
     MessageEmbed
-} from "discord.js";
-import { ArrivalTimes, BusRoute } from "../types/Bus";
-import { Command } from "./Command";
-import { mergeArgs } from "../utils/StringUtil";
-import { BusProcessor } from "../processors/BusProcessor";
-import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
+} from 'discord.js';
+import { ArrivalTimes, BusRoute } from '../types/Bus';
+import { Command } from './Command';
+import { mergeArgs } from '../utils/StringUtil';
+import { BusProcessor } from '../processors/BusProcessor';
+import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
 
 /**
  * Command used to display various RIT bus related information
@@ -17,7 +17,7 @@ import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
 export class Bus extends Command {
     busProcessor: BusProcessor = BusProcessor.getInstance();
     incorrectSyntaxMessage = getErrorEmbed(
-        "`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`"
+        '`Incorrect Syntax. Try -bus routes or -bus arrivals [route]`'
     );
 
     async useCommand(
@@ -35,13 +35,13 @@ export class Bus extends Command {
             }
 
             switch (args[0].toLowerCase()) {
-                case "routes":
+                case 'routes':
                     this.showRoutes(evt);
                     break;
-                case "arrivals":
+                case 'arrivals':
                     await this.showStops(evt, args);
                     break;
-                case "forcerefresh":
+                case 'forcerefresh':
                     await this.forceRefresh(
                         evt.channel as TextChannel,
                         sender.hasPermission(Permissions.FLAGS.KICK_MEMBERS)
@@ -55,7 +55,7 @@ export class Bus extends Command {
     }
 
     getCommand(): string[] {
-        return ["bus"];
+        return ['bus'];
     }
 
     /**
@@ -69,8 +69,8 @@ export class Bus extends Command {
             await this.busProcessor.refreshInformation();
             await channel.send(
                 getInformationalEmbed(
-                    "Refreshed",
-                    "Forced refresh of bus information"
+                    'Refreshed',
+                    'Forced refresh of bus information'
                 )
             );
         }
@@ -94,7 +94,7 @@ export class Bus extends Command {
     async showStops(evt: Message, args: string[]): Promise<void> {
         if (args.length < 2) {
             evt.channel.send(
-                getErrorEmbed("`Incorrect Syntax. Try -bus arrivals [route]`")
+                getErrorEmbed('`Incorrect Syntax. Try -bus arrivals [route]`')
             );
             return;
         }
@@ -121,7 +121,7 @@ export class Bus extends Command {
         } else {
             evt.channel.send(
                 getErrorEmbed(
-                    "Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route."
+                    'Invalid Route. Note: These must match the names of the routes as per -bus routes, or you must use the number of the route.'
                 )
             );
         }
@@ -132,23 +132,23 @@ export class Bus extends Command {
      * @param routes The list of bus routes retrieved from the API
      */
     getRoutesEmbed(routes: BusRoute[]): MessageEmbed {
-        const embed = new MessageEmbed().setTitle("Active RIT Bus Routes");
+        const embed = new MessageEmbed().setTitle('Active RIT Bus Routes');
 
         if (routes.length > 0) {
-            let routesString = "";
+            let routesString = '';
             let i = 1;
             routes.forEach((route) => {
                 routesString += `${i}. ${route.long_name}\n`;
                 i++;
             });
 
-            embed.addField("Routes", routesString);
+            embed.addField('Routes', routesString);
 
             return embed;
         } else {
             embed.addField(
-                "No buses running",
-                "There are currently no buses running."
+                'No buses running',
+                'There are currently no buses running.'
             );
             return embed;
         }
@@ -169,8 +169,8 @@ export class Bus extends Command {
             });
         } else {
             embed.addField(
-                "No results",
-                "No arrival times retrieved. The bus may be stopped. Try again in a few minutes."
+                'No results',
+                'No arrival times retrieved. The bus may be stopped. Try again in a few minutes.'
             );
         }
 
@@ -178,6 +178,6 @@ export class Bus extends Command {
     }
 
     getConfigBase(): string {
-        return "bus";
+        return 'bus';
     }
 }

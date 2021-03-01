@@ -1,10 +1,12 @@
-import { Alarm } from "../types/Alarm";
-import moment from "moment-timezone";
-import {Client, Guild, MessageEmbed, TextChannel} from "discord.js";
-import { Alarm as AlarmModel } from "../models/Alarm";
-import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
-import * as sentry from "@sentry/node";
-import { DateTime } from "luxon";
+import { Alarm } from '../types/Alarm';
+import moment from 'moment-timezone';
+import { Client, Guild, MessageEmbed, TextChannel } from 'discord.js';
+import { Alarm as AlarmModel } from '../models/Alarm';
+import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
+import * as sentry from '@sentry/node';
+import { DateTime } from 'luxon';
+import {WeatherProcessor} from "./WeatherProcessor";
+import {WeatherResponse} from "../types/Weather";
 
 const MS_IN_23_HOURS = 82800000;
 const DATE_FORMAT = 'MM/dd/yy hh:mm:ss a ZZZZ';
@@ -48,10 +50,10 @@ export class AlarmProcessor {
     ): Promise<void> {
         try {
             let lastUsed = 0;
-            const hoursToUse: number = meridiem == 'AM' ? hours : hours + (12);
+            const hoursToUse: number = meridiem == 'AM' ? hours : hours + 12;
 
             // Deal with times that have already passed today
-            const current = moment().tz("America/New_York");
+            const current = moment().tz('America/New_York');
             current.hours(hoursToUse);
             current.minutes(minutes);
             if (Date.now() > current.valueOf()) {
@@ -84,7 +86,7 @@ export class AlarmProcessor {
             }
             await commandChannel.send(
                 getInformationalEmbed(
-                    "Alarm created",
+                    'Alarm created',
                     `An alarm for ${targetChannel} was created to go off at ${hours}:${minutesToSend} ${meridiem.toUpperCase()} saying ${messageToSend}`
                 )
             );
@@ -128,13 +130,14 @@ export class AlarmProcessor {
                     id: alarm.id
                 });
 
-                let luxonDate = DateTime.fromJSDate(date);
-                luxonDate = luxonDate.setZone('EST');
+                const luxonDate = DateTime.fromJSDate(date);
 
                 await commandChannel.send(
                     getInformationalEmbed(
-                        "Alarm created",
-                        `An alarm for ${targetChannel} was created to go off at ${luxonDate.toFormat(DATE_FORMAT)} saying ${messageToSend}`
+                        'Alarm created',
+                        `An alarm for ${targetChannel} was created to go off at ${luxonDate.toFormat(
+                            DATE_FORMAT
+                        )} saying ${messageToSend}`
                     )
                 );
             } catch (error) {
@@ -174,7 +177,7 @@ export class AlarmProcessor {
                     channelId: alarm.channelId,
                     serverId: alarm.serverId,
                     id: alarm.id
-                })
+                });
             } else if (alarm.type === 'date') {
                 this.alarms.push({
                     type: alarm.type,
@@ -184,7 +187,7 @@ export class AlarmProcessor {
                     id: alarm.id,
                     date: alarm.date ?? 0,
                     sent: alarm.sent ?? false
-                })
+                });
             }
         }
     }
@@ -195,24 +198,31 @@ export class AlarmProcessor {
      * @param guild The guild the command was sent in
      * @param commandChannel The channel the command was sent in
      */
-    async sendAlarmListEmbed(guild: Guild, commandChannel: TextChannel): Promise<void> {
+    async sendAlarmListEmbed(
+        guild: Guild,
+        commandChannel: TextChannel
+    ): Promise<void> {
         const embed = new MessageEmbed();
         const alarms = this.getAlarms(guild);
-        let description = "";
-        embed.setTitle("Alarms");
+        let description = '';
+        embed.setTitle('Alarms');
         if (alarms && alarms.length > 0) {
             for (const alarm of alarms) {
                 if (alarm.type === 'time') {
                     const hours = alarm.hours !== 12 ? alarm.hours % 12 : 12;
                     const minutes = alarm.minutes;
-                    const amPm = alarm.hours >= 12 ? "pm" : "am";
+                    const amPm = alarm.hours >= 12 ? 'pm' : 'am';
                     description +=
                         `**ID:** ${alarm.id}\n` +
-                        `**Time:** ${hours}:${minutes >= 10 ? minutes : `0${minutes}`} ${amPm}\n` +
+                        `**Time:** ${hours}:${
+                            minutes >= 10 ? minutes : `0${minutes}`
+                        } ${amPm}\n` +
                         `**Message:** ${alarm.message}\n\n`;
                 } else if (alarm.type === 'date') {
                     const date = DateTime.fromMillis(alarm.date);
-                    const formattedDate = date.toFormat('MM/dd/yy hh:mm:ss a ZZZZ');
+                    const formattedDate = date.toFormat(
+                        'MM/dd/yy hh:mm:ss a ZZZZ'
+                    );
                     description +=
                         `**ID:** ${alarm.id}\n` +
                         `**Date:** ${formattedDate}\n` +
@@ -221,11 +231,11 @@ export class AlarmProcessor {
                 }
             }
 
-            embed.addField("Alarms", description);
+            embed.addField('Alarms', description);
 
             await commandChannel.send(embed);
         } else {
-            await commandChannel.send(getErrorEmbed("No alarms found"));
+            await commandChannel.send(getErrorEmbed('No alarms found'));
         }
     }
 
@@ -235,7 +245,11 @@ export class AlarmProcessor {
      * @param commandChannel the channel the command was used in
      * @param id The id of the alarm
      */
-    async deleteAlarm(guild: Guild, commandChannel: TextChannel, id: string): Promise<void> {
+    async deleteAlarm(
+        guild: Guild,
+        commandChannel: TextChannel,
+        id: string
+    ): Promise<void> {
         const alarm = await AlarmModel.findOne({
             where: {
                 id
@@ -255,19 +269,19 @@ export class AlarmProcessor {
 
                 await commandChannel.send(
                     getInformationalEmbed(
-                        "Alarm deleted",
+                        'Alarm deleted',
                         `The alarm with the id ${id} was deleted.`
                     )
                 );
             } else {
                 await commandChannel.send(
-                    getErrorEmbed(
-                        "That alarm doesn't belong to this server."
-                    )
+                    getErrorEmbed('That alarm doesn\'t belong to this server.')
                 );
             }
         } else {
-            await commandChannel.send(getErrorEmbed("No alarm with that id exists"));
+            await commandChannel.send(
+                getErrorEmbed('No alarm with that id exists')
+            );
         }
     }
 
@@ -280,7 +294,10 @@ export class AlarmProcessor {
                 alarm.channelId
             ) as TextChannel;
             if (channel) {
-                await channel.send(alarm.message);
+                const regex = /{fn:(.*?)}/gm;
+                let messageToSend = alarm.message.replace(regex, '');
+                messageToSend = messageToSend === '' ? ' ' : messageToSend;
+                await channel.send(messageToSend);
                 if (alarm.type === 'time') {
                     alarm.lastSent = now;
                     await AlarmModel.update(
@@ -295,14 +312,18 @@ export class AlarmProcessor {
                     );
                 } else if (alarm.type === 'date') {
                     alarm.sent = true;
-                    await AlarmModel.update({
-                        sent: true
-                    }, {
-                        where: {
-                            id: alarm.id
+                    await AlarmModel.update(
+                        {
+                            sent: true
+                        },
+                        {
+                            where: {
+                                id: alarm.id
+                            }
                         }
-                    });
+                    );
                 }
+                await this.runAlarmFunctions(client, alarm);
             }
         }
     }
@@ -314,18 +335,17 @@ export class AlarmProcessor {
     async tickAlarms(client: Client): Promise<void> {
         for (const alarm of this.alarms) {
             const now = Date.now();
-            const date = moment().tz("America/New_York");
+            const date = moment().tz('America/New_York');
             if (alarm.type === 'date') {
                 const timePassed = alarm.date < Date.now();
                 if (timePassed && !alarm.sent) {
                     await this.sendAlarm(client, alarm);
                 }
             } else if (alarm.type === 'time') {
-                const sameHourMoreMinutes = (
+                const sameHourMoreMinutes =
                     date.hours() === alarm.hours &&
-                    date.minutes() >= alarm.minutes
-                );
-                const moreHours = (date.hours() > alarm.hours);
+                    date.minutes() >= alarm.minutes;
+                const moreHours = date.hours() > alarm.hours;
                 if (
                     alarm.lastSent + MS_IN_23_HOURS < now &&
                     (sameHourMoreMinutes || moreHours)
@@ -334,5 +354,38 @@ export class AlarmProcessor {
                 }
             }
         }
+    }
+
+    async runAlarmFunctions(client: Client, alarm: Alarm) {
+        const regex = /{fn:(.*?)}/g;
+        const functions = alarm.message.matchAll(regex);
+        for (const match of functions) {
+            if (match.length > 1) {
+                const parts = match[1].trim().split(' ');
+                if (parts.length > 0) {
+                    const mappedFn = this.fnMapper[parts[0]]
+                    await mappedFn(client, alarm, parts.splice(1));
+                }
+            }
+        }
+    }
+
+    async sendWeatherEmbed(client: Client, alarm: Alarm, args: string[]) {
+        const zip = args?.[0];
+        if (zip) {
+            const weather = await WeatherProcessor.getWeather(zip);
+            if (!(weather instanceof Error)) {
+                const embed = WeatherProcessor.getEmbed(zip, weather);
+                const channel = client.guilds.resolve(alarm.serverId)?.channels?.resolve(alarm.channelId);
+                if (channel instanceof TextChannel) {
+                    await channel.send(embed);
+                }
+            }
+        }
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    fnMapper: {[key: string]: Function} = {
+        weather: this.sendWeatherEmbed
     }
 }

@@ -1,7 +1,7 @@
-import { Message, MessageEmbed, TextChannel } from "discord.js";
-import { Emoji } from "../models/Emoji";
-import memoize from "memoizee";
-import { ConfigProperty } from "../models/ConfigProperty";
+import { Message, MessageEmbed, TextChannel } from 'discord.js';
+import { Emoji } from '../models/Emoji';
+import memoize from 'memoizee';
+import { ConfigProperty } from '../models/ConfigProperty';
 
 /**
  * Class for processing emojis from text events and tracking them to DB
@@ -123,10 +123,10 @@ export class EmojiProcessor {
                 serverId: channel.guild.id
             },
             limit: 10,
-            order: [["num", "DESC"]]
+            order: [['num', 'DESC']]
         });
         const embed = new MessageEmbed();
-        embed.setTitle("Top 10 emojis by usage in the server");
+        embed.setTitle('Top 10 emojis by usage in the server');
         emojis.forEach((emoji) => {
             embed.addField(emoji.emoji, `Used ${emoji.num} times`);
         });
@@ -139,7 +139,7 @@ export class EmojiProcessor {
      */
     async allowedChannels(serverId: string): Promise<string[]> {
         const allowedChannelsJSON = await ConfigProperty.getServerProperty(
-            "emojiCount.allowed",
+            'emojiCount.allowed',
             serverId
         );
         if (allowedChannelsJSON?.value) {

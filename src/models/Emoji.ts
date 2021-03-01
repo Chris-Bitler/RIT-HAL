@@ -1,4 +1,4 @@
-import { Table, Model, PrimaryKey, Column } from "sequelize-typescript";
+import { Table, Model, PrimaryKey, Column } from 'sequelize-typescript';
 
 /**
  * Class modeling an emoji usage row from the database
