@@ -1,95 +1,119 @@
-import {CommandContext, CommandOptionType, SlashCreator} from "slash-create";
-import {Client, Guild, TextChannel} from "discord.js";
-import {ExtendedSlashCommand} from "../ExtendedSlashCommand";
-import {AlarmProcessor} from "../../processors/AlarmProcessor";
-import {getChronoCustom} from "../../utils/DateUtil";
+import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+import { Client, Guild, TextChannel } from 'discord.js';
+import { ExtendedSlashCommand } from '../ExtendedSlashCommand';
+import { AlarmProcessor } from '../../processors/AlarmProcessor';
+import { getChronoCustom } from '../../utils/DateUtil';
 
 export class Alarm extends ExtendedSlashCommand {
     client: Client;
     constructor(client: Client, creator: SlashCreator) {
         super(creator, {
             name: 'alarm',
-            description: 'Set an alarm to go off at a specific time every day or at a specific date/time',
-            requiredPermissions: ["ADMINISTRATOR"],
-            options: [{
-                type: CommandOptionType.SUB_COMMAND,
-                name: 'date',
-                description: 'date specific type alarm',
-                options: [{
-                    type: CommandOptionType.STRING,
+            description:
+                'Set an alarm to go off at a specific time every day or at a specific date/time',
+            requiredPermissions: ['ADMINISTRATOR'],
+            options: [
+                {
+                    type: CommandOptionType.SUB_COMMAND,
                     name: 'date',
-                    description: 'the date/time for the alarm to go off at',
-                    required: true,
-                }, {
-                    type: CommandOptionType.CHANNEL,
-                    name: 'channel',
-                    description: 'the channel to send the message in',
-                    required: true,
-                }, {
-                    type: CommandOptionType.STRING,
-                    name: 'message',
-                    description: 'the message to send in the alarm',
-                    required: true,
-                }]
-            }, {
-                type: CommandOptionType.SUB_COMMAND,
-                name: 'time',
-                description: 're-occurring alarm',
-                options: [{
-                    type: CommandOptionType.INTEGER,
-                    name: 'hours',
-                    description: 'the hour (0-12) for the alarm to go off at',
-                    required: true,
-                }, {
-                    type: CommandOptionType.INTEGER,
-                    name: 'minutes',
-                    description: 'the minute (0-59) for the alarm to go off at',
-                    required: true,
-                }, {
-                    type: CommandOptionType.STRING,
-                    name: 'meridiem',
-                    description: 'AM or PM',
-                    required: true,
-                    choices: [{
-                        name: "morning",
-                        value: "AM"
-                    }, {
-                        name: "afternoon",
-                        value: "PM"
-                    }]
-                }, {
-                    type: CommandOptionType.CHANNEL,
-                    name: 'channel',
-                    description: 'the channel to send the message in',
-                    required: true,
-                }, {
-                    type: CommandOptionType.STRING,
-                    name: 'message',
-                    description: 'the message to send in the alarm',
-                    required: true,
-                }]
-            }, {
-                type: CommandOptionType.SUB_COMMAND,
-                name: 'list',
-                description: 'list the alarms'
-            }, {
-                type: CommandOptionType.SUB_COMMAND,
-                name: 'delete',
-                description: 'delete an alarm',
-                options: [{
-                    type: CommandOptionType.STRING,
-                    name: 'alarm-id',
-                    description: 'alarm id',
-                    required: true,
-                }]
-            }]
+                    description: 'date specific type alarm',
+                    options: [
+                        {
+                            type: CommandOptionType.STRING,
+                            name: 'date',
+                            description:
+                                'the date/time for the alarm to go off at',
+                            required: true
+                        },
+                        {
+                            type: CommandOptionType.CHANNEL,
+                            name: 'channel',
+                            description: 'the channel to send the message in',
+                            required: true
+                        },
+                        {
+                            type: CommandOptionType.STRING,
+                            name: 'message',
+                            description: 'the message to send in the alarm',
+                            required: true
+                        }
+                    ]
+                },
+                {
+                    type: CommandOptionType.SUB_COMMAND,
+                    name: 'time',
+                    description: 're-occurring alarm',
+                    options: [
+                        {
+                            type: CommandOptionType.INTEGER,
+                            name: 'hours',
+                            description:
+                                'the hour (0-12) for the alarm to go off at',
+                            required: true
+                        },
+                        {
+                            type: CommandOptionType.INTEGER,
+                            name: 'minutes',
+                            description:
+                                'the minute (0-59) for the alarm to go off at',
+                            required: true
+                        },
+                        {
+                            type: CommandOptionType.STRING,
+                            name: 'meridiem',
+                            description: 'AM or PM',
+                            required: true,
+                            choices: [
+                                {
+                                    name: 'morning',
+                                    value: 'AM'
+                                },
+                                {
+                                    name: 'afternoon',
+                                    value: 'PM'
+                                }
+                            ]
+                        },
+                        {
+                            type: CommandOptionType.CHANNEL,
+                            name: 'channel',
+                            description: 'the channel to send the message in',
+                            required: true
+                        },
+                        {
+                            type: CommandOptionType.STRING,
+                            name: 'message',
+                            description: 'the message to send in the alarm',
+                            required: true
+                        }
+                    ]
+                },
+                {
+                    type: CommandOptionType.SUB_COMMAND,
+                    name: 'list',
+                    description: 'list the alarms'
+                },
+                {
+                    type: CommandOptionType.SUB_COMMAND,
+                    name: 'delete',
+                    description: 'delete an alarm',
+                    options: [
+                        {
+                            type: CommandOptionType.STRING,
+                            name: 'alarm-id',
+                            description: 'alarm id',
+                            required: true
+                        }
+                    ]
+                }
+            ]
         });
 
         this.client = client;
     }
 
     async run(context: CommandContext) {
-        const {guild, channel} = this.getGuildChannel(this.client, context);
+        const { guild, channel } = this.getGuildChannel(this.client, context);
         if (guild && channel) {
             const hasPermission = this.hasPermission(context);
             if (hasPermission) {
@@ -115,7 +139,11 @@ export class Alarm extends ExtendedSlashCommand {
         }
     }
 
-    async handleDateCommand(guild: Guild, commandChannel: TextChannel, context: CommandContext) {
+    async handleDateCommand(
+        guild: Guild,
+        commandChannel: TextChannel,
+        context: CommandContext
+    ) {
         const dateOptions = context.options.date;
         if (typeof dateOptions === 'object') {
             const date = dateOptions.date as string;
@@ -126,20 +154,35 @@ export class Alarm extends ExtendedSlashCommand {
             if (parsedDate) {
                 const targetChannel = guild.channels.resolve(channel);
                 if (targetChannel && targetChannel instanceof TextChannel) {
-                    await AlarmProcessor.getInstance().createAlarmDate(guild, commandChannel, targetChannel, parsedDate, message);
+                    await AlarmProcessor.getInstance().createAlarmDate(
+                        guild,
+                        commandChannel,
+                        targetChannel,
+                        parsedDate,
+                        message
+                    );
                     await context.acknowledge(false);
                     return;
                 } else {
-                    await context.send('Unknown channel. Please try again.', {ephemeral: true});
+                    await context.send('Unknown channel. Please try again.', {
+                        ephemeral: true
+                    });
                     return;
                 }
             }
         }
 
-        await context.send('Unknown error. Please check arguments and try again', {ephemeral: true});
+        await context.send(
+            'Unknown error. Please check arguments and try again',
+            { ephemeral: true }
+        );
     }
 
-    async handleTimeCommand(guild: Guild, commandChannel: TextChannel, context: CommandContext) {
+    async handleTimeCommand(
+        guild: Guild,
+        commandChannel: TextChannel,
+        context: CommandContext
+    ) {
         const timeOptions = context.options.time;
         if (typeof timeOptions === 'object') {
             const hours = timeOptions.hours as number;
@@ -149,28 +192,56 @@ export class Alarm extends ExtendedSlashCommand {
             const message = timeOptions.message as string;
             const targetChannel = guild.channels.resolve(channel);
             if (targetChannel && targetChannel instanceof TextChannel) {
-                await AlarmProcessor.getInstance().createAlarmTime(guild, commandChannel, targetChannel, hours, minutes, meridiem, message);
+                await AlarmProcessor.getInstance().createAlarmTime(
+                    guild,
+                    commandChannel,
+                    targetChannel,
+                    hours,
+                    minutes,
+                    meridiem,
+                    message
+                );
                 await context.acknowledge(false);
                 return;
             } else {
-                await context.send('Unknown channel. Please try again.', {ephemeral: true})
+                await context.send('Unknown channel. Please try again.', {
+                    ephemeral: true
+                });
                 return;
             }
         }
 
-        await context.send('Unknown error. Please check arguments and try again', {ephemeral: true});
+        await context.send(
+            'Unknown error. Please check arguments and try again',
+            { ephemeral: true }
+        );
     }
 
-    async handleListCommand(guild: Guild, commandChannel: TextChannel, context: CommandContext) {
-        await AlarmProcessor.getInstance().sendAlarmListEmbed(guild, commandChannel);
+    async handleListCommand(
+        guild: Guild,
+        commandChannel: TextChannel,
+        context: CommandContext
+    ) {
+        await AlarmProcessor.getInstance().sendAlarmListEmbed(
+            guild,
+            commandChannel
+        );
         await context.acknowledge(false);
     }
 
-    async handleDeleteCommand(guild: Guild, commandChannel: TextChannel, context: CommandContext) {
+    async handleDeleteCommand(
+        guild: Guild,
+        commandChannel: TextChannel,
+        context: CommandContext
+    ) {
         const deleteOptions = context.options.delete;
         if (typeof deleteOptions === 'object') {
             const alarm = deleteOptions['alarm-id'] as string;
-            await AlarmProcessor.getInstance().deleteAlarm(guild, commandChannel, alarm);
+            await AlarmProcessor.getInstance().deleteAlarm(
+                guild,
+                commandChannel,
+                alarm
+            );
         }
     }
 }

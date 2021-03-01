@@ -1,4 +1,4 @@
-import { Command } from "./Command";
+import { Command } from './Command';
 import {
     Client,
     Guild,
@@ -8,18 +8,25 @@ import {
     Permissions,
     Role,
     TextChannel
-} from "discord.js";
-import { getErrorEmbed } from "../utils/EmbedUtil";
-import {addEmojiRole, getChannel, getRole, listEmojiRoles, removeEmojiRole} from "../processors/EmojiRoleProcessor";
-import { UnicodeEmoji } from "../types/Emoji";
-import {getEmoji} from "../utils/EmojiUtil";
-import {containsNonLatinCodepoints} from "../utils/StringUtil";
+} from 'discord.js';
+import { getErrorEmbed } from '../utils/EmbedUtil';
+import {
+    addEmojiRole,
+    getChannel,
+    getRole,
+    listEmojiRoles,
+    removeEmojiRole
+} from '../processors/EmojiRoleProcessor';
+import { UnicodeEmoji } from '../types/Emoji';
+import { getEmoji } from '../utils/EmojiUtil';
+import { containsNonLatinCodepoints } from '../utils/StringUtil';
 
 const emojiRegex = /:(.+):/;
-const errorText = "Incorrect syntax. Try one of the following:\n" +
-    "`-emojirole add [emoji] [role id or name] [channel id or name]`\n" +
-    "`-emojirole remove [channel]  [emoji]`\n" +
-    "`-emojirole list [channel] (emoji)`";
+const errorText =
+    'Incorrect syntax. Try one of the following:\n' +
+    '`-emojirole add [emoji] [role id or name] [channel id or name]`\n' +
+    '`-emojirole remove [channel]  [emoji]`\n' +
+    '`-emojirole list [channel] (emoji)`';
 export class EmojiRole extends Command {
     async useCommand(
         client: Client,
@@ -28,11 +35,7 @@ export class EmojiRole extends Command {
     ): Promise<void> {
         const initialChannel = evt.channel as TextChannel;
         if (args.length < 1) {
-            await initialChannel.send(
-                getErrorEmbed(
-                    errorText
-                )
-            );
+            await initialChannel.send(getErrorEmbed(errorText));
             return;
         }
         const commandSubtype = args[0];
@@ -47,19 +50,21 @@ export class EmojiRole extends Command {
                 await this.listEmojiRole(evt, initialChannel, args);
                 break;
             default:
-                await initialChannel.send(
-                    getErrorEmbed(
-                        errorText
-                    )
-                );
+                await initialChannel.send(getErrorEmbed(errorText));
                 break;
         }
     }
 
-    async addEmojiRole(evt: Message, initialChannel: TextChannel, args: string[]): Promise<void> {
+    async addEmojiRole(
+        evt: Message,
+        initialChannel: TextChannel,
+        args: string[]
+    ): Promise<void> {
         if (args.length < 4) {
             await initialChannel.send(
-                getErrorEmbed("Invalid arguments. Try `-emojirole add [emoji] [role id or name] [channel id or name]`")
+                getErrorEmbed(
+                    'Invalid arguments. Try `-emojirole add [emoji] [role id or name] [channel id or name]`'
+                )
             );
             return;
         }
@@ -67,9 +72,9 @@ export class EmojiRole extends Command {
 
         const role = getRole(evt, args[2]);
         const channel = getChannel(evt, args[3]);
-        if (channel?.type !== "text") {
+        if (channel?.type !== 'text') {
             await initialChannel.send(
-                getErrorEmbed("Invalid channel. Try again.")
+                getErrorEmbed('Invalid channel. Try again.')
             );
             return;
         }
@@ -80,19 +85,25 @@ export class EmojiRole extends Command {
             await addEmojiRole(initialChannel, emoji, role, textChannel);
         } else if (!emoji) {
             await initialChannel.send(
-                getErrorEmbed("No valid emoji found. Try again.")
+                getErrorEmbed('No valid emoji found. Try again.')
             );
         } else if (!role) {
             await initialChannel.send(
-                getErrorEmbed("Invalid role. Try again.")
+                getErrorEmbed('Invalid role. Try again.')
             );
         }
     }
 
-    async removeEmojiRole(evt: Message, initialChannel: TextChannel, args: string[]): Promise<void> {
+    async removeEmojiRole(
+        evt: Message,
+        initialChannel: TextChannel,
+        args: string[]
+    ): Promise<void> {
         if (args.length < 3) {
             await initialChannel.send(
-                getErrorEmbed("Invalid arguments. Try `-emojirole remove [channel id or name] [emoji]`")
+                getErrorEmbed(
+                    'Invalid arguments. Try `-emojirole remove [channel id or name] [emoji]`'
+                )
             );
             return;
         }
@@ -106,19 +117,23 @@ export class EmojiRole extends Command {
         } else {
             await initialChannel.send(
                 getErrorEmbed(
-                    "Cannot remove emoji to role from non-existent channel"
+                    'Cannot remove emoji to role from non-existent channel'
                 )
             );
         }
     }
 
-    async listEmojiRole(evt: Message, initialChannel: TextChannel, args: string[]): Promise<void> {
+    async listEmojiRole(
+        evt: Message,
+        initialChannel: TextChannel,
+        args: string[]
+    ): Promise<void> {
         let emote = undefined;
         if (args.length < 2) {
             await initialChannel.send(
                 getErrorEmbed(
                     'Invalid arguments. Try `-emojirole list [channel] (emoji)`\n' +
-                    'Note: the emoji argument is optional'
+                        'Note: the emoji argument is optional'
                 )
             );
             return;
@@ -127,7 +142,8 @@ export class EmojiRole extends Command {
         const channel = getChannel(evt, args[1]);
 
         if (args.length >= 3) {
-            emote = this.getEmojiFromString(initialChannel, args[2]) ?? undefined;
+            emote =
+                this.getEmojiFromString(initialChannel, args[2]) ?? undefined;
         }
 
         if (channel instanceof TextChannel) {
@@ -135,13 +151,16 @@ export class EmojiRole extends Command {
         } else {
             await initialChannel.send(
                 getErrorEmbed(
-                    "Cannot list emoji to role from non-existent channel"
+                    'Cannot list emoji to role from non-existent channel'
                 )
             );
         }
     }
 
-    getEmojiFromString(channel: TextChannel, emojiText: string): GuildEmoji | UnicodeEmoji | null {
+    getEmojiFromString(
+        channel: TextChannel,
+        emojiText: string
+    ): GuildEmoji | UnicodeEmoji | null {
         const emojiMatch = emojiText.match(emojiRegex);
         let emoji: GuildEmoji | UnicodeEmoji | null = null;
         if (emojiMatch?.[1]) {
@@ -158,7 +177,7 @@ export class EmojiRole extends Command {
     }
 
     getCommand(): string[] {
-        return ["emojirole"];
+        return ['emojirole'];
     }
 
     getRequiredPermission(): number {

@@ -1,6 +1,6 @@
-import { Client, Message } from "discord.js";
-import { Command } from "./Command";
-import { getSpecials, getSpecialsEmbed } from "../processors/FoodProcessor";
+import { Client, Message } from 'discord.js';
+import { Command } from './Command';
+import { getSpecials, getSpecialsEmbed } from '../processors/FoodProcessor';
 
 /**
  * Command to show what the specials are at the various food places on campus
@@ -16,10 +16,10 @@ export class FoodSpecials extends Command {
     }
 
     getCommand(): string[] {
-        return ["rit specials"];
+        return ['rit specials'];
     }
 
     getConfigBase(): string {
-        return "specials";
+        return 'specials';
     }
 }

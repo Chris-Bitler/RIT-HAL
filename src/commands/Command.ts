@@ -1,5 +1,5 @@
-import { Client, Message, Permissions } from "discord.js";
-import { ConfigProperty } from "../models/ConfigProperty";
+import { Client, Message, Permissions } from 'discord.js';
+import { ConfigProperty } from '../models/ConfigProperty';
 
 /**
  * Class representing a command
@@ -16,14 +16,14 @@ export class Command {
         evt: Message,
         args: string[]
     ): Promise<void> {
-        throw new Error("You need to implement useCommand");
+        throw new Error('You need to implement useCommand');
     }
 
     /**
      * Get the textual version of the command minus prefix
      */
     getCommand(): string[] {
-        throw new Error("You need to implement getCommand");
+        throw new Error('You need to implement getCommand');
     }
 
     /**
@@ -39,7 +39,7 @@ export class Command {
      * The first section of any config property related to this command
      */
     getConfigBase(): string {
-        return "base";
+        return 'base';
     }
 
     /**
@@ -63,11 +63,11 @@ export class Command {
             guildId
         );
 
-        return enabled !== null ? enabled.value.toLowerCase() === "true" : true;
+        return enabled !== null ? enabled.value.toLowerCase() === 'true' : true;
     }
 
     commandType(): string {
-        return "text";
+        return 'text';
     }
 
     allowEmptyArgs(): boolean {

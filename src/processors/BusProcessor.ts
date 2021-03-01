@@ -1,12 +1,12 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { AxiosInstance } from 'axios';
 import {
     ArrivalResponseContainer,
     BusRoute,
     BusRoutes,
     ArrivalTimes,
     Stop
-} from "../types/Bus";
-import moment from "moment";
+} from '../types/Bus';
+import moment from 'moment';
 
 const AGENCY_ID = 643; // TODO: Make config changeable
 let axiosInstance: AxiosInstance;
@@ -21,10 +21,10 @@ export class BusProcessor {
 
     constructor() {
         axiosInstance = axios.create({
-            baseURL: "https://transloc-api-1-2.p.rapidapi.com",
+            baseURL: 'https://transloc-api-1-2.p.rapidapi.com',
             headers: {
-                "x-rapidapi-host": "transloc-api-1-2.p.rapidapi.com",
-                "x-rapidapi-key": process.env.rapidapi_token
+                'x-rapidapi-host': 'transloc-api-1-2.p.rapidapi.com',
+                'x-rapidapi-key': process.env.rapidapi_token
             }
         });
     }
@@ -54,7 +54,7 @@ export class BusProcessor {
      */
     async fetchRoutes(): Promise<BusRoutes> {
         const response = (
-            await axiosInstance.get("/routes.json", {
+            await axiosInstance.get('/routes.json', {
                 params: {
                     agencies: AGENCY_ID
                 }
@@ -70,7 +70,7 @@ export class BusProcessor {
      */
     async updateStops(routes: BusRoutes) {
         const stopsResponse = (
-            await axiosInstance.get("/stops.json", {
+            await axiosInstance.get('/stops.json', {
                 params: {
                     agencies: AGENCY_ID
                 }
@@ -94,7 +94,7 @@ export class BusProcessor {
     async getArrivalTimes(route: BusRoute): Promise<ArrivalTimes> {
         const stopInformation: ArrivalTimes = {};
         const response = (
-            await axiosInstance.get("/arrival-estimates.json", {
+            await axiosInstance.get('/arrival-estimates.json', {
                 params: {
                     agencies: AGENCY_ID,
                     routes: route.route_id

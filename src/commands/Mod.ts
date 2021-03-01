@@ -5,14 +5,14 @@ import {
     MessageEmbed,
     Permissions,
     TextChannel
-} from "discord.js";
-import {CommandArgs, CommandArgsTime, ListArgs} from "../types/Mod";
-import { Command } from "./Command";
-import moment from "moment-timezone";
-import { parseModDateString } from "../utils/DateUtil";
-import {ModProcessor, PunishmentType} from "../processors/ModProcessor";
-import { Punishment } from "../models/Punishment";
-import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
+} from 'discord.js';
+import { CommandArgs, CommandArgsTime, ListArgs } from '../types/Mod';
+import { Command } from './Command';
+import moment from 'moment-timezone';
+import { parseModDateString } from '../utils/DateUtil';
+import { ModProcessor, PunishmentType } from '../processors/ModProcessor';
+import { Punishment } from '../models/Punishment';
+import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
 
 const modProcessor = ModProcessor.getInstance();
 
@@ -33,27 +33,27 @@ export class Mod extends Command {
             const channel: TextChannel = evt.channel as TextChannel;
             const sender: GuildMember = evt.member;
             switch (args[0].toLowerCase()) {
-                case "mute":
-                    cmdArgs = this.parseArgsTime(evt, args, "mute");
+                case 'mute':
+                    cmdArgs = this.parseArgsTime(evt, args, 'mute');
                     await this.muteUser(channel, sender, cmdArgs);
                     break;
-                case "unmute":
-                    cmdArgs = this.parseArgsTime(evt, args, "mute");
+                case 'unmute':
+                    cmdArgs = this.parseArgsTime(evt, args, 'mute');
                     await this.unmuteUser(channel, sender, cmdArgs);
                     break;
-                case "ban":
-                    cmdArgs = this.parseArgsTime(evt, args, "ban");
+                case 'ban':
+                    cmdArgs = this.parseArgsTime(evt, args, 'ban');
                     await this.banUser(channel, sender, cmdArgs);
                     break;
-                case "warn":
+                case 'warn':
                     cmdArgs = this.parseArgs(evt, args);
                     await this.warnUser(channel, sender, cmdArgs);
                     break;
-                case "kick":
+                case 'kick':
                     cmdArgs = this.parseArgs(evt, args);
                     await this.kickUser(channel, sender, cmdArgs);
                     break;
-                case "actions":
+                case 'actions':
                     cmdArgs = this.parseListArgs(evt, args);
                     if (cmdArgs && cmdArgs.name) {
                         await this.listActions(
@@ -71,7 +71,7 @@ export class Mod extends Command {
     }
 
     getCommand(): string[] {
-        return ["mod"];
+        return ['mod'];
     }
 
     getRequiredPermission(): number {
@@ -101,7 +101,7 @@ export class Mod extends Command {
         }
 
         if (args.length >= 3) {
-            const remainder = args.slice(2).join(" ").split("|");
+            const remainder = args.slice(2).join(' ').split('|');
             cmdArgs.time = parseModDateString(remainder[0].trim());
             cmdArgs.reason = remainder.length > 1 ? remainder[1].trim() : null;
         } else {
@@ -117,10 +117,10 @@ export class Mod extends Command {
      * @param type The type of the punishment [mute|ban]
      */
     getDefaultLength(type: string): number {
-        if (type === "mute") {
+        if (type === 'mute') {
             return 60 * 60 * 1000;
-        } else if (type === "ban") {
-            return parseModDateString("9999 years");
+        } else if (type === 'ban') {
+            return parseModDateString('9999 years');
         } else {
             return 60 * 1000;
         }
@@ -147,7 +147,7 @@ export class Mod extends Command {
         }
 
         if (args.length >= 3) {
-            cmdArgs.reason = args.slice(2).join(" ");
+            cmdArgs.reason = args.slice(2).join(' ');
         }
 
         return cmdArgs;
@@ -159,13 +159,15 @@ export class Mod extends Command {
      * @param args The message arguments
      */
     parseListArgs(evt: Message, args: string[]): ListArgs | null {
-        let type: PunishmentType|undefined = undefined;
+        let type: PunishmentType | undefined = undefined;
         // If 3 or more arghs, try to parse type
         if (args.length >= 3) {
             type = PunishmentType[args[2] as keyof typeof PunishmentType];
             if (!type) {
                 evt.channel.send(
-                    getErrorEmbed("-mod actions [user] [type] requires a valid type (warn/mute/kick/ban)")
+                    getErrorEmbed(
+                        '-mod actions [user] [type] requires a valid type (warn/mute/kick/ban)'
+                    )
                 );
                 return null;
             }
@@ -183,10 +185,12 @@ export class Mod extends Command {
             return {
                 type: type,
                 name: name
-            }
+            };
         } else {
             evt.channel.send(
-                getErrorEmbed("-mod actions [user] requires a valid user display name or ping")
+                getErrorEmbed(
+                    '-mod actions [user] requires a valid user display name or ping'
+                )
             );
             return null;
         }
@@ -238,7 +242,7 @@ export class Mod extends Command {
             );
             await channel.send(
                 getInformationalEmbed(
-                    "User has been unmuted",
+                    'User has been unmuted',
                     `${cmdArgs.target} has been unmuted.`
                 )
             );
@@ -266,7 +270,7 @@ export class Mod extends Command {
             await modProcessor.kickUser(cmdArgs.target, sender, cmdArgs.reason);
             await channel.send(
                 getInformationalEmbed(
-                    "User kicked",
+                    'User kicked',
                     `${cmdArgs.target} has been kicked.`
                 )
             );
@@ -293,8 +297,8 @@ export class Mod extends Command {
         if (cmdArgs.target && cmdArgs.time && cmdArgs.reason) {
             const expirationDate = moment(Date.now() + cmdArgs.time);
             const expirationDateString = moment
-                .tz(expirationDate, "America/New_York")
-                .format("MMMM Do YYYY, h:mm:ss a");
+                .tz(expirationDate, 'America/New_York')
+                .format('MMMM Do YYYY, h:mm:ss a');
 
             await modProcessor.banUser(
                 cmdArgs.target,
@@ -304,7 +308,7 @@ export class Mod extends Command {
             );
             await channel.send(
                 getInformationalEmbed(
-                    "User banned",
+                    'User banned',
                     `${cmdArgs.target} has been banned for _${cmdArgs.reason}_ until ${expirationDateString}.`
                 )
             );
@@ -332,7 +336,7 @@ export class Mod extends Command {
             await modProcessor.warnUser(cmdArgs.target, sender, cmdArgs.reason);
             await channel.send(
                 getInformationalEmbed(
-                    "User warned",
+                    'User warned',
                     `${cmdArgs.target} has been warned for _${cmdArgs.reason}_.`
                 )
             );
@@ -370,14 +374,16 @@ export class Mod extends Command {
             );
             const titleAddition = punishmentType ? ` - ${punishmentType}s` : '';
             const embed = new MessageEmbed().setTitle(
-                `Found punishments - ${member.nickname || member.displayName}${titleAddition}`
+                `Found punishments - ${
+                    member.nickname || member.displayName
+                }${titleAddition}`
             );
             punishments.forEach((punishment) => {
                 if (punishmentType && punishmentType !== punishment.type)
                     return;
                 const expirationDateString = moment
-                    .tz(punishment.expiration, "America/New_York")
-                    .format("MMMM Do YYYY, h:mm:ss a");
+                    .tz(punishment.expiration, 'America/New_York')
+                    .format('MMMM Do YYYY, h:mm:ss a');
                 embed.addField(
                     `Punishment`,
                     `Name: ${punishment.userName}\n` +
@@ -386,15 +392,15 @@ export class Mod extends Command {
                         `Expiration: ${
                             punishment.expiration !== 0
                                 ? expirationDateString
-                                : "N/A"
+                                : 'N/A'
                         }\n` +
-                        `Active: ${punishment.active ? "True" : "False"}\n` +
+                        `Active: ${punishment.active ? 'True' : 'False'}\n` +
                         `By: ${punishment.punisherName}\n\n`
                 );
             });
             await channel.send(embed);
         } else {
-            await channel.send("User not found.");
+            await channel.send('User not found.');
         }
     }
 }

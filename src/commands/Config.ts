@@ -1,8 +1,8 @@
-import { Command } from "./Command";
-import { Client, Message, Permissions } from "discord.js";
-import { mergeArgs } from "../utils/StringUtil";
-import { ConfigProperty } from "../models/ConfigProperty";
-import { getErrorEmbed, getInformationalEmbed } from "../utils/EmbedUtil";
+import { Command } from './Command';
+import { Client, Message, Permissions } from 'discord.js';
+import { mergeArgs } from '../utils/StringUtil';
+import { ConfigProperty } from '../models/ConfigProperty';
+import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
 
 /**
  * Command to manage server config in the interim until the web panel is made
@@ -35,7 +35,7 @@ export class Config extends Command {
                 if (created) {
                     evt.channel.send(
                         getInformationalEmbed(
-                            "Value created",
+                            'Value created',
                             `${configProperty.key} was created and set to ${configProperty.value}`
                         )
                     );
@@ -53,29 +53,31 @@ export class Config extends Command {
                     );
                     evt.channel.send(
                         getInformationalEmbed(
-                            "Value updated",
+                            'Value updated',
                             `${configProperty.key} was updated to ${value}`
                         )
                     );
                 }
             } else {
                 evt.channel.send(
-                    getErrorEmbed("Cannot resolve server to set config for")
+                    getErrorEmbed('Cannot resolve server to set config for')
                 );
             }
         } else {
             evt.channel.send(
-                getErrorEmbed("Not enough arguments. Try `-config [key] [value]`")
-            )
+                getErrorEmbed(
+                    'Not enough arguments. Try `-config [key] [value]`'
+                )
+            );
         }
     }
 
     getCommand(): string[] {
-        return ["config"];
+        return ['config'];
     }
 
     getConfigBase(): string {
-        return "config";
+        return 'config';
     }
 
     getRequiredPermission(): number {

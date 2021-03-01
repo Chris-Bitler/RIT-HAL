@@ -1,3 +1,3 @@
 export interface ServerCensors {
-    [key: string]: string[]
+    [key: string]: string[];
 }

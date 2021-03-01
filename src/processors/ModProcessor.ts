@@ -1,17 +1,17 @@
-import {Ban, Mute} from "../types/Punishment";
-import {Client, Guild, GuildMember, TextChannel, User} from "discord.js";
-import {Punishment} from "../models/Punishment";
-import {ConfigProperty} from "../models/ConfigProperty";
-import moment from "moment-timezone";
-import {getErrorEmbed, getInformationalEmbed} from "../utils/EmbedUtil";
-import * as sentry from "@sentry/node";
-import {LogProcessor} from "./LogProcessor";
+import { Ban, Mute } from '../types/Punishment';
+import { Client, Guild, GuildMember, TextChannel, User } from 'discord.js';
+import { Punishment } from '../models/Punishment';
+import { ConfigProperty } from '../models/ConfigProperty';
+import moment from 'moment-timezone';
+import { getErrorEmbed, getInformationalEmbed } from '../utils/EmbedUtil';
+import * as sentry from '@sentry/node';
+import { LogProcessor } from './LogProcessor';
 
 export enum PunishmentType {
-    warn = "warn",
-    mute = "mute",
-    kick = "kick",
-    ban = "ban"
+    warn = 'warn',
+    mute = 'mute',
+    kick = 'kick',
+    ban = 'ban'
 }
 
 /**
@@ -73,7 +73,7 @@ export class ModProcessor {
                 userName: memberToMute.user.username,
                 punisherId: muter.id,
                 punisherName: muter.user.username,
-                type: "mute",
+                type: 'mute',
                 reason,
                 active: true,
                 expiration: expirationDateTime,
@@ -82,11 +82,11 @@ export class ModProcessor {
 
             const expirationDate = moment(expirationDateTime);
             const expirationDateString = moment
-                .tz(expirationDate, "America/New_York")
-                .format("MMMM Do YYYY, h:mm:ss a");
+                .tz(expirationDate, 'America/New_York')
+                .format('MMMM Do YYYY, h:mm:ss a');
             await channel.send(
                 getInformationalEmbed(
-                    "User muted",
+                    'User muted',
                     `${memberToMute} has been muted for ${reason} until ${expirationDateString}`
                 )
             );
@@ -100,7 +100,7 @@ export class ModProcessor {
             );
             await memberToMute.send(
                 getInformationalEmbed(
-                    "You have been muted",
+                    'You have been muted',
                     `You have been muted for _${reason}_ until ${expirationDateString} EST by **${
                         muter.displayName || muter.user.username
                     }**`
@@ -109,7 +109,7 @@ export class ModProcessor {
         } else {
             await muter.send(
                 getErrorEmbed(
-                    "Your server admin needs to set the ID of the muted role before you can use this command."
+                    'Your server admin needs to set the ID of the muted role before you can use this command.'
                 )
             );
         }
@@ -130,9 +130,7 @@ export class ModProcessor {
     ): Promise<void> {
         const expirationDateTime = Date.now() + expiration;
 
-        this.bans = this.bans.filter(
-            (ban) => ban.memberId !== memberToBan.id
-        );
+        this.bans = this.bans.filter((ban) => ban.memberId !== memberToBan.id);
 
         this.bans.push({
             memberId: memberToBan.id,
@@ -143,8 +141,8 @@ export class ModProcessor {
         });
 
         const expirationDateString = moment
-            .tz(expirationDateTime, "America/New_York")
-            .format("MMMM Do YYYY, h:mm:ss a");
+            .tz(expirationDateTime, 'America/New_York')
+            .format('MMMM Do YYYY, h:mm:ss a');
 
         try {
             await memberToBan.ban({ reason: reason });
@@ -158,7 +156,7 @@ export class ModProcessor {
             );
             await memberToBan.send(
                 getInformationalEmbed(
-                    "You have been banned",
+                    'You have been banned',
                     `You have been banned from the RIT discord for _${reason.trim()}_ by **${
                         banner.user.username
                     }** until ${expirationDateString}`
@@ -166,7 +164,7 @@ export class ModProcessor {
             );
         } catch (err) {
             await banner.send(
-                getErrorEmbed("An error occurred when trying to ban that user.")
+                getErrorEmbed('An error occurred when trying to ban that user.')
             );
             await memberToBan.ban({ reason: reason });
         }
@@ -175,7 +173,7 @@ export class ModProcessor {
             userName: memberToBan.user.username,
             punisherId: banner.id,
             punisherName: banner.user.username,
-            type: "ban",
+            type: 'ban',
             reason,
             expiration: expirationDateTime,
             active: true,
@@ -195,7 +193,7 @@ export class ModProcessor {
         automatic = false
     ): Promise<void> {
         let userBanned = false;
-        const idToUnban = typeof user === "string" ? user : user.id;
+        const idToUnban = typeof user === 'string' ? user : user.id;
         this.bans = this.bans.filter((ban) => {
             if (ban.memberId === idToUnban && ban.serverId === guild.id) {
                 userBanned = true;
@@ -218,7 +216,7 @@ export class ModProcessor {
                     where: {
                         userId: idToUnban,
                         serverId: guild.id,
-                        type: "ban"
+                        type: 'ban'
                     }
                 }
             );
@@ -250,7 +248,9 @@ export class ModProcessor {
                 await memberToUnmute.roles.remove(mutedRoleId);
             }
 
-            LogProcessor.getLogger().info(`Mute found for user ${user}: ${userMuted}`);
+            LogProcessor.getLogger().info(
+                `Mute found for user ${user}: ${userMuted}`
+            );
 
             if (userMuted) {
                 await Punishment.update(
@@ -261,11 +261,13 @@ export class ModProcessor {
                         where: {
                             userId: memberToUnmute.id,
                             serverId: memberToUnmute.guild.id,
-                            type: "mute"
+                            type: 'mute'
                         }
                     }
                 );
-                LogProcessor.getLogger().info(`DB punishment updated for ${user}`);
+                LogProcessor.getLogger().info(
+                    `DB punishment updated for ${user}`
+                );
             }
         }
     }
@@ -285,7 +287,7 @@ export class ModProcessor {
         try {
             await memberToKick.send(
                 getInformationalEmbed(
-                    "You have been kicked",
+                    'You have been kicked',
                     `You have been kicked from the RIT discord for _${reason.trim()}_ by **${
                         kicker.user.username
                     }**`
@@ -296,7 +298,7 @@ export class ModProcessor {
                 userName: memberToKick.user.username,
                 punisherId: kicker.id,
                 punisherName: kicker.user.username,
-                type: "kick",
+                type: 'kick',
                 reason,
                 serverId: memberToKick.guild.id,
                 expiration: 0
@@ -312,7 +314,7 @@ export class ModProcessor {
         } catch (err) {
             await kicker.send(
                 getErrorEmbed(
-                    "An error occurred when trying to kick that user."
+                    'An error occurred when trying to kick that user.'
                 )
             );
             await Punishment.create({
@@ -320,7 +322,7 @@ export class ModProcessor {
                 userName: memberToKick.user.username,
                 punisherId: kicker.id,
                 punisherName: kicker.user.username,
-                type: "kick",
+                type: 'kick',
                 reason,
                 serverId: memberToKick.guild.id,
                 expiration: 0
@@ -343,7 +345,7 @@ export class ModProcessor {
         try {
             await memberToWarn.send(
                 getInformationalEmbed(
-                    "You have been warned",
+                    'You have been warned',
                     `You have been warned by **${
                         warner.user.username
                     }** in the RIT discord for _${reason.trim()}_.`
@@ -354,7 +356,7 @@ export class ModProcessor {
                 userName: memberToWarn.user.username,
                 punisherId: warner.id,
                 punisherName: warner.user.username,
-                type: "warn",
+                type: 'warn',
                 reason,
                 serverId: memberToWarn.guild.id,
                 expiration: 0
@@ -369,7 +371,7 @@ export class ModProcessor {
         } catch (err) {
             await warner.send(
                 getErrorEmbed(
-                    "An error occurred when trying to warn that user."
+                    'An error occurred when trying to warn that user.'
                 )
             );
             await Punishment.create({
@@ -377,7 +379,7 @@ export class ModProcessor {
                 userName: memberToWarn.user.username,
                 punisherId: warner.id,
                 punisherName: warner.user.username,
-                type: "warn",
+                type: 'warn',
                 reason,
                 serverId: memberToWarn.guild.id,
                 expiration: 0
@@ -415,7 +417,7 @@ export class ModProcessor {
         });
         punishments.forEach((punishment) => {
             switch (punishment.type) {
-                case "mute":
+                case 'mute':
                     // Get rid of any existing loaded mutes
                     // This prevents issues with having two conflicting mutes
                     this.mutes = this.mutes.filter((mute) => {
@@ -429,7 +431,7 @@ export class ModProcessor {
                         serverId: punishment.serverId
                     });
                     break;
-                case "ban":
+                case 'ban':
                     this.bans = this.bans.filter((ban) => {
                         return ban.memberId !== punishment.userId;
                     });
@@ -460,26 +462,38 @@ export class ModProcessor {
         );
         expiredMutes.forEach((mute) => {
             const guild = client.guilds.resolve(mute.serverId);
-            LogProcessor.getLogger().info(`Attempting to unmute ${mute.memberId} - expired`);
+            LogProcessor.getLogger().info(
+                `Attempting to unmute ${mute.memberId} - expired`
+            );
             if (guild) {
-                LogProcessor.getLogger().info(`Unmuting ${mute.memberId} in ${guild.name}`);
+                LogProcessor.getLogger().info(
+                    `Unmuting ${mute.memberId} in ${guild.name}`
+                );
                 try {
                     this.unmuteUser(guild, mute.memberId);
                 } catch (err) {
-                    LogProcessor.getLogger().info(`Error unmuting user: ${err}`);
+                    LogProcessor.getLogger().info(
+                        `Error unmuting user: ${err}`
+                    );
                     sentry.captureException(err);
                 }
             }
         });
         expiredBans.forEach((ban) => {
             const guild = client.guilds.resolve(ban.serverId);
-            LogProcessor.getLogger().info(`Attempting to unban ${ban.memberId} - expired`);
+            LogProcessor.getLogger().info(
+                `Attempting to unban ${ban.memberId} - expired`
+            );
             if (guild) {
-                LogProcessor.getLogger().info(`Unbanning ${ban.memberId} in ${guild.name}`);
+                LogProcessor.getLogger().info(
+                    `Unbanning ${ban.memberId} in ${guild.name}`
+                );
                 try {
                     this.unbanUser(guild, ban.memberId, true);
                 } catch (err) {
-                    LogProcessor.getLogger().info(`Error unbanning user: ${err}`);
+                    LogProcessor.getLogger().info(
+                        `Error unbanning user: ${err}`
+                    );
                     sentry.captureException(err);
                 }
             }
@@ -517,17 +531,17 @@ export class ModProcessor {
             case PunishmentType.warn:
                 channelId = this.fetchWarnLogChannel(serverId);
                 break;
-                case PunishmentType.mute:
-                    channelId = this.fetchMuteLogChannel(serverId);
-                    break;
-                case PunishmentType.kick:
-                    channelId = this.fetchKickLogChannel(serverId);
-                    break;
-                case PunishmentType.ban:
-                    channelId = this.fetchBanLogChannel(serverId);
-                    break;
-                default:
-                    break;
+            case PunishmentType.mute:
+                channelId = this.fetchMuteLogChannel(serverId);
+                break;
+            case PunishmentType.kick:
+                channelId = this.fetchKickLogChannel(serverId);
+                break;
+            case PunishmentType.ban:
+                channelId = this.fetchBanLogChannel(serverId);
+                break;
+            default:
+                break;
         }
         return channelId;
     }
@@ -549,19 +563,28 @@ export class ModProcessor {
         reason: string,
         expirationTime?: string
     ): Promise<void> {
-        LogProcessor.getLogger().info(`Getting punishment log channel for ${punishmentType} in ${guild.id}`);
-        const channelId = await this.getChannelForPunishment(guild.id, punishmentType);
-        LogProcessor.getLogger().info(`Resulting punishment log channel id: ${channelId}`);
+        LogProcessor.getLogger().info(
+            `Getting punishment log channel for ${punishmentType} in ${guild.id}`
+        );
+        const channelId = await this.getChannelForPunishment(
+            guild.id,
+            punishmentType
+        );
+        LogProcessor.getLogger().info(
+            `Resulting punishment log channel id: ${channelId}`
+        );
         if (channelId != null) {
             LogProcessor.getLogger().info(`Attempting to find channel`);
             const channel = guild.channels.resolve(channelId);
-            LogProcessor.getLogger().info(`Channel ${channel?.name} found, type is ${channel?.type}`);
+            LogProcessor.getLogger().info(
+                `Channel ${channel?.name} found, type is ${channel?.type}`
+            );
             if (channel && channel instanceof TextChannel) {
                 switch (punishmentType) {
                     case PunishmentType.warn:
                         await channel.send(
                             getInformationalEmbed(
-                                "User warned",
+                                'User warned',
                                 `${punisher} has warned ${punishee} for ${reason}`
                             )
                         );
@@ -569,7 +592,7 @@ export class ModProcessor {
                     case PunishmentType.mute:
                         await channel.send(
                             getInformationalEmbed(
-                                "User muted",
+                                'User muted',
                                 `${punisher} has muted ${punishee} for ${reason} until ${expirationTime}`
                             )
                         );
@@ -577,7 +600,7 @@ export class ModProcessor {
                     case PunishmentType.kick:
                         await channel.send(
                             getInformationalEmbed(
-                                "User kicked",
+                                'User kicked',
                                 `${punisher} has kicked ${punishee} for ${reason}`
                             )
                         );
@@ -585,7 +608,7 @@ export class ModProcessor {
                     case PunishmentType.ban:
                         await channel.send(
                             getInformationalEmbed(
-                                "User banned",
+                                'User banned',
                                 `${punisher} has banned ${punishee} for ${reason} until ${expirationTime}`
                             )
                         );
@@ -601,7 +624,7 @@ export class ModProcessor {
      */
     async fetchMutedRoleId(serverId: string): Promise<string | null> {
         const mutedRoleId = await ConfigProperty.getServerProperty(
-            "muted.role",
+            'muted.role',
             serverId
         );
         if (mutedRoleId?.value) {
@@ -617,7 +640,7 @@ export class ModProcessor {
      */
     async fetchWarnLogChannel(serverId: string): Promise<string | null> {
         const modWarnLogChannels = await ConfigProperty.getServerProperty(
-            "mod.action.logs.warn",
+            'mod.action.logs.warn',
             serverId
         );
         if (modWarnLogChannels?.value) {
@@ -633,7 +656,7 @@ export class ModProcessor {
      */
     async fetchKickLogChannel(serverId: string): Promise<string | null> {
         const modKickLogChannels = await ConfigProperty.getServerProperty(
-            "mod.action.logs.kick",
+            'mod.action.logs.kick',
             serverId
         );
         if (modKickLogChannels?.value) {
@@ -649,7 +672,7 @@ export class ModProcessor {
      */
     async fetchMuteLogChannel(serverId: string): Promise<string | null> {
         const modMuteLogChannels = await ConfigProperty.getServerProperty(
-            "mod.action.logs.mute",
+            'mod.action.logs.mute',
             serverId
         );
         if (modMuteLogChannels?.value) {
@@ -665,7 +688,7 @@ export class ModProcessor {
      */
     async fetchBanLogChannel(serverId: string): Promise<string | null> {
         const modBanLogChannels = await ConfigProperty.getServerProperty(
-            "mod.action.logs.ban",
+            'mod.action.logs.ban',
             serverId
         );
         if (modBanLogChannels?.value) {

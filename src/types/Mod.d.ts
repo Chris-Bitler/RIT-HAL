@@ -1,5 +1,5 @@
-import { GuildMember } from "discord.js";
-import {PunishmentType} from "../processors/ModProcessor";
+import { GuildMember } from 'discord.js';
+import { PunishmentType } from '../processors/ModProcessor';
 
 export interface CommandArgsTime {
     target: GuildMember | null;
