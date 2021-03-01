@@ -130,7 +130,8 @@ export class AlarmProcessor {
                     id: alarm.id
                 });
 
-                const luxonDate = DateTime.fromJSDate(date);
+                let luxonDate = DateTime.fromJSDate(date);
+                luxonDate = luxonDate.setZone('America/New_York');
 
                 await commandChannel.send(
                     getInformationalEmbed(
