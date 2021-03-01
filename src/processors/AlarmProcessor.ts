@@ -117,7 +117,8 @@ export class AlarmProcessor {
                     serverId: guild.id,
                     messageToSend,
                     date: date.getTime(),
-                    sent: false
+                    sent: false,
+                    type: 'date'
                 });
 
                 this.alarms.push({
