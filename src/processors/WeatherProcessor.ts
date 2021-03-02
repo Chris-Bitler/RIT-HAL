@@ -39,21 +39,21 @@ export class WeatherProcessor {
         );
         embed.addField(
             'Visibility',
-            `${weather.visibility / 1000} km`
+            `${weather.visibility / 1609.34} miles`
         );
         if (weather?.rain) {
             embed.addField(
                 'Rain',
-                (weather?.rain?.['1h'] ? `**Last hour**: ${weather.rain['1h']} mm\n` : '') +
-                (weather?.rain?.['3h'] ? `**Last 3 hours**: ${weather.rain['3h']} mm` : '')
+                (weather?.rain?.['1h'] ? `**Last hour**: ${weather.rain['1h']/25.4} inches\n` : '') +
+                (weather?.rain?.['3h'] ? `**Last 3 hours**: ${weather.rain['3h']/25.4} inches` : '')
             );
         }
 
         if (weather?.snow) {
             embed.addField(
                 'Snow',
-                (weather?.snow?.['1h'] ? `**Last hour**: ${weather.snow['1h']} mm\n` : '') +
-                (weather?.snow?.['3h'] ? `**Last 3 hours**: ${weather.snow['3h']} mm` : '')
+                (weather?.snow?.['1h'] ? `**Last hour**: ${weather.snow['1h']/25.4} inches\n` : '') +
+                (weather?.snow?.['3h'] ? `**Last 3 hours**: ${weather.snow['3h']/25.4} inches` : '')
             );
         }
 
