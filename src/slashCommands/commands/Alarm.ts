@@ -1,8 +1,9 @@
-import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+import {CommandContext, CommandOptionType, Message, SlashCreator} from 'slash-create';
 import { Client, Guild, TextChannel } from 'discord.js';
 import { ExtendedSlashCommand } from '../ExtendedSlashCommand';
 import { AlarmProcessor } from '../../processors/AlarmProcessor';
 import { getChronoCustom } from '../../utils/DateUtil';
+import {LogProcessor} from "../../processors/LogProcessor";
 
 export class Alarm extends ExtendedSlashCommand {
     client: Client;
@@ -123,6 +124,10 @@ export class Alarm extends ExtendedSlashCommand {
             const hasPermission = this.hasPermission(context);
             if (hasPermission) {
                 const type = context.subcommands?.[0] ?? null;
+                LogProcessor.getLogger().info(`Alarm command called with ${type}. Subcommands:`);
+                context.subcommands.forEach((cmd) => {
+                    LogProcessor.getLogger().info(cmd);
+                });
                 switch (type) {
                     case 'date':
                         await this.handleDateCommand(guild, channel, context);
@@ -264,5 +269,11 @@ export class Alarm extends ExtendedSlashCommand {
                 alarm
             );
         }
+    }
+
+    onError(err: Error, ctx: CommandContext): Promise<boolean | Message> | undefined {
+        const result = super.onError(err, ctx);
+        LogProcessor.getLogger().error(err);
+        return result;
     }
 }
