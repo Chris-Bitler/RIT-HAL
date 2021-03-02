@@ -12,6 +12,7 @@ export type WeatherResponse = {
         pressure: number;
         humidity: number;
     };
+    visibility: number;
     wind: {
         speed: number;
         deg: number;
