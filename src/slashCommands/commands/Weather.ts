@@ -1,7 +1,7 @@
 import { ExtendedSlashCommand } from '../ExtendedSlashCommand';
 import {Client} from 'discord.js';
 import SlashCreator from 'slash-create/lib/creator';
-import { CommandOptionType } from 'slash-create';
+import {CommandOptionType, Message} from 'slash-create';
 import CommandContext from 'slash-create/lib/context';
 import {WeatherProcessor} from '../../processors/WeatherProcessor';
 import {LogProcessor} from '../../processors/LogProcessor';
@@ -45,5 +45,11 @@ export class Weather extends ExtendedSlashCommand {
             await context.send('An error occurred trying to fetch the weather. Try again later.', {ephemeral: true});
             LogProcessor.getLogger().error(weather);
         }
+    }
+
+    onError(err: Error, ctx: CommandContext): Promise<boolean | Message> | undefined {
+        const result = super.onError(err, ctx);
+        LogProcessor.getLogger().error(err);
+        return result;
     }
 }
