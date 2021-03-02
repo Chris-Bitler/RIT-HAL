@@ -37,6 +37,10 @@ export class WeatherProcessor {
             `**Wind Speed**: ${weather.wind.speed} mph\n` +
             (weather.wind.gust ? `**Wind Gust**: ${weather.wind.gust} mph\n` : '')
         );
+        embed.addField(
+            'Visibility',
+            `${weather.visibility / 1000} km`
+        );
         if (weather?.rain) {
             embed.addField(
                 'Rain',
