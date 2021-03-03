@@ -258,9 +258,14 @@ export class Alarm extends ExtendedSlashCommand {
         commandChannel: TextChannel,
         context: CommandContext
     ) {
+        LogProcessor.logger.info('Attempting to delete alarm');
         const deleteOptions = context.options.delete;
+        const deleteOptionsJson = JSON.stringify(deleteOptions);
         if (typeof deleteOptions === 'object') {
+            LogProcessor.logger.info('Delete option found');
             const alarm = deleteOptions['alarm-id'] as string;
+            LogProcessor.logger.info(`Alarm id found as ${alarm}`);
+            LogProcessor.logger.info(`DEBUG: ${deleteOptionsJson}`);
             await AlarmProcessor.getInstance().deleteAlarm(
                 guild,
                 commandChannel,
