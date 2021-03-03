@@ -123,11 +123,9 @@ export class Alarm extends ExtendedSlashCommand {
         if (guild && channel) {
             const hasPermission = this.hasPermission(context);
             if (hasPermission) {
-                const type = context.subcommands?.[0] ?? null;
-                LogProcessor.getLogger().info(`Alarm command called with ${type}. Subcommands:`);
-                context.subcommands.forEach((cmd) => {
-                    LogProcessor.getLogger().info(cmd);
-                });
+                // context.subcommands is sometimes empty even if subcommand used
+                // use first option instead
+                const type = Object.keys(context?.options)?.[0] ?? null;
                 switch (type) {
                     case 'date':
                         await this.handleDateCommand(guild, channel, context);
