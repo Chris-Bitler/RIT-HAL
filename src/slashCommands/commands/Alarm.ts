@@ -271,7 +271,7 @@ export class Alarm extends ExtendedSlashCommand {
 
     onError(err: Error, ctx: CommandContext): Promise<boolean | Message> | undefined {
         const result = super.onError(err, ctx);
-        LogProcessor.getLogger().error(err);
+        LogProcessor.getLogger().error(`Error message: ${err.message}, stack: ${err.stack}`);
         return result;
     }
 }

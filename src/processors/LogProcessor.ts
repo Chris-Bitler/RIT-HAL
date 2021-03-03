@@ -16,7 +16,8 @@ export class LogProcessor {
                         subdomain: process.env.loggly_subdomain || '',
                         tags: ['Winston-NodeJS'],
                         json: true
-                    })
+                    }),
+                    new winston.transports.Console()
                 ]
             });
             this.logger.info('Winston logger setup');
