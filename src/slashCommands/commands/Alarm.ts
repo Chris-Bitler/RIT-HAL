@@ -156,6 +156,8 @@ export class Alarm extends ExtendedSlashCommand {
         context: CommandContext
     ) {
         const dateOptions = context.options.date;
+        LogProcessor.getLogger().debug(`Date alarm command called: ${JSON.stringify(dateOptions)}`)
+
         if (typeof dateOptions === 'object') {
             const date = dateOptions.date as string;
             const channel = dateOptions.channel as string;
@@ -195,6 +197,7 @@ export class Alarm extends ExtendedSlashCommand {
         context: CommandContext
     ) {
         const timeOptions = context.options.time;
+        LogProcessor.getLogger().debug(`Time alarm command called: ${JSON.stringify(timeOptions)}`)
         if (typeof timeOptions === 'object') {
             const hours = timeOptions.hours as number;
             const minutes = timeOptions.minutes as number;
@@ -233,6 +236,7 @@ export class Alarm extends ExtendedSlashCommand {
         commandChannel: TextChannel,
         context: CommandContext
     ) {
+        LogProcessor.getLogger().debug(`List alarm command called: ${JSON.stringify(context)}`)
         await AlarmProcessor.getInstance().sendAlarmListEmbed(
             guild,
             commandChannel
@@ -245,6 +249,7 @@ export class Alarm extends ExtendedSlashCommand {
         commandChannel: TextChannel,
         context: CommandContext
     ) {
+        LogProcessor.getLogger().debug(`Archive alarm command called: ${JSON.stringify(context)}`)
         await AlarmProcessor.getInstance().sendAlarmListEmbed(
             guild,
             commandChannel,
@@ -258,14 +263,11 @@ export class Alarm extends ExtendedSlashCommand {
         commandChannel: TextChannel,
         context: CommandContext
     ) {
-        LogProcessor.logger.info('Attempting to delete alarm');
         const deleteOptions = context.options.delete;
+        LogProcessor.getLogger().debug(`Delete alarm command called: ${JSON.stringify(deleteOptions)}`)
         const deleteOptionsJson = JSON.stringify(deleteOptions);
         if (typeof deleteOptions === 'object') {
-            LogProcessor.logger.info('Delete option found');
             const alarm = deleteOptions['alarm-id'] as string;
-            LogProcessor.logger.info(`Alarm id found as ${alarm}`);
-            LogProcessor.logger.info(`DEBUG: ${deleteOptionsJson}`);
             await AlarmProcessor.getInstance().deleteAlarm(
                 guild,
                 commandChannel,
