@@ -119,6 +119,7 @@ export class Alarm extends ExtendedSlashCommand {
     }
 
     async run(context: CommandContext) {
+        LogProcessor.getLogger().debug(`Debug: Options: ${JSON.stringify(context.options)} | ${context.options}`);
         const { guild, channel } = this.getGuildChannel(this.client, context);
         if (guild && channel) {
             const hasPermission = this.hasPermission(context);
