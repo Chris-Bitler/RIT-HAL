@@ -15,7 +15,8 @@ export class LogProcessor {
                         token: process.env.loggly_token || '',
                         subdomain: process.env.loggly_subdomain || '',
                         tags: ['Winston-NodeJS'],
-                        json: true
+                        json: true,
+                        level: 'debug'
                     }),
                     new winston.transports.Console()
                 ]
