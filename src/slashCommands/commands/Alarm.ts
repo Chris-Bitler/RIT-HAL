@@ -156,7 +156,7 @@ export class Alarm extends ExtendedSlashCommand {
         context: CommandContext
     ) {
         const dateOptions = context.options.date;
-        LogProcessor.getLogger().debug(`Date alarm command called: ${JSON.stringify(context)}`)
+        LogProcessor.getLogger().debug(`Date alarm command called: ${JSON.stringify(context.data)}`)
 
         if (typeof dateOptions === 'object') {
             const date = dateOptions.date as string;
@@ -197,7 +197,7 @@ export class Alarm extends ExtendedSlashCommand {
         context: CommandContext
     ) {
         const timeOptions = context.options.time;
-        LogProcessor.getLogger().debug(`Time alarm command called: ${JSON.stringify(context)}`)
+        LogProcessor.getLogger().debug(`Time alarm command called: ${JSON.stringify(context.data)}`)
         if (typeof timeOptions === 'object') {
             const hours = timeOptions.hours as number;
             const minutes = timeOptions.minutes as number;
@@ -236,7 +236,7 @@ export class Alarm extends ExtendedSlashCommand {
         commandChannel: TextChannel,
         context: CommandContext
     ) {
-        LogProcessor.getLogger().debug(`List alarm command called: ${JSON.stringify(context)}`)
+        LogProcessor.getLogger().debug(`List alarm command called: ${JSON.stringify(context.data)}`)
         await AlarmProcessor.getInstance().sendAlarmListEmbed(
             guild,
             commandChannel
@@ -249,7 +249,7 @@ export class Alarm extends ExtendedSlashCommand {
         commandChannel: TextChannel,
         context: CommandContext
     ) {
-        LogProcessor.getLogger().debug(`Archive alarm command called: ${JSON.stringify(context)}`)
+        LogProcessor.getLogger().debug(`Archive alarm command called: ${JSON.stringify(context.data)}`)
         await AlarmProcessor.getInstance().sendAlarmListEmbed(
             guild,
             commandChannel,
@@ -264,7 +264,7 @@ export class Alarm extends ExtendedSlashCommand {
         context: CommandContext
     ) {
         const deleteOptions = context.options.delete;
-        LogProcessor.getLogger().debug(`Delete alarm command called: ${JSON.stringify(context)}`)
+        LogProcessor.getLogger().debug(`Delete alarm command called: ${JSON.stringify(context.data)}`)
         if (typeof deleteOptions === 'object') {
             const alarm = deleteOptions['alarm-id'] as string;
             await AlarmProcessor.getInstance().deleteAlarm(
