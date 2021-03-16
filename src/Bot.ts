@@ -96,7 +96,14 @@ const sequelize: Sequelize = new Sequelize(process.env.DATABASE_URL as string, {
         MailConfig,
         CensorEntry,
         StarboardedMessage
-    ]
+    ],
+    ssl: true,
+    dialectOptions: {
+        ssl: {
+            require: true,
+            rejectUnauthorized: false,
+        }
+    }
 });
 sequelize.sync();
 
