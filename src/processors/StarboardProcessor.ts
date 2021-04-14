@@ -92,10 +92,8 @@ export class StarboardProcessor {
         if (reaction.count === null) {
             reaction = await messageReaction.fetch();
         }
-        if (
-            !messageReaction.message ||
-            (messageReaction.message?.content.trim().length == 0 &&
-                messageReaction.message.attachments.size == 0)
+        if (messageReaction.message?.content.trim().length == 0 &&
+            messageReaction.message.attachments.size == 0
         ) {
             // Don't try to starboard blank messages or embeds
             return;
