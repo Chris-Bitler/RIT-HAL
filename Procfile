@@ -1,1 +1,1 @@
-worker: node dist/Bot.js
+worker: node dist/Bot.js --async-stack-traces
