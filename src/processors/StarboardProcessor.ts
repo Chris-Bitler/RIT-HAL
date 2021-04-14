@@ -92,12 +92,7 @@ export class StarboardProcessor {
         if (reaction.count === null) {
             reaction = await messageReaction.fetch();
         }
-        if (messageReaction.message?.content.trim().length == 0 &&
-            messageReaction.message.attachments.size == 0
-        ) {
-            // Don't try to starboard blank messages or embeds
-            return;
-        }
+
         const channel = reaction.message.channel;
         if (channel instanceof TextChannel && reaction.emoji.name === '⭐') {
             const requiredAmount = await this.fetchStarboardRequiredCount(
