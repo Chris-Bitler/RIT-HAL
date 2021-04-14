@@ -183,6 +183,8 @@ export class StarboardProcessor {
             embed.setAuthor(author.displayName, author.user.displayAvatarURL());
             if (message.content) {
                 embed.setDescription(message.content);
+            } else {
+                embed.setDescription('No text in starboarded message');
             }
             embed.addField('Source', `[Link](${message.url})`);
             if (message.attachments.size > 0) {
