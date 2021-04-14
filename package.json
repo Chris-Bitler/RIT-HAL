@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": "12.18.2"
+  },
   "scripts": {
     "test": "jest",
     "hal": "node dist/Bot.js",
