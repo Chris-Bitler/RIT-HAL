@@ -7,7 +7,7 @@ import {
     Collection,
     Role,
     User,
-    GuildMemberManager, GuildManager, GuildChannelManager
+    GuildMemberManager, GuildManager, GuildChannelManager, Snowflake
 } from "discord.js";
 import {ConfigProperty} from "../../src/models/ConfigProperty";
 import {ModProcessor} from "../../src/processors/ModProcessor";
@@ -19,7 +19,8 @@ jest.mock('../../src/processors/LogProcessor', () => {
         LogProcessor: {
             getLogger: () => {
                 return {
-                    info: jest.fn()
+                    info: jest.fn(),
+                    error: jest.fn()
                 }
             }
         }
@@ -71,7 +72,8 @@ describe("ModProcessor tests", () => {
         channel.send = sendMock;
         guildChannelManager.resolve = jest.fn().mockReturnValue(null);
         mockDateNow = jest.fn();
-        roleManager.remove = jest.fn();
+        roleManager.cache = new Collection<Snowflake, Role>();
+        roleManager.set = jest.fn();
         Date.now = mockDateNow;
 
         Object.defineProperty(member, "id", {
@@ -224,7 +226,7 @@ describe("ModProcessor tests", () => {
             Punishment.update = updateMock;
 
             await ModProcessor.getInstance().unmuteUser(guild, user);
-            expect(roleManager.remove).toHaveBeenCalled();
+            expect(roleManager.set).toHaveBeenCalled();
             expect(updateMock).toHaveBeenCalledWith({
                 active: false
             }, {
