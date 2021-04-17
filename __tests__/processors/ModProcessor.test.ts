@@ -19,7 +19,8 @@ jest.mock('../../src/processors/LogProcessor', () => {
         LogProcessor: {
             getLogger: () => {
                 return {
-                    info: jest.fn()
+                    info: jest.fn(),
+                    error: jest.fn()
                 }
             }
         }
