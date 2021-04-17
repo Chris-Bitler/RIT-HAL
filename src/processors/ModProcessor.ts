@@ -244,8 +244,15 @@ export class ModProcessor {
             const mutedRoleId = await this.fetchMutedRoleId(guild.id);
             LogProcessor.getLogger().info(`Muted role found: ${mutedRoleId}`);
             if (mutedRoleId) {
-                LogProcessor.getLogger().info(`Attempting to unmute ${user}`);
-                await memberToUnmute.roles.remove(mutedRoleId);
+                LogProcessor.getLogger().info(`Attempting to remove muted role from ${user}`);
+                try {
+                    let roles = memberToUnmute.roles.cache;
+                    roles = roles.filter((role) => role.id !== mutedRoleId);
+                    await memberToUnmute.roles.set(roles);
+                    LogProcessor.getLogger().info(`Removed mute from ${user}`);
+                } catch (err) {
+                    LogProcessor.getLogger().error(`Error removing mute from ${user}`);
+                }
             }
 
             LogProcessor.getLogger().info(
