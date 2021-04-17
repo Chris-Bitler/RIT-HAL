@@ -251,7 +251,7 @@ export class ModProcessor {
                     await memberToUnmute.roles.set(roles);
                     LogProcessor.getLogger().info(`Removed mute from ${user}`);
                 } catch (err) {
-                    LogProcessor.getLogger().error(`Error removing mute from ${user}`);
+                    LogProcessor.getLogger().error(`Error removing mute from ${user}: ${err}`);
                 }
             }
 
