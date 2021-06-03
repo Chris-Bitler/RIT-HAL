@@ -3,7 +3,6 @@
 import * as pg from 'pg';
 pg.defaults.parseInt8 = true;
 
-import { ModProcessor } from './processors/ModProcessor';
 import {
     Client,
     GuildMember,
@@ -27,7 +26,6 @@ import { checkFoodDaily } from './processors/FoodProcessor';
 import { ConfigProperty } from './models/ConfigProperty';
 import { Emoji } from './models/Emoji';
 import { EmojiToRole } from './models/EmojiToRole';
-import { Punishment } from './models/Punishment';
 import { AlarmProcessor } from './processors/AlarmProcessor';
 import { Alarm } from './models/Alarm';
 import { Alarm as AlarmSlashCommand } from './slashCommands/commands/Alarm';
@@ -44,7 +42,6 @@ import {Weather} from './slashCommands/commands/Weather';
 dotenv.config();
 
 const commandRegistry = new CommandRegistry();
-const modProcessor = ModProcessor.getInstance();
 const starboardProcessor = new StarboardProcessor();
 const alarmProcessor = AlarmProcessor.getInstance();
 
@@ -91,7 +88,6 @@ const sequelize: Sequelize = new Sequelize(process.env.DATABASE_URL as string, {
         ConfigProperty,
         Emoji,
         EmojiToRole,
-        Punishment,
         Alarm,
         MailConfig,
         CensorEntry,
@@ -100,7 +96,7 @@ const sequelize: Sequelize = new Sequelize(process.env.DATABASE_URL as string, {
     ssl: true,
     dialectOptions: {
         ssl: {
-            require: true,
+            require: false,
             rejectUnauthorized: false,
         }
     }
@@ -124,40 +120,6 @@ client.on('messageDelete', async (message: Message | PartialMessage) => {
         deletedMessage = await message.fetch();
     }
     await starboardProcessor.handleRemovedMessage(deletedMessage);
-});
-
-client.on('guildMemberUpdate', async (oldMember, newMember) => {
-    const mutedRoleId = await modProcessor.fetchMutedRoleId(newMember.guild.id);
-    if (mutedRoleId) {
-        if (
-            oldMember.roles.cache.get(mutedRoleId) &&
-            !newMember.roles.cache.get(mutedRoleId)
-        ) {
-            LogProcessor.getLogger().info(
-                `Removing mute in db for ${newMember?.user?.username}`
-            );
-            await modProcessor.unmuteUser(newMember.guild, newMember.id);
-        }
-    }
-});
-
-client.on('guildMemberAdd', async (member) => {
-    let guildMember: GuildMember;
-    if (member.partial) {
-        guildMember = await member.fetch();
-    } else {
-        guildMember = member;
-    }
-    if (modProcessor.isUserMuted(guildMember)) {
-        LogProcessor.getLogger().info(
-            `Adding mute back for ${member?.user?.username}`
-        );
-        await modProcessor.reassignUserMutedRole(guildMember);
-    }
-});
-
-client.on('guildBanRemove', async (guild, member) => {
-    await modProcessor.unbanUser(guild, member.id);
 });
 
 const handleEmojiReactions = async (
@@ -192,24 +154,34 @@ const handleEmojiReactions = async (
     }
 };
 
+const handleReactionChanges = async (reaction: MessageReaction, user: User | PartialUser) => {
+    await handleEmojiReactions(reaction, user);
+    const messageChannel = reaction.message.channel;
+    if (messageChannel.type === 'text') {
+        const serverId = messageChannel.guild.id;
+        const starboardChannel = await starboardProcessor.fetchStarboardChannel(serverId);
+        if (messageChannel.id !== starboardChannel) {
+            await starboardProcessor.respondToStarReaction(await user.fetch(), reaction);
+        } else {
+            console.log('ignoring starboard due to starring in starboard channel');
+        }
+    }
+};
+
 client.on(
     'messageReactionAdd',
     async (reaction: MessageReaction, user: User | PartialUser) => {
-        handleEmojiReactions(reaction, user);
-        starboardProcessor.respondToStarReaction(await user.fetch(), reaction);
+        await handleReactionChanges(reaction, user);
     }
 );
 
 client.on(
     'messageReactionRemove',
     async (reaction: MessageReaction, user: User | PartialUser) => {
-        handleEmojiReactions(reaction, user);
-        starboardProcessor.respondToStarReaction(await user.fetch(), reaction);
+        await handleReactionChanges(reaction, user);
     }
 );
 
-setTimeout(() => modProcessor.loadPunishmentsFromDB(), 1000);
-setInterval(() => modProcessor.tickPunishments(client), 2000);
 setTimeout(() => alarmProcessor.loadAlarms(), 1000);
 setTimeout(() => CensorProcessor.getInstance().loadCensoredWords(), 1000);
 setTimeout(() => starboardProcessor.loadStarredMessages(), 1000);
