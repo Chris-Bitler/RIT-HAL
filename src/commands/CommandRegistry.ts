@@ -5,7 +5,6 @@ import { Bus } from './Bus';
 import { EmojiTop } from './EmojiTop';
 import { Courses } from './Courses';
 import { removeEmptyArgs } from '../utils/StringUtil';
-import { Mod } from './Mod';
 import { Food } from './Food';
 import { FoodSpecials } from './FoodSpecials';
 import { EmojiRole } from './EmojiRole';
@@ -34,7 +33,6 @@ export class CommandRegistry {
         if (commands.length === 0) {
             this.registry.push(new Food());
             this.registry.push(new FoodSpecials());
-            this.registry.push(new Mod());
             this.registry.push(new EmojiRole());
             this.registry.push(new Courses());
             this.registry.push(new Bus());
