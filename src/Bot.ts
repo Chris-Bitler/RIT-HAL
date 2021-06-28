@@ -106,7 +106,7 @@ sequelize.sync();
 client.on('message', async (message: Message) => {
     if (!message.partial) {
         const ranCommand = await commandRegistry.runCommands(client, message);
-        await EmojiProcessor.getInstance().logEmojis(message);
+        // await EmojiProcessor.getInstance().logEmojis(message);
         await CensorProcessor.getInstance().processMessage(message);
         if (!ranCommand) {
             SendEmbedStateMachine.getInstance().handleStep(client, message);
