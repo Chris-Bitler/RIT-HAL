@@ -239,20 +239,17 @@ export async function checkFoodDaily(client: Client) {
                             .catch(console.error);
                     }
                     const places = await getOpenPlaces();
+                    let placeEmbeds: MessageEmbed[] = [];
                     if (places) {
-                        places.forEach((place) => {
-                            if (place.sections.length > 0) {
-                                channel.send(getFoodEmbed(place));
-                            }
-                        });
+                        placeEmbeds = places.map((place) => getFoodEmbed(place));
                     }
                     const specials = await getSpecials();
-
-                    specials.forEach((place) => {
-                        if (place.breakfast || place.lunch || place.dinner) {
-                            channel.send(getSpecialsEmbed(place));
-                        }
-                    });
+                    const specialEmbeds = specials.filter((place) => (place.breakfast || place.lunch || place.dinner)).map((place) => getSpecialsEmbed(place));
+                    const embedsToSend = placeEmbeds.concat(specialEmbeds);
+                    while (embedsToSend.length > 0) {
+                        const embeds = embedsToSend.splice(0, 10);
+                        await channel.send(embeds);
+                    }
                 }
             }
         }
