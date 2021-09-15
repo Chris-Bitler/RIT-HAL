@@ -113,6 +113,8 @@ export class CommandRegistry {
         const prohibitedChannels = await command.getProhibitedChannels(
             channel.guild.id
         );
+
+        // NOTE: This whitelists VoidWhisperer's discord ID for testing purposes
         const hasPermission =
             !!message.member &&
             (message.member.hasPermission(command.getRequiredPermission()) ||
