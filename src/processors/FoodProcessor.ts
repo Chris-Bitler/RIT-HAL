@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { DailyPostInfo, FoodPlace, MenuItem, PlaceMenu } from '../types/Food';
-import { Client, MessageEmbed, TextChannel } from 'discord.js';
+import {APIMessage, Client, MessageEmbed, TextChannel, WebhookMessageOptions} from 'discord.js';
 import { ConfigProperty } from '../models/ConfigProperty';
 import * as sentry from '@sentry/node';
 const placeIDs = [103, 104, 105, 106, 107, 108, 112];
@@ -248,7 +248,14 @@ export async function checkFoodDaily(client: Client) {
                     const embedsToSend = placeEmbeds.concat(specialEmbeds);
                     while (embedsToSend.length > 0) {
                         const embeds = embedsToSend.splice(0, 10);
-                        await channel.send(embeds);
+                        // Hack to send multiple embeds in this version of discord.js
+                        const message = APIMessage.create(channel, 'test', {
+                            embeds
+                        } as WebhookMessageOptions);
+                        message.data = {
+                            embeds
+                        }
+                        await channel.send(message);
                     }
                 }
             }
