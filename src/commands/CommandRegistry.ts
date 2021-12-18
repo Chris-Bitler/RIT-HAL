@@ -16,6 +16,8 @@ import { MailConfig } from './MailConfig';
 import { SendEmbed } from './SendEmbed';
 import { Melo } from './Melo';
 import { Censor } from './Censor';
+import { Snowball } from './Snowball';
+import { Present } from './Present';
 
 /**
  * Class to contain the registry of commands for the discord bot
