@@ -44,8 +44,8 @@ export class CommandRegistry {
             this.registry.push(new Mail());
             this.registry.push(new MailConfig());
             this.registry.push(new SendEmbed());
-            //this.registry.push(new Snowball());
-            //this.registry.push(new Present());
+            this.registry.push(new Snowball());
+            this.registry.push(new Present());
             this.registry.push(new Melo());
             this.registry.push(new Censor());
         } else {
