@@ -21,6 +21,8 @@ export class Melo extends Command {
         args: string[]
     ): Promise<void> {
         if (evt.member) {
+            // Andy
+            if (evt.member.id === '116972453841862662') return;
             const inCooldown = isInCooldown(COOLDOWN_TYPE.MELO, evt.member);
             if (!inCooldown) {
                 await evt.react('🍈');
