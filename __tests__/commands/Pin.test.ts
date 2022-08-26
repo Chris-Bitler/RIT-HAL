@@ -198,6 +198,5 @@ describe("Pin command tests", () => {
         const pin = new Pin();
         expect(pin.getCommand()).toEqual(["starboard"]);
         expect(pin.getConfigBase()).toEqual("starboard");
-        expect(pin.getRequiredPermission()).toEqual(Permissions.FLAGS.KICK_MEMBERS);
     });
 });
