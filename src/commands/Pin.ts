@@ -165,7 +165,7 @@ export class Pin extends Command {
     }
 
     getRequiredPermission(): number {
-        return Permissions.FLAGS.KICK_MEMBERS;
+        return Permissions.FLAGS.MANAGE_EMOJIS;
     }
 
     /**
